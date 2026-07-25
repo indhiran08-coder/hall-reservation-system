@@ -7,7 +7,8 @@ import axios from 'axios';
  */
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
-  headers: { 'Content-Type': 'application/json' }
+  headers: { 'Content-Type': 'application/json' },
+  timeout: 60000   // 60s — handles Render free-tier cold start (~30s wake time)
 });
 
 // ── Request interceptor: attach JWT ─────────────────────────────────────────

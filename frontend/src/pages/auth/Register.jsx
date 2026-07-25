@@ -21,6 +21,7 @@ const Register = () => {
   const [errors, setErrors]     = useState({});
   const [loading, setLoading]   = useState(false);
   const [apiError, setApiError] = useState('');
+  const [slowWarning, setSlowWarning] = useState(false); // shows after 4s
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -61,6 +62,11 @@ const Register = () => {
 
     setLoading(true);
     setApiError('');
+    setSlowWarning(false);
+
+    // Show "waking up" hint after 4 seconds if still waiting
+    const wakeTimer = setTimeout(() => setSlowWarning(true), 4000);
+
     try {
       // Send first_name as the full name; backend uses first_name column
       await authAPI.register({
@@ -76,8 +82,15 @@ const Register = () => {
       });
       navigate('/verify-otp', { state: { personal_email: form.personal_email.trim() } });
     } catch (err) {
-      setApiError(err.response?.data?.error || 'Registration failed. Please try again.');
+      const isTimeout = err.code === 'ECONNABORTED' || err.message?.includes('timeout');
+      setApiError(
+        isTimeout
+          ? 'Server is still waking up. Please try again in 10 seconds.'
+          : (err.response?.data?.error || 'Registration failed. Please try again.')
+      );
     } finally {
+      clearTimeout(wakeTimer);
+      setSlowWarning(false);
       setLoading(false);
     }
   };
@@ -92,6 +105,17 @@ const Register = () => {
 
         <form onSubmit={handleSubmit} className="card-body space-y-4" noValidate autoComplete="off">
           {apiError && <div className="alert-error">{apiError}</div>}
+
+          {/* Slow-start warning — appears after 4s when Render is waking up */}
+          {slowWarning && !apiError && (
+            <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2.5 text-sm text-amber-800">
+              <svg className="w-4 h-4 mt-0.5 flex-shrink-0 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+              </svg>
+              <span>Server is waking up — this takes up to 30 seconds on first request. Please wait…</span>
+            </div>
+          )}
 
           {/* Full Name */}
           <Input

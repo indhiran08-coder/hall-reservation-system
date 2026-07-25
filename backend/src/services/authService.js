@@ -43,8 +43,10 @@ const initiateRegistration = async (userData) => {
 
   if (otpError) throw new Error('Failed to generate OTP. Please try again.');
 
-  // Send OTP email
-  await sendOTPEmail(personal_email, first_name.trim(), otp);
+  // Send OTP email NON-BLOCKING — respond immediately, email arrives shortly after
+  sendOTPEmail(personal_email, first_name.trim(), otp).catch((e) =>
+    console.error('OTP email failed:', e.message)
+  );
 
   return { message: 'OTP sent to your personal email. It is valid for 10 minutes.' };
 };
