@@ -1,6 +1,6 @@
-const transporter = require('../utils/email');
+const { sendMail } = require('../utils/email');
 
-const FROM = `"${process.env.EMAIL_FROM_NAME || 'Hall Reservation System'}" <${process.env.SMTP_USER}>`;
+const FROM = `${process.env.EMAIL_FROM_NAME || 'Hall Reservation System'} <onboarding@resend.dev>`;
 const YEAR = new Date().getFullYear();
 
 // ─── Shared HTML Shell ────────────────────────────────────────────────────────
@@ -65,7 +65,7 @@ const sendOTPEmail = async (personalEmail, firstName, otp) => {
     </div>
     <p style="color:#9ca3af;font-size:13px;">Do not share this OTP with anyone. If you did not request this, please ignore this email.</p>`;
 
-  await transporter.sendMail({
+  await sendMail({
     from: FROM,
     to: personalEmail,
     subject: 'Your Registration OTP — Hall Reservation System',
@@ -75,8 +75,9 @@ const sendOTPEmail = async (personalEmail, firstName, otp) => {
 
 // ─── 2. Booking Confirmation Email ────────────────────────────────────────────
 const sendBookingConfirmationEmail = async (user, booking, hall) => {
+  const name = [user.first_name, user.last_name].filter(Boolean).join(' ');
   const body = `
-    <p style="color:#374151;font-size:16px;">Hello <strong>${user.first_name} ${user.last_name}</strong>,</p>
+    <p style="color:#374151;font-size:16px;">Hello <strong>${name}</strong>,</p>
     <p style="color:#6b7280;">Your hall booking has been <strong style="color:#16a34a;">confirmed</strong>. Details below:</p>
     <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin:20px 0;">
       ${row('Hall', hall.name, false)}
@@ -90,11 +91,13 @@ const sendBookingConfirmationEmail = async (user, booking, hall) => {
     <div style="background:#dcfce7;border:1px solid #86efac;border-radius:8px;padding:14px;margin-top:16px;">
       <p style="color:#166534;margin:0;font-size:14px;">✓ Your slot is reserved. Please arrive on time.</p>
     </div>
-    <p style="color:#9ca3af;font-size:13px;margin-top:20px;">To cancel, visit the Hall Reservation System and go to Booking History.</p>`;
+    <p style="color:#9ca3af;font-size:13px;margin-top:20px;">To cancel, visit the Hall Reservation System and go to My Bookings.</p>`;
 
-  await transporter.sendMail({
+  // Send to both college and personal email
+  const recipients = [user.personal_email, user.college_email].filter(Boolean);
+  await sendMail({
     from: FROM,
-    to: [user.college_email, user.personal_email],
+    to: recipients,
     subject: `✅ Booking Confirmed — ${hall.name} on ${fmtDate(booking.date)}`,
     html: wrapEmail('#2563eb', 'Booking Confirmed ✓', body)
   });
@@ -102,8 +105,9 @@ const sendBookingConfirmationEmail = async (user, booking, hall) => {
 
 // ─── 3. Booking Cancellation Email ────────────────────────────────────────────
 const sendBookingCancellationEmail = async (user, booking, hall) => {
+  const name = [user.first_name, user.last_name].filter(Boolean).join(' ');
   const body = `
-    <p style="color:#374151;font-size:16px;">Hello <strong>${user.first_name} ${user.last_name}</strong>,</p>
+    <p style="color:#374151;font-size:16px;">Hello <strong>${name}</strong>,</p>
     <p style="color:#6b7280;">Your booking has been <strong style="color:#dc2626;">cancelled</strong>. Details of the cancelled booking:</p>
     <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin:20px 0;">
       ${row('Hall', hall.name, false)}
@@ -116,9 +120,10 @@ const sendBookingCancellationEmail = async (user, booking, hall) => {
       <p style="color:#991b1b;margin:0;font-size:14px;">This booking has been successfully cancelled and the slot is now available.</p>
     </div>`;
 
-  await transporter.sendMail({
+  const recipients = [user.personal_email, user.college_email].filter(Boolean);
+  await sendMail({
     from: FROM,
-    to: [user.college_email, user.personal_email],
+    to: recipients,
     subject: `❌ Booking Cancelled — ${hall.name} on ${fmtDate(booking.date)}`,
     html: wrapEmail('#dc2626', 'Booking Cancelled', body)
   });

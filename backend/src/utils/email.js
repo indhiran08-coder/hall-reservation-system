@@ -1,34 +1,27 @@
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 
 /**
- * Nodemailer SMTP transport.
- * Configure SMTP_* variables in .env
- * For Gmail: use an App Password (not your account password).
+ * Resend email client.
+ * Uses HTTPS API — not SMTP — so it works from any cloud provider
+ * including Render, Railway, Fly.io etc. without port blocking.
  *
- * connectionTimeout / greetingTimeout / socketTimeout prevent the transporter
- * from hanging on slow cold-start environments like Render free tier.
+ * Sign up at https://resend.com (free: 100 emails/day, 3000/month)
+ * Get your API key from https://resend.com/api-keys
  */
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: parseInt(process.env.SMTP_PORT, 10) || 587,
-  secure: process.env.SMTP_SECURE === 'true', // true for 465, false for 587
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS
-  },
-  // Timeout settings — prevent hanging on Render cold starts
-  connectionTimeout: 10000,   // 10s to establish TCP connection
-  greetingTimeout:   10000,   // 10s to receive SMTP greeting
-  socketTimeout:     15000    // 15s idle socket timeout
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-// Verify SMTP connection on startup (non-blocking)
-transporter.verify((err) => {
-  if (err) {
-    console.error('⚠️  SMTP connection failed:', err.message);
-  } else {
-    console.log('✅ SMTP connection established');
+/**
+ * Send an email using Resend.
+ * @param {object} options - { from, to, subject, html }
+ */
+const sendMail = async ({ from, to, subject, html }) => {
+  const { data, error } = await resend.emails.send({ from, to, subject, html });
+  if (error) {
+    console.error('Resend email error:', error);
+    throw new Error(`Email send failed: ${error.message || JSON.stringify(error)}`);
   }
-});
+  console.log('Email sent:', data?.id);
+  return data;
+};
 
-module.exports = transporter;
+module.exports = { sendMail };
