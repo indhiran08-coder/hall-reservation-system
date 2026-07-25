@@ -1,6 +1,7 @@
 const { sendMail } = require('../utils/email');
 
-const FROM = `${process.env.EMAIL_FROM_NAME || 'Hall Reservation System'} <onboarding@resend.dev>`;
+// Resend's default sender — display name not supported with onboarding@resend.dev
+const FROM = 'onboarding@resend.dev';
 const YEAR = new Date().getFullYear();
 
 // ─── Shared HTML Shell ────────────────────────────────────────────────────────
