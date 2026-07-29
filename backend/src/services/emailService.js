@@ -1,7 +1,7 @@
 const { sendMail } = require('../utils/email');
 
-// Resend's default sender — display name not supported with onboarding@resend.dev
-const FROM = 'onboarding@resend.dev';
+// Verified sender — velalarengg.ac.in domain is verified on Resend
+const FROM = 'VCET Hall Reservation <indhirans@velalarengg.ac.in>';
 const YEAR = new Date().getFullYear();
 
 // ─── Shared HTML Shell ────────────────────────────────────────────────────────

@@ -49,7 +49,7 @@ app.get('/test-email', async (req, res) => {
     const { Resend } = require('resend');
     const resend = new Resend(process.env.RESEND_API_KEY);
     const { data, error } = await resend.emails.send({
-      from: 'onboarding@resend.dev',
+      from: 'VCET Hall Reservation <indhirans@velalarengg.ac.in>',
       to,
       subject: 'Hall Reservation — Email Test',
       html: '<p>✅ Email is working correctly from Render!</p>'
