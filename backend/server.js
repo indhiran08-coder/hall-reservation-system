@@ -11,16 +11,20 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // ─── CORS ─────────────────────────────────────────────────────────────────────
-// FRONTEND_URL can be a comma-separated list of allowed origins,
-// e.g. "http://localhost:5173,https://hall-reservation.vercel.app"
+// Allow production URL from env + ALL Vercel preview deployments
 const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:5173')
   .split(',')
   .map((o) => o.trim());
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (mobile apps, curl, Render health checks)
+    // Allow requests with no origin (Render health checks, curl, mobile)
     if (!origin) return callback(null, true);
+    // Allow ALL Vercel deployments (production + every preview URL)
+    if (origin.endsWith('.vercel.app')) return callback(null, true);
+    // Allow localhost for development
+    if (origin.startsWith('http://localhost')) return callback(null, true);
+    // Allow any explicitly listed origins
     if (allowedOrigins.includes(origin)) return callback(null, true);
     callback(new Error(`CORS: origin ${origin} not allowed`));
   },
