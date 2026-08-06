@@ -48,10 +48,11 @@ export const hallsAPI = {
 
 // ── Bookings ─────────────────────────────────────────────────────────────────
 export const bookingsAPI = {
-  create: (data)   => api.post('/bookings', data),
-  getAll: (params) => api.get('/bookings', { params }),
-  cancel: (id)     => api.patch(`/bookings/${id}/cancel`),   // soft cancel
-  remove: (id)     => api.delete(`/bookings/${id}`)          // permanent delete
+  create:      (data)   => api.post('/bookings', data),
+  getAll:      (params) => api.get('/bookings', { params }),
+  getAllStaff: (params) => api.get('/bookings/all', { params }),  // all staff — for dashboard
+  cancel:      (id)     => api.patch(`/bookings/${id}/cancel`),
+  remove:      (id)     => api.delete(`/bookings/${id}`)
 };
 
 // ── Profile ──────────────────────────────────────────────────────────────────

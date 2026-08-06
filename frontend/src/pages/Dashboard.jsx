@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import DashboardLayout from '../layouts/DashboardLayout';
 import BookingCard from '../components/BookingCard';
@@ -6,6 +6,14 @@ import Spinner from '../components/ui/Spinner';
 import { useAuth } from '../context/AuthContext';
 import { bookingsAPI, hallsAPI } from '../services/api';
 import { formatDate, formatTimeRange } from '../utils/formatters';
+import supabase from '../lib/supabase';
+
+const LiveBadge = () => (
+  <span className="inline-flex items-center gap-1.5 text-xs font-medium text-green-700 bg-green-50 border border-green-200 px-2 py-0.5 rounded-full">
+    <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+    Live
+  </span>
+);
 
 const StatCard = ({ label, value, icon, color }) => (
   <div className="card p-5 flex items-center gap-4">
@@ -25,23 +33,31 @@ const Dashboard = () => {
   const [halls, setHalls]       = useState([]);
   const [loading, setLoading]   = useState(true);
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const [bRes, hRes] = await Promise.all([
-          bookingsAPI.getAll({ sort_by: 'date', sort_order: 'asc' }),
-          hallsAPI.getAll()
-        ]);
-        setBookings(bRes.data.bookings || []);
-        setHalls(hRes.data.halls || []);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    load();
+  // Fetch ALL staff bookings for the shared dashboard
+  const fetchData = useCallback(async () => {
+    try {
+      const [bRes, hRes] = await Promise.all([
+        bookingsAPI.getAllStaff({ sort_by: 'date', sort_order: 'asc' }),
+        hallsAPI.getAll()
+      ]);
+      setBookings(bRes.data.bookings || []);
+      setHalls(hRes.data.halls || []);
+    } catch (err) {
+      console.error('Dashboard fetch error:', err);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  // Initial load + Supabase Realtime — re-fetch on any booking change
+  useEffect(() => {
+    fetchData();
+    const channel = supabase
+      .channel('dashboard-bookings')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'bookings' }, () => { fetchData(); })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [fetchData]);
 
   const now = new Date();
   const todayStr = now.toISOString().split('T')[0];
@@ -78,7 +94,7 @@ const Dashboard = () => {
             Good {now.getHours() < 12 ? 'Morning' : now.getHours() < 17 ? 'Afternoon' : 'Evening'},{' '}
             {user?.first_name}!
           </h1>
-          <p className="page-subtitle">Here's your reservation overview for today.</p>
+          <p className="page-subtitle">Here's the live reservation overview for your college.</p>
         </div>
 
         {/* Stats */}
@@ -133,7 +149,10 @@ const Dashboard = () => {
           {/* Upcoming bookings */}
           <div className="lg:col-span-2 card">
             <div className="card-header flex items-center justify-between">
-              <h2 className="font-semibold text-gray-900">Upcoming Bookings</h2>
+              <div className="flex items-center gap-2">
+                <h2 className="font-semibold text-gray-900">Upcoming Bookings</h2>
+                <LiveBadge />
+              </div>
               <Link to="/bookings" className="text-sm text-blue-600 hover:underline">View all</Link>
             </div>
             <div className="card-body">
@@ -153,7 +172,18 @@ const Dashboard = () => {
               ) : (
                 <div>
                   {nextBookings.map((b) => (
-                    <BookingCard key={b.id} booking={b} compact />
+                    <div key={b.id}>
+                      <BookingCard booking={b} compact />
+                      {b.user && (
+                        <p className="text-xs text-gray-400 ml-1 -mt-1 mb-2">
+                          Booked by{' '}
+                          <span className="font-medium text-gray-500">
+                            {b.user.first_name}{b.user.last_name ? ` ${b.user.last_name}` : ''}
+                            {b.user.department ? ` — ${b.user.department}` : ''}
+                          </span>
+                        </p>
+                      )}
+                    </div>
                   ))}
                 </div>
               )}
@@ -182,7 +212,10 @@ const Dashboard = () => {
             {/* Today's schedule */}
             <div className="card">
               <div className="card-header">
-                <h3 className="font-semibold text-gray-900">Today's Schedule</h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-semibold text-gray-900">Today's Schedule</h3>
+                  <LiveBadge />
+                </div>
                 <p className="text-xs text-gray-500 mt-0.5">{formatDate(todayStr)}</p>
               </div>
               <div className="card-body">
@@ -190,11 +223,16 @@ const Dashboard = () => {
                   <p className="text-sm text-gray-400 text-center py-4">No bookings today</p>
                 ) : (
                   todaySchedule.map((b) => (
-                    <div key={b.id} className="flex items-center gap-3 py-2.5 border-b border-gray-50 last:border-0">
-                      <div className="w-1.5 h-10 bg-blue-400 rounded-full flex-shrink-0" />
+                    <div key={b.id} className="flex items-start gap-3 py-2.5 border-b border-gray-50 last:border-0">
+                      <div className="w-1.5 h-10 bg-blue-400 rounded-full flex-shrink-0 mt-0.5" />
                       <div className="min-w-0">
                         <p className="text-sm font-medium text-gray-900 truncate">{b.hall?.name}</p>
                         <p className="text-xs text-gray-500">{formatTimeRange(b.start_time, b.end_time)}</p>
+                        {b.user && (
+                          <p className="text-xs text-gray-400 mt-0.5 truncate">
+                            {b.user.first_name}{b.user.last_name ? ` ${b.user.last_name}` : ''}
+                          </p>
+                        )}
                       </div>
                     </div>
                   ))
@@ -207,7 +245,10 @@ const Dashboard = () => {
         {/* Hall availability quick view */}
         <div className="card">
           <div className="card-header flex items-center justify-between">
-            <h2 className="font-semibold text-gray-900">Hall Status — Right Now</h2>
+            <div className="flex items-center gap-2">
+              <h2 className="font-semibold text-gray-900">Hall Status — Right Now</h2>
+              <LiveBadge />
+            </div>
             <Link to="/halls" className="text-sm text-blue-600 hover:underline">View all halls</Link>
           </div>
           <div className="card-body">
@@ -218,7 +259,7 @@ const Dashboard = () => {
                   to={`/halls/${hall.id}`}
                   className="p-3 rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all group"
                 >
-                  <div className={`w-2 h-2 rounded-full mb-2 ${hall.current_status === 'booked' ? 'bg-orange-400' : 'bg-green-400'}`} />
+                  <div className={`w-2 h-2 rounded-full mb-2 ${hall.current_status === 'booked' ? 'bg-orange-400 animate-pulse' : 'bg-green-400'}`} />
                   <p className="text-sm font-medium text-gray-900 group-hover:text-blue-600 transition-colors leading-tight">
                     {hall.name}
                   </p>

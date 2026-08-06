@@ -1,4 +1,4 @@
-const { createBooking, getUserBookings, cancelBooking, deleteBooking } = require('../services/bookingService');
+const { createBooking, getUserBookings, getAllBookings, cancelBooking, deleteBooking } = require('../services/bookingService');
 
 const create = async (req, res) => {
   try {
@@ -14,6 +14,16 @@ const create = async (req, res) => {
 const getBookings = async (req, res) => {
   try {
     const bookings = await getUserBookings(req.user.id, req.query);
+    res.status(200).json({ bookings });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// Returns ALL staff bookings — used by the shared real-time dashboard
+const getAllStaffBookings = async (req, res) => {
+  try {
+    const bookings = await getAllBookings(req.query);
     res.status(200).json({ bookings });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -38,4 +48,4 @@ const remove = async (req, res) => {
   }
 };
 
-module.exports = { create, getBookings, cancel, remove };
+module.exports = { create, getBookings, getAllStaffBookings, cancel, remove };

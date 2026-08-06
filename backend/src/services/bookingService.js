@@ -158,4 +158,21 @@ const deleteBooking = async (bookingId, userId) => {
   return { message: 'Booking deleted successfully' };
 };
 
-module.exports = { createBooking, getUserBookings, cancelBooking, deleteBooking };
+/**
+ * Returns ALL bookings across all staff (for shared dashboard view).
+ * Used by the real-time dashboard so every staff sees the full picture.
+ */
+const getAllBookings = async (query = {}) => {
+  const { sort_by = 'date', sort_order = 'asc' } = query;
+
+  const { data: bookings, error } = await supabase
+    .from('bookings')
+    .select('*, hall:halls(id, name, floor, location), user:users(id, first_name, last_name, department)')
+    .order(sort_by, { ascending: sort_order === 'asc' })
+    .order('start_time', { ascending: true });
+
+  if (error) throw new Error('Failed to fetch bookings');
+  return bookings || [];
+};
+
+module.exports = { createBooking, getUserBookings, getAllBookings, cancelBooking, deleteBooking };
