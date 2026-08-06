@@ -26,8 +26,8 @@ const initiateRegistration = async (userData) => {
 
   const metadata = JSON.stringify({
     first_name: first_name.trim(),
-    last_name: (last_name || '').trim(),
-    staff_id: (staff_id || '').trim(),
+    last_name: (last_name || '').trim() || null,
+    staff_id: (staff_id || '').trim() || null,
     department: department.trim(),
     college_email: college_email.trim().toLowerCase(),
     phone: phone.trim(),

@@ -7,8 +7,8 @@
 CREATE TABLE IF NOT EXISTS users (
   id              UUID          DEFAULT gen_random_uuid() PRIMARY KEY,
   first_name      VARCHAR(100)  NOT NULL,
-  last_name       VARCHAR(100)  NOT NULL,
-  staff_id        VARCHAR(50)   UNIQUE NOT NULL,
+  last_name       VARCHAR(100),           -- optional
+  staff_id        VARCHAR(50),            -- optional, unique only when provided
   department      VARCHAR(100)  NOT NULL,
   college_email   VARCHAR(255)  UNIQUE NOT NULL,
   personal_email  VARCHAR(255)  NOT NULL,
@@ -62,4 +62,7 @@ CREATE INDEX IF NOT EXISTS idx_bookings_status       ON bookings(status);
 CREATE INDEX IF NOT EXISTS idx_bookings_date         ON bookings(date);
 CREATE INDEX IF NOT EXISTS idx_otp_personal_email    ON otp(personal_email);
 CREATE INDEX IF NOT EXISTS idx_users_college_email   ON users(college_email);
-CREATE INDEX IF NOT EXISTS idx_users_staff_id        ON users(staff_id);
+-- Partial unique index: only enforces uniqueness when staff_id is actually provided
+CREATE UNIQUE INDEX IF NOT EXISTS users_staff_id_unique
+  ON users (staff_id)
+  WHERE staff_id IS NOT NULL AND staff_id <> '';
