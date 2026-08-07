@@ -7,12 +7,7 @@ import { profileAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { formatDate } from '../utils/formatters';
 
-const DEPARTMENTS = [
-  'Computer Science & Engineering', 'Information Technology',
-  'Electronics & Communication', 'Electrical Engineering',
-  'Mechanical Engineering', 'Civil Engineering',
-  'Mathematics', 'Physics', 'Chemistry', 'Management Studies', 'Other'
-];
+
 
 const Profile = () => {
   const { user, updateUser } = useAuth();
@@ -163,18 +158,12 @@ const Profile = () => {
               placeholder="9876543210" maxLength={10}
             />
 
-            <div>
-              <label className="label">Department</label>
-              <select
-                name="department"
-                value={form.department}
-                onChange={handleChange}
-                className="input-field"
-              >
-                <option value="">Select department…</option>
-                {DEPARTMENTS.map((d) => <option key={d} value={d}>{d}</option>)}
-              </select>
-            </div>
+            <Input
+              label="Department" name="department"
+              value={form.department} onChange={handleChange}
+              error={errors.department}
+              placeholder="e.g. Computer Science, EEE, MBA…"
+            />
           </div>
 
           {/* Password change */}
