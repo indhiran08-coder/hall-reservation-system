@@ -7,39 +7,66 @@ import Spinner from '../components/ui/Spinner';
 import { hallsAPI, bookingsAPI } from '../services/api';
 import { today } from '../utils/formatters';
 
-// ── Time slot helpers ──────────────────────────────────────────────────────────
-// Booking hours: 9:00 AM – 10:00 PM  (09:00 – 22:00)
-const START_HOUR = 9;   // 9 AM
-const END_HOUR   = 22;  // 10 PM  (last END slot = 22:00)
+// ── Time picker helpers ────────────────────────────────────────────────────────
+// Booking window: 9:00 AM – 10:00 PM  (09:00 – 22:00)
+const BOOK_START = 9;   // 9 AM
+const BOOK_END   = 22;  // 10 PM
 
-/** Convert "HH:MM" to a human-readable "H:MM AM/PM" label */
-const toAmPm = (hhmm) => {
-  const [h, m] = hhmm.split(':').map(Number);
+// Hour options: 9 AM … 10 PM  → 24-h values 9…22
+const HOUR_OPTIONS = Array.from({ length: BOOK_END - BOOK_START + 1 }, (_, i) => {
+  const h = BOOK_START + i;
   const period = h >= 12 ? 'PM' : 'AM';
-  const hour   = h % 12 || 12;
-  return `${hour}:${String(m).padStart(2, '0')} ${period}`;
+  const label  = `${h % 12 || 12} ${period}`;
+  return { value: h, label };
+});
+
+// Minute options: 00, 05, 10 … 55  (5-minute steps)
+const MINUTE_OPTIONS = Array.from({ length: 12 }, (_, i) => ({
+  value: i * 5,
+  label: String(i * 5).padStart(2, '0'),
+}));
+
+/** Parse "HH:MM" → { hour: number, minute: number }  (defaults: 9 AM, :00) */
+const parseHHMM = (hhmm) => {
+  if (!hhmm) return { hour: BOOK_START, minute: 0 };
+  const [h, m] = hhmm.split(':').map(Number);
+  return { hour: h, minute: m };
 };
 
-/** Build a list of "HH:MM" strings in 30-min steps within [startHour, endHour] */
-const buildSlots = (startHour, endHour) => {
-  const slots = [];
-  for (let h = startHour; h <= endHour; h++) {
-    for (let m of [0, 30]) {
-      if (h === endHour && m > 0) break; // e.g. stop at 22:00 sharp
-      slots.push(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`);
-    }
-  }
-  return slots;
-};
-
-const ALL_SLOTS = buildSlots(START_HOUR, END_HOUR);
+/** Format { hour, minute } back to "HH:MM" */
+const toHHMM = (hour, minute) =>
+  `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
 
 /**
- * Dropdown that shows time slots in AM/PM format.
- * `name`, `value`, `onChange`, `label`, `error` work like Input props.
+ * Two-dropdown time picker: Hour (9 AM – 10 PM) + Minute (00–55, 5-min steps).
+ * Fires a synthetic onChange event with name + value="HH:MM", matching Input API.
+ * maxHour / minAfter let the parent constrain which hours are selectable.
  */
-const TimeSelect = ({ name, value, onChange, label, error, slotFilter }) => {
-  const slots = slotFilter ? ALL_SLOTS.filter(slotFilter) : ALL_SLOTS;
+const TimeSelect = ({ name, value, onChange, label, error, minAfter = null, isEndTime = false }) => {
+  const { hour, minute } = parseHHMM(value);
+
+  const fireChange = (newHour, newMinute) => {
+    // Clamp to booking window
+    const clampedHour   = Math.min(Math.max(newHour, BOOK_START), BOOK_END);
+    const clampedMinute = clampedHour === BOOK_END ? 0 : newMinute; // 22:00 is the max end
+    onChange({ target: { name, value: toHHMM(clampedHour, clampedMinute) } });
+  };
+
+  // For End Time: only show hours >= start hour
+  const startHour   = minAfter ? parseHHMM(minAfter).hour : BOOK_START;
+  const startMinute = minAfter ? parseHHMM(minAfter).minute : 0;
+
+  const filteredHours = HOUR_OPTIONS.filter(({ value: h }) => {
+    if (!isEndTime) return h < BOOK_END;          // start: up to 9 PM
+    return h > startHour || (h === startHour && startMinute < 55); // end: must be after start
+  });
+
+  // For End Time with same hour as start: only show minutes > start minute
+  const filteredMinutes = MINUTE_OPTIONS.filter(({ value: m }) => {
+    if (!isEndTime || hour !== startHour) return true;
+    return m > startMinute;
+  });
+
   return (
     <div>
       {label && (
@@ -47,17 +74,31 @@ const TimeSelect = ({ name, value, onChange, label, error, slotFilter }) => {
           {label} <span className="text-red-500">*</span>
         </label>
       )}
-      <select
-        name={name}
-        value={value}
-        onChange={onChange}
-        className={`input-field ${error ? 'input-error' : ''}`}
-      >
-        <option value="">Select time…</option>
-        {slots.map((s) => (
-          <option key={s} value={s}>{toAmPm(s)}</option>
-        ))}
-      </select>
+      <div className={`flex gap-1.5 ${error ? 'ring-1 ring-red-400 rounded-lg' : ''}`}>
+        {/* Hour */}
+        <select
+          value={hour}
+          onChange={(e) => fireChange(Number(e.target.value), minute)}
+          className="input-field flex-1 min-w-0"
+          aria-label={`${label} hour`}
+        >
+          {filteredHours.map(({ value: h, label: l }) => (
+            <option key={h} value={h}>{l}</option>
+          ))}
+        </select>
+        {/* Minute */}
+        <select
+          value={minute}
+          onChange={(e) => fireChange(hour, Number(e.target.value))}
+          className="input-field w-20"
+          aria-label={`${label} minute`}
+          disabled={isEndTime && filteredMinutes.length === 0}
+        >
+          {filteredMinutes.map(({ value: m, label: l }) => (
+            <option key={m} value={m}>{l}</option>
+          ))}
+        </select>
+      </div>
       {error && <p className="mt-1.5 text-xs text-red-600">{error}</p>}
     </div>
   );
@@ -240,19 +281,19 @@ const BookHall = () => {
               />
 
               <div className="grid grid-cols-2 gap-3">
-                {/* Start time — 9:00 AM to 9:30 PM (end must come after) */}
+                {/* Start Time — Hour + Minute dropdowns */}
                 <TimeSelect
                   label="Start Time" name="start_time"
                   value={form.start_time} onChange={handleChange}
                   error={errors.start_time}
-                  slotFilter={(s) => s < '22:00'}
                 />
-                {/* End time — only slots strictly after the chosen start */}
+                {/* End Time — filtered so it's always after Start Time */}
                 <TimeSelect
                   label="End Time" name="end_time"
                   value={form.end_time} onChange={handleChange}
                   error={errors.end_time}
-                  slotFilter={(s) => s > (form.start_time || '09:00')}
+                  isEndTime
+                  minAfter={form.start_time}
                 />
               </div>
 
