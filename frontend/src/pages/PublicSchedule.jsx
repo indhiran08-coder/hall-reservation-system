@@ -89,14 +89,20 @@ const PublicSchedule = () => {
       <header className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center">
-              <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3z" />
+            {/* VCET Hall Logo */}
+            <div className="w-9 h-9 relative flex items-end justify-center rounded-xl overflow-hidden bg-gradient-to-br from-blue-600 to-indigo-700 shadow-md shadow-blue-500/25 shrink-0">
+              <svg className="w-5 h-5 text-white mb-0.5" viewBox="0 0 24 24" fill="currentColor">
+                <rect x="2" y="20" width="20" height="2" rx="1" fill="white" opacity="0.9" />
+                <rect x="4" y="10" width="2.5" height="10" rx="0.5" fill="white" />
+                <rect x="8.75" y="10" width="2.5" height="10" rx="0.5" fill="white" />
+                <rect x="13.5" y="10" width="2.5" height="10" rx="0.5" fill="white" />
+                <rect x="18" y="10" width="2" height="10" rx="0.5" fill="white" />
+                <path d="M1 10 L12 3 L23 10 Z" fill="white" opacity="0.95" />
               </svg>
             </div>
-            <div>
-              <h1 className="text-base font-bold text-gray-900 leading-tight">Hall Schedule</h1>
-              <p className="text-xs text-gray-500">VCET — Main Block</p>
+            <div className="leading-tight">
+              <h1 className="text-base font-bold text-gray-900 tracking-tight">VCET Hall</h1>
+              <p className="text-xs font-semibold text-blue-600 tracking-wide uppercase">Reservation</p>
             </div>
           </div>
           <Link to="/login"

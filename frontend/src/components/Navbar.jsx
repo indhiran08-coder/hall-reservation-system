@@ -31,7 +31,22 @@ const Navbar = ({ onMenuClick }) => {
       </button>
 
       {/* Logo text — visible on mobile (sidebar is hidden) */}
-      <span className="lg:hidden text-sm font-semibold text-gray-900">Hall Reservation</span>
+      <div className="lg:hidden flex items-center gap-2">
+        <div className="w-7 h-7 relative flex items-end justify-center rounded-lg overflow-hidden bg-gradient-to-br from-blue-600 to-indigo-700 shrink-0">
+          <svg className="w-4 h-4 text-white mb-0.5" viewBox="0 0 24 24" fill="currentColor">
+            <rect x="2" y="20" width="20" height="2" rx="1" fill="white" opacity="0.9" />
+            <rect x="4" y="10" width="2.5" height="10" rx="0.5" fill="white" />
+            <rect x="8.75" y="10" width="2.5" height="10" rx="0.5" fill="white" />
+            <rect x="13.5" y="10" width="2.5" height="10" rx="0.5" fill="white" />
+            <rect x="18" y="10" width="2" height="10" rx="0.5" fill="white" />
+            <path d="M1 10 L12 3 L23 10 Z" fill="white" opacity="0.95" />
+          </svg>
+        </div>
+        <div className="leading-tight">
+          <p className="text-xs font-bold text-gray-900 tracking-tight leading-none">VCET Hall</p>
+          <p className="text-xs font-semibold text-blue-600 tracking-wide uppercase leading-none mt-0.5">Reservation</p>
+        </div>
+      </div>
 
       {/* Spacer */}
       <div className="flex-1" />

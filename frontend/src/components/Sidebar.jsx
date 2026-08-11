@@ -142,14 +142,20 @@ const Sidebar = ({ isOpen, onClose }) => {
         {/* Logo / Brand */}
         <div className="px-5 py-5 border-b border-gray-100">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg className="w-4.5 h-4.5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z" />
+            {/* VCET Hall Logo mark */}
+            <div className="w-9 h-9 relative flex items-end justify-center rounded-xl overflow-hidden bg-gradient-to-br from-blue-600 to-indigo-700 shadow-md shadow-blue-500/25 shrink-0">
+              <svg className="w-5 h-5 text-white mb-0.5" viewBox="0 0 24 24" fill="currentColor">
+                <rect x="2" y="20" width="20" height="2" rx="1" fill="white" opacity="0.9" />
+                <rect x="4" y="10" width="2.5" height="10" rx="0.5" fill="white" />
+                <rect x="8.75" y="10" width="2.5" height="10" rx="0.5" fill="white" />
+                <rect x="13.5" y="10" width="2.5" height="10" rx="0.5" fill="white" />
+                <rect x="18" y="10" width="2" height="10" rx="0.5" fill="white" />
+                <path d="M1 10 L12 3 L23 10 Z" fill="white" opacity="0.95" />
               </svg>
             </div>
-            <div>
-              <p className="text-sm font-semibold text-gray-900 leading-tight">Hall Reservation</p>
-              <p className="text-xs text-gray-500">Management System</p>
+            <div className="leading-tight">
+              <p className="text-sm font-bold text-gray-900 tracking-tight">VCET Hall</p>
+              <p className="text-xs font-semibold text-blue-600 tracking-wide uppercase">Reservation</p>
             </div>
           </div>
         </div>
