@@ -87,21 +87,29 @@ const PublicSchedule = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {/* Header */}
       <header className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-10">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <img src="/vcet-logo.png" alt="VCET" className="w-10 h-10 object-contain shrink-0" />
-            <div className="leading-tight">
-              <h1 className="text-base font-bold text-gray-900 tracking-tight">VCET Hall</h1>
-              <p className="text-xs font-semibold text-blue-600 tracking-wide uppercase">Reservation</p>
-            </div>
-          </div>
-          <Link to="/login"
-            className="inline-flex items-center gap-1.5 bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+        {/* VCET Banner row */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-4 px-3 sm:px-6 pt-2 pb-1 sm:py-2">
+          {/* Banner image — full width on mobile, auto on desktop */}
+          <img
+            src="/vcet-banner.png"
+            alt="Velalar College of Engineering and Technology"
+            className="w-full sm:w-auto sm:h-12 h-auto object-contain"
+            style={{ maxHeight: '56px' }}
+          />
+          {/* Sign In button — right-aligned on sm+, centered on mobile */}
+          <Link
+            to="/login"
+            className="self-center sm:self-auto shrink-0 inline-flex items-center gap-1.5 bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14" />
             </svg>
             Sign In
           </Link>
+        </div>
+        {/* Blue subtitle bar */}
+        <div className="bg-blue-700 text-white text-center py-1 text-xs font-semibold tracking-widest uppercase">
+          Hall Reservation System — Live Schedule
         </div>
       </header>
 
