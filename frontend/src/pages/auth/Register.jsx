@@ -125,7 +125,7 @@ const Register = () => {
             value={form.first_name}
             onChange={handleChange}
             error={errors.first_name}
-            placeholder="e.g. Indhiran K"
+            placeholder="e.g. Indhiran Sivachandran"
             autoComplete="off"
           />
 
@@ -137,7 +137,7 @@ const Register = () => {
             value={form.department}
             onChange={handleChange}
             error={errors.department}
-            placeholder="e.g. Computer Science & Engineering"
+            placeholder="Enter your department"
             autoComplete="off"
           />
 
@@ -178,7 +178,7 @@ const Register = () => {
             value={form.phone}
             onChange={handleChange}
             error={errors.phone}
-            placeholder="9876543210"
+            placeholder="Enter your mobile number"
             maxLength={10}
             autoComplete="new-password"
             id="register_phone_field"
