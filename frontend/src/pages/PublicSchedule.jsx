@@ -9,8 +9,22 @@ const fmtTime = (t) => {
   return `${h % 12 || 12}:${String(m).padStart(2, '0')} ${h >= 12 ? 'PM' : 'AM'}`;
 };
 
-// Today as YYYY-MM-DD
-const toDateStr = (d) => d.toISOString().slice(0, 10);
+// Format date object → "YYYY-MM-DD" using LOCAL timezone (not UTC)
+// Using toISOString() causes off-by-one errors in UTC+5:30 (IST)
+const toDateStr = (d) => {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+};
+
+// Go forward or backward N days from a YYYY-MM-DD string
+const shiftDate = (dateStr, days) => {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  const date = new Date(y, m - 1, d); // local midnight — no timezone issues
+  date.setDate(date.getDate() + days);
+  return toDateStr(date);
+};
 
 // Palette per hall index
 const COLORS = [
@@ -106,11 +120,8 @@ const PublicSchedule = () => {
           </div>
           <div className="flex items-center gap-2">
             <button
-              onClick={() => {
-                const d = new Date(date + 'T00:00:00');
-                d.setDate(d.getDate() - 1);
-                setDate(toDateStr(d));
-              }}
+              onClick={() => setDate(d => shiftDate(d, -1))}
+              aria-label="Previous day"
               className="p-2 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 transition-colors"
             >
               <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -124,11 +135,8 @@ const PublicSchedule = () => {
               className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <button
-              onClick={() => {
-                const d = new Date(date + 'T00:00:00');
-                d.setDate(d.getDate() + 1);
-                setDate(toDateStr(d));
-              }}
+              onClick={() => setDate(d => shiftDate(d, +1))}
+              aria-label="Next day"
               className="p-2 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 transition-colors"
             >
               <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -137,6 +145,7 @@ const PublicSchedule = () => {
             </button>
             <button
               onClick={() => setDate(toDateStr(new Date()))}
+              aria-label="Go to today"
               className="px-3 py-1.5 text-sm font-medium text-blue-600 border border-blue-200 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
             >
               Today
