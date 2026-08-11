@@ -89,17 +89,7 @@ const PublicSchedule = () => {
       <header className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            {/* VCET Hall Logo */}
-            <div className="w-9 h-9 relative flex items-end justify-center rounded-xl overflow-hidden bg-gradient-to-br from-blue-600 to-indigo-700 shadow-md shadow-blue-500/25 shrink-0">
-              <svg className="w-5 h-5 text-white mb-0.5" viewBox="0 0 24 24" fill="currentColor">
-                <rect x="2" y="20" width="20" height="2" rx="1" fill="white" opacity="0.9" />
-                <rect x="4" y="10" width="2.5" height="10" rx="0.5" fill="white" />
-                <rect x="8.75" y="10" width="2.5" height="10" rx="0.5" fill="white" />
-                <rect x="13.5" y="10" width="2.5" height="10" rx="0.5" fill="white" />
-                <rect x="18" y="10" width="2" height="10" rx="0.5" fill="white" />
-                <path d="M1 10 L12 3 L23 10 Z" fill="white" opacity="0.95" />
-              </svg>
-            </div>
+            <img src="/vcet-logo.png" alt="VCET" className="w-10 h-10 object-contain shrink-0" />
             <div className="leading-tight">
               <h1 className="text-base font-bold text-gray-900 tracking-tight">VCET Hall</h1>
               <p className="text-xs font-semibold text-blue-600 tracking-wide uppercase">Reservation</p>
