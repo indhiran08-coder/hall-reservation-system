@@ -8,9 +8,9 @@ import {
 } from 'recharts';
 
 const StatCard = ({ label, value, sub, color }) => (
-  <div className={`card p-5 border-l-4 ${color}`}>
+  <div className={`card p-4 border-l-4 ${color}`}>
     <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">{label}</p>
-    <p className="text-3xl font-bold text-gray-900 mt-1">{value}</p>
+    <p className="text-2xl sm:text-3xl font-bold text-gray-900 mt-1">{value}</p>
     {sub && <p className="text-xs text-gray-400 mt-1">{sub}</p>}
   </div>
 );
@@ -69,23 +69,23 @@ const AdminDashboard = () => {
         </div>
 
         {/* Quick links */}
-        <div className="flex flex-wrap gap-3">
-          <Link to="/admin/bookings" className="inline-flex items-center gap-2 bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+        <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-3">
+          <Link to="/admin/bookings" className="flex items-center justify-center gap-2 bg-blue-600 text-white text-sm font-medium px-4 py-2.5 rounded-lg hover:bg-blue-700 transition-colors">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
-            Manage Bookings
+            Bookings
           </Link>
-          <Link to="/admin/halls" className="inline-flex items-center gap-2 bg-emerald-600 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors">
+          <Link to="/admin/halls" className="flex items-center justify-center gap-2 bg-emerald-600 text-white text-sm font-medium px-4 py-2.5 rounded-lg hover:bg-emerald-700 transition-colors">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
-            Manage Halls
+            Halls
           </Link>
         </div>
 
         {/* Summary cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard label="Total Bookings"  value={summary.total}      color="border-blue-500"   sub="All time" />
-          <StatCard label="Confirmed"        value={summary.confirmed}  color="border-emerald-500" sub="Currently active" />
-          <StatCard label="Cancelled"        value={summary.cancelled}  color="border-red-400"    sub="By staff or admin" />
-          <StatCard label="Cancel Rate"      value={`${summary.cancellation_rate}%`} color="border-amber-400" sub="Of all bookings" />
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <StatCard label="Total"     value={summary.total}      color="border-blue-500"   sub="All time" />
+          <StatCard label="Confirmed" value={summary.confirmed}  color="border-emerald-500" sub="Active" />
+          <StatCard label="Cancelled" value={summary.cancelled}  color="border-red-400"    sub="By staff/admin" />
+          <StatCard label="Cancel %"  value={`${summary.cancellation_rate}%`} color="border-amber-400" sub="Of all bookings" />
         </div>
 
         {/* Charts row */}

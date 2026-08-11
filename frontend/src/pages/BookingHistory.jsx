@@ -99,23 +99,23 @@ const BookingHistory = () => {
     <DashboardLayout>
       <div className="max-w-5xl mx-auto space-y-5">
         {/* Header */}
-        <div className="flex items-center justify-between gap-4 flex-wrap">
+        <div className="flex items-start justify-between gap-3 flex-wrap">
           <div>
             <h1 className="page-title">My Bookings</h1>
             <p className="page-subtitle">
               {loading ? '…' : `${filtered.length} booking${filtered.length !== 1 ? 's' : ''} found`}
             </p>
           </div>
-          <Link to="/book" className="btn-primary btn text-sm">
+          <Link to="/book" className="btn-primary btn text-sm shrink-0">
             + New Booking
           </Link>
         </div>
 
         {/* Filters */}
         <div className="card p-4">
-          <div className="flex gap-3 flex-wrap items-end">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {/* Search */}
-            <div className="flex-1 min-w-48">
+            <div className="sm:col-span-1">
               <label className="label">Search</label>
               <div className="relative">
                 <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
@@ -132,7 +132,6 @@ const BookingHistory = () => {
                 />
               </div>
             </div>
-
             {/* Status filter */}
             <div>
               <label className="label">Status</label>
@@ -140,7 +139,6 @@ const BookingHistory = () => {
                 {STATUSES.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
               </select>
             </div>
-
             {/* Sort */}
             <div>
               <label className="label">Sort by</label>

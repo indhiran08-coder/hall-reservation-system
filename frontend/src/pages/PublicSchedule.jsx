@@ -157,85 +157,111 @@ const PublicSchedule = () => {
           })}
         </div>
 
-        {/* Timeline */}
+        {/* Timeline — desktop md+ */}
         {loading ? (
           <div className="flex items-center justify-center h-48">
             <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
           </div>
         ) : (
-          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-            {/* Hour axis */}
-            <div className="border-b border-gray-100 overflow-x-auto">
-              <div className="flex min-w-max">
-                <div className="w-32 shrink-0 border-r border-gray-100" />
-                {hourLabels.map(({ h, label }) => (
-                  <div key={h} className="w-16 shrink-0 text-center text-xs text-gray-400 py-2 border-r border-gray-50 last:border-0">
-                    {label}
-                  </div>
-                ))}
+          <>
+            {/* ── Desktop Gantt (md+) ──────────────────────────────── */}
+            <div className="hidden md:block bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+              {/* Hour axis */}
+              <div className="border-b border-gray-100 overflow-x-auto">
+                <div className="flex min-w-max">
+                  <div className="w-32 shrink-0 border-r border-gray-100" />
+                  {hourLabels.map(({ h, label }) => (
+                    <div key={h} className="w-16 shrink-0 text-center text-xs text-gray-400 py-2 border-r border-gray-50 last:border-0">
+                      {label}
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-
-            {/* Hall rows */}
-            {halls.length === 0 ? (
-              <div className="text-center py-16 text-gray-400 text-sm">No halls available</div>
-            ) : (
-              halls.map((hall, hi) => {
-                const c = COLORS[hi % COLORS.length];
-                const hallBookings = bookingsByHall[hall.id] || [];
-                return (
-                  <div key={hall.id} className="border-b border-gray-100 last:border-0">
-                    <div className="flex min-w-max">
-                      {/* Hall label */}
-                      <div className="w-32 shrink-0 border-r border-gray-100 px-3 py-4 flex flex-col justify-center">
-                        <p className="text-xs font-semibold text-gray-800 leading-tight">{hall.name}</p>
-                        <p className="text-xs text-gray-400 mt-0.5">{hall.floor}</p>
-                      </div>
-
-                      {/* Timeline track */}
-                      <div className="relative flex-1 h-16 bg-gray-50">
-                        {/* Hour grid lines */}
-                        {hourLabels.map(({ h }) => (
-                          <div
-                            key={h}
-                            className="absolute top-0 bottom-0 border-l border-gray-100"
-                            style={{ left: `${((h - TIMELINE_START) / (TIMELINE_END - TIMELINE_START)) * 100}%` }}
-                          />
-                        ))}
-
-                        {/* Booking blocks */}
-                        {hallBookings.map(b => {
-                          const startMins = timeToMins(b.start_time) - TIMELINE_START * 60;
-                          const endMins   = timeToMins(b.end_time)   - TIMELINE_START * 60;
-                          const leftPct   = Math.max(0, (startMins / TOTAL_MINS) * 100);
-                          const widthPct  = Math.min(100 - leftPct, ((endMins - startMins) / TOTAL_MINS) * 100);
-                          return (
-                            <div
-                              key={b.id}
-                              title={`${b.purpose}\n${fmtTime(b.start_time)} – ${fmtTime(b.end_time)}\n${b.participants} participants`}
-                              className={`absolute top-2 bottom-2 rounded-md ${c.bar} opacity-85 hover:opacity-100 transition-opacity cursor-pointer flex items-center px-2 overflow-hidden shadow-sm`}
-                              style={{ left: `${leftPct}%`, width: `${widthPct}%` }}
-                            >
-                              <span className="text-white text-xs font-medium truncate">
-                                {fmtTime(b.start_time)} {b.purpose}
-                              </span>
+              {halls.length === 0 ? (
+                <div className="text-center py-16 text-gray-400 text-sm">No halls available</div>
+              ) : (
+                halls.map((hall, hi) => {
+                  const c = COLORS[hi % COLORS.length];
+                  const hallBookings = bookingsByHall[hall.id] || [];
+                  return (
+                    <div key={hall.id} className="border-b border-gray-100 last:border-0">
+                      <div className="flex min-w-max">
+                        <div className="w-32 shrink-0 border-r border-gray-100 px-3 py-4 flex flex-col justify-center">
+                          <p className="text-xs font-semibold text-gray-800 leading-tight">{hall.name}</p>
+                          <p className="text-xs text-gray-400 mt-0.5">{hall.floor}</p>
+                        </div>
+                        <div className="relative flex-1 h-16 bg-gray-50">
+                          {hourLabels.map(({ h }) => (
+                            <div key={h} className="absolute top-0 bottom-0 border-l border-gray-100"
+                              style={{ left: `${((h - TIMELINE_START) / (TIMELINE_END - TIMELINE_START)) * 100}%` }} />
+                          ))}
+                          {hallBookings.map(b => {
+                            const startMins = timeToMins(b.start_time) - TIMELINE_START * 60;
+                            const endMins   = timeToMins(b.end_time)   - TIMELINE_START * 60;
+                            const leftPct   = Math.max(0, (startMins / TOTAL_MINS) * 100);
+                            const widthPct  = Math.min(100 - leftPct, ((endMins - startMins) / TOTAL_MINS) * 100);
+                            return (
+                              <div key={b.id}
+                                title={`${b.purpose}\n${fmtTime(b.start_time)} – ${fmtTime(b.end_time)}`}
+                                className={`absolute top-2 bottom-2 rounded-md ${c.bar} opacity-85 hover:opacity-100 transition-opacity cursor-pointer flex items-center px-2 overflow-hidden shadow-sm`}
+                                style={{ left: `${leftPct}%`, width: `${widthPct}%` }}>
+                                <span className="text-white text-xs font-medium truncate">
+                                  {fmtTime(b.start_time)} {b.purpose}
+                                </span>
+                              </div>
+                            );
+                          })}
+                          {hallBookings.length === 0 && (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <span className="text-xs text-gray-300">Available all day</span>
                             </div>
-                          );
-                        })}
-
-                        {/* Empty label */}
-                        {hallBookings.length === 0 && (
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <span className="text-xs text-gray-300">Available all day</span>
-                          </div>
-                        )}
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })
-            )}
-          </div>
+                  );
+                })
+              )}
+            </div>
+
+            {/* ── Mobile: Hall cards with booking list ─────────────── */}
+            <div className="md:hidden space-y-3">
+              {halls.length === 0 ? (
+                <div className="text-center py-12 text-gray-400 text-sm bg-white rounded-2xl border border-gray-200">No halls available</div>
+              ) : (
+                halls.map((hall, hi) => {
+                  const c = COLORS[hi % COLORS.length];
+                  const hallBookings = bookingsByHall[hall.id] || [];
+                  return (
+                    <div key={hall.id} className={`rounded-2xl border ${c.border} ${c.bg} p-4`}>
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className={`w-2.5 h-2.5 rounded-full ${c.bar}`} />
+                        <p className={`font-semibold text-sm ${c.text}`}>{hall.name}</p>
+                        <span className="ml-auto text-xs text-gray-400">{hall.floor}</span>
+                      </div>
+                      {hallBookings.length === 0 ? (
+                        <p className="text-xs text-gray-400 text-center py-2">Available all day ✓</p>
+                      ) : (
+                        <div className="space-y-2">
+                          {hallBookings.map(b => (
+                            <div key={b.id} className="bg-white/70 rounded-xl px-3 py-2.5">
+                              <div className="flex items-start justify-between gap-2">
+                                <p className="text-sm font-medium text-gray-900 leading-tight">{b.purpose}</p>
+                                <span className="shrink-0 text-xs text-gray-500 whitespace-nowrap">{b.participants} pax</span>
+                              </div>
+                              <p className={`text-xs font-medium ${c.text} mt-0.5`}>
+                                {fmtTime(b.start_time)} – {fmtTime(b.end_time)}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </>
         )}
 
         {/* Booking cards below */}

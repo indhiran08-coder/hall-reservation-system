@@ -100,3 +100,34 @@
     @apply bg-blue-50 border border-blue-200 text-blue-700 rounded-lg px-4 py-3 text-sm;
   }
 }
+
+/* ── Mobile / touch utilities ────────────────────────────── */
+@layer utilities {
+  /* Safe area bottom — for bottom nav on iPhone X+ with home indicator */
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  /* Remove tap highlight on mobile browsers */
+  .no-tap-highlight {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Smooth momentum scrolling on iOS */
+  .scroll-ios {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Apply tap-highlight removal globally for touch devices */
+@media (pointer: coarse) {
+  button, a, [role="button"] {
+    -webkit-tap-highlight-color: transparent;
+  }
+  /* Minimum tap target size (WCAG) */
+  button, a {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
