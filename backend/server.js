@@ -6,6 +6,8 @@ const authRoutes = require('./src/routes/authRoutes');
 const hallRoutes = require('./src/routes/hallRoutes');
 const bookingRoutes = require('./src/routes/bookingRoutes');
 const profileRoutes = require('./src/routes/profileRoutes');
+const publicRoutes = require('./src/routes/publicRoutes');
+const adminRoutes = require('./src/routes/adminRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -37,6 +39,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/halls', hallRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/profile', profileRoutes);
+app.use('/api/public',  publicRoutes);
+app.use('/api/admin',   adminRoutes);
 
 // ─── Health Check ─────────────────────────────────────────────────────────────
 app.get('/health', (req, res) => {

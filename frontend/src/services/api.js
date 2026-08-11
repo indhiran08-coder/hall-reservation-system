@@ -61,4 +61,23 @@ export const profileAPI = {
   update: (data) => api.put('/profile', data)
 };
 
+// ── Public (no auth required) ─────────────────────────────────────────────
+export const publicAPI = {
+  getHalls:    ()           => api.get('/public/halls'),
+  getSchedule: (date)       => api.get('/public/schedule', { params: { date } })
+};
+
+// ── Admin ─────────────────────────────────────────────────────────────────────
+export const adminAPI = {
+  // Bookings
+  getBookings:    (params) => api.get('/admin/bookings', { params }),
+  cancelBooking:  (id)     => api.patch(`/admin/bookings/${id}/cancel`),
+  // Halls
+  getHalls:       ()       => api.get('/admin/halls'),
+  createHall:     (data)   => api.post('/admin/halls', data),
+  updateHall:     (id, data) => api.put(`/admin/halls/${id}`, data),
+  // Analytics
+  getAnalytics:   ()       => api.get('/admin/analytics')
+};
+
 export default api;

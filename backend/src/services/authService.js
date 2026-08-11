@@ -111,7 +111,7 @@ const loginUser = async (collegeEmail, password) => {
   if (!isMatch) throw new Error('Invalid email or password');
 
   const token = jwt.sign(
-    { id: user.id, college_email: user.college_email, first_name: user.first_name, last_name: user.last_name },
+    { id: user.id, college_email: user.college_email, first_name: user.first_name, last_name: user.last_name, role: user.role || 'staff' },
     process.env.JWT_SECRET,
     { expiresIn: '7d' }
   );
@@ -126,7 +126,8 @@ const loginUser = async (collegeEmail, password) => {
       department: user.department,
       college_email: user.college_email,
       personal_email: user.personal_email,
-      phone: user.phone
+      phone: user.phone,
+      role: user.role || 'staff'
     }
   };
 };

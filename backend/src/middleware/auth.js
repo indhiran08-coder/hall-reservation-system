@@ -15,11 +15,22 @@ const authenticate = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // { id, college_email, first_name, last_name }
+    req.user = decoded; // { id, college_email, first_name, last_name, role }
     next();
   } catch (err) {
     return res.status(401).json({ error: 'Invalid or expired token. Please login again.' });
   }
 };
 
-module.exports = { authenticate };
+/**
+ * Middleware: Requires the authenticated user to have role === 'admin'.
+ * Must be used AFTER authenticate.
+ */
+const requireAdmin = (req, res, next) => {
+  if (!req.user || req.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Admin access required.' });
+  }
+  next();
+};
+
+module.exports = { authenticate, requireAdmin };
