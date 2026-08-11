@@ -2,7 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const supabase = require('../config/db');
 const { generateOTP, getOTPExpiry } = require('../utils/otp');
-const { sendOTPEmail } = require('./emailService');
+const { sendOTPEmail, sendPasswordResetEmail } = require('./emailService');
 
 /**
  * Step 1: Validate uniqueness, generate OTP, store temporarily, send email.
@@ -132,4 +132,77 @@ const loginUser = async (collegeEmail, password) => {
   };
 };
 
-module.exports = { initiateRegistration, verifyOTPAndCreateUser, loginUser };
+/**
+ * Step 1 of password reset: verify email exists, generate OTP, send to college email.
+ */
+const forgotPassword = async (collegeEmail) => {
+  const email = collegeEmail.trim().toLowerCase();
+
+  // Check user exists
+  const { data: user, error } = await supabase
+    .from('users')
+    .select('id, first_name, college_email')
+    .eq('college_email', email)
+    .maybeSingle();
+
+  if (error || !user) throw new Error('No account found with this college email.');
+
+  // Generate OTP and store it (upsert keyed on email + type)
+  const otp = generateOTP();
+  const expires_at = getOTPExpiry();
+
+  const { error: upsertErr } = await supabase
+    .from('password_reset_otp')
+    .upsert(
+      { college_email: email, otp, expires_at, used: false },
+      { onConflict: 'college_email' }
+    );
+
+  if (upsertErr) throw new Error('Failed to initiate password reset. Please try again.');
+
+  // Send OTP email non-blocking
+  sendPasswordResetEmail(email, user.first_name, otp).catch((e) =>
+    console.error('Password reset email failed:', e.message)
+  );
+
+  return { message: 'OTP sent to your college email. It is valid for 10 minutes.' };
+};
+
+/**
+ * Step 2 of password reset: verify OTP, set new password.
+ */
+const resetPassword = async (collegeEmail, otp, newPassword) => {
+  const email = collegeEmail.trim().toLowerCase();
+
+  const { data: record, error } = await supabase
+    .from('password_reset_otp')
+    .select('*')
+    .eq('college_email', email)
+    .eq('used', false)
+    .maybeSingle();
+
+  if (error || !record) throw new Error('No pending password reset found. Please request a new OTP.');
+  if (new Date(record.expires_at) < new Date()) throw new Error('OTP has expired. Please request a new one.');
+  if (record.otp !== String(otp)) throw new Error('Incorrect OTP. Please try again.');
+
+  // Hash new password
+  const password_hash = await bcrypt.hash(newPassword, 12);
+
+  // Update user password
+  const { error: updateErr } = await supabase
+    .from('users')
+    .update({ password_hash })
+    .eq('college_email', email);
+
+  if (updateErr) throw new Error('Failed to update password. Please try again.');
+
+  // Mark OTP as used
+  await supabase
+    .from('password_reset_otp')
+    .update({ used: true })
+    .eq('college_email', email);
+
+  return { message: 'Password reset successfully. You can now log in.' };
+};
+
+module.exports = { initiateRegistration, verifyOTPAndCreateUser, loginUser, forgotPassword, resetPassword };

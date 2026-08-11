@@ -5,9 +5,10 @@ import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
 
 // Auth pages
-import Login     from './pages/auth/Login';
-import Register  from './pages/auth/Register';
-import VerifyOTP from './pages/auth/VerifyOTP';
+import Login          from './pages/auth/Login';
+import Register       from './pages/auth/Register';
+import VerifyOTP      from './pages/auth/VerifyOTP';
+import ForgotPassword from './pages/auth/ForgotPassword';
 
 // Public pages (no auth)
 import PublicSchedule from './pages/PublicSchedule';
@@ -35,10 +36,11 @@ const App = () => {
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
           {/* Public routes — no login required */}
-          <Route path="/schedule" element={<PublicSchedule />} />
-          <Route path="/login"      element={<Login />} />
-          <Route path="/register"   element={<Register />} />
-          <Route path="/verify-otp" element={<VerifyOTP />} />
+          <Route path="/schedule"         element={<PublicSchedule />} />
+          <Route path="/login"            element={<Login />} />
+          <Route path="/register"         element={<Register />} />
+          <Route path="/verify-otp"       element={<VerifyOTP />} />
+          <Route path="/forgot-password"  element={<ForgotPassword />} />
 
           {/* Protected staff routes */}
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />

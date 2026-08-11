@@ -157,9 +157,28 @@ const sendAdminCancellationEmail = async (user, booking, hall) => {
   });
 };
 
+// ─── 5. Password Reset OTP Email ──────────────────────────────────────────────
+const sendPasswordResetEmail = async (collegeEmail, firstName, otp) => {
+  const body = `
+    <p style="color:#374151;font-size:16px;">Hello <strong>${firstName}</strong>,</p>
+    <p style="color:#6b7280;">We received a request to reset your password. Use the OTP below. It expires in <strong>10 minutes</strong>.</p>
+    <div style="background:#fff7ed;border:2px dashed #f97316;border-radius:10px;padding:24px;text-align:center;margin:24px 0;">
+      <span style="font-size:40px;font-weight:700;color:#ea580c;letter-spacing:10px;">${otp}</span>
+    </div>
+    <p style="color:#9ca3af;font-size:13px;">If you did not request a password reset, please ignore this email. Your password will not change.</p>`;
+
+  await sendMail({
+    from: FROM,
+    to: collegeEmail,
+    subject: 'Password Reset OTP — VCET Hall Reservation',
+    html: wrapEmail('#ea580c', 'Reset Your Password', body)
+  });
+};
+
 module.exports = {
   sendOTPEmail,
   sendBookingConfirmationEmail,
   sendBookingCancellationEmail,
-  sendAdminCancellationEmail
+  sendAdminCancellationEmail,
+  sendPasswordResetEmail
 };

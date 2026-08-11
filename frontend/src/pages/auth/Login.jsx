@@ -95,6 +95,13 @@ const Login = () => {
             autoComplete="current-password"
           />
 
+          {/* Forgot password link */}
+          <div className="text-right -mt-2">
+            <Link to="/forgot-password" className="text-xs text-blue-600 hover:underline font-medium">
+              Forgot password?
+            </Link>
+          </div>
+
           <Button type="submit" variant="primary" loading={loading} className="w-full" size="lg">
             Sign In
           </Button>
