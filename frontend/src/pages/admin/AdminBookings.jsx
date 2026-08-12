@@ -70,88 +70,144 @@ const AdminBookings = () => {
   };
 
   const exportPDF = () => {
-    const doc = new jsPDF({ orientation: 'landscape' });
-    const pageW = doc.internal.pageSize.getWidth();
+    const doc    = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+    const pageW  = doc.internal.pageSize.getWidth();
+    const pageH  = doc.internal.pageSize.getHeight();
+    const margin = 14;
+    const navy   = [15, 40, 100];
 
-    // ── Load and embed the VCET banner image ──────────────────────────────────
-    const img = new Image();
-    img.src = '/vcet-banner.png';
-    img.onload = () => {
-      // Draw banner spanning full page width at top
-      const bannerH = 22; // height in mm
-      const bannerW = pageW;
-      doc.addImage(img, 'PNG', 0, 0, bannerW, bannerH);
+    const confirmed = bookings.filter(b => b.status === 'confirmed').length;
+    const cancelled = bookings.filter(b => b.status === 'cancelled').length;
 
-      // Blue subtitle bar
-      doc.setFillColor(29, 78, 216);
+    const renderPDF = (bannerImg) => {
+      // 1. VCET Banner
+      const bannerH = 22;
+      if (bannerImg) {
+        doc.addImage(bannerImg, 'PNG', 0, 0, pageW, bannerH);
+      } else {
+        doc.setFillColor(...navy);
+        doc.rect(0, 0, pageW, bannerH, 'F');
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(13); doc.setTextColor(255, 255, 255);
+        doc.text('Velalar College of Engineering and Technology (Autonomous)', pageW / 2, 14, { align: 'center' });
+      }
+
+      // 2. Navy subtitle bar
+      doc.setFillColor(...navy);
       doc.rect(0, bannerH, pageW, 7, 'F');
-      doc.setFontSize(9); doc.setTextColor(255, 255, 255);
-      doc.text('HALL RESERVATION SYSTEM  ·  BOOKING REPORT', pageW / 2, bannerH + 4.5, { align: 'center' });
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(8); doc.setTextColor(255, 255, 255);
+      doc.text('HALL RESERVATION SYSTEM  ·  OFFICIAL BOOKING REPORT', pageW / 2, bannerH + 4.8, { align: 'center' });
 
-      // ── Report metadata ────────────────────────────────────────────────────
-      const y0 = bannerH + 13;
-      doc.setFontSize(11); doc.setTextColor(30, 30, 30);
-      doc.text(`Period: ${fmtDate(filters.date_from)} – ${fmtDate(filters.date_to)}`, 14, y0);
-      doc.setFontSize(9); doc.setTextColor(100, 100, 100);
-      doc.text(`Generated: ${new Date().toLocaleString('en-IN')}`, 14, y0 + 6);
-      doc.text(`Total Bookings: ${bookings.length}`, 14, y0 + 12);
+      // 3. Report title (left) + metadata (right)
+      const y1 = bannerH + 14;
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(13); doc.setTextColor(...navy);
+      doc.text('Hall Booking Report', margin, y1);
 
-      // ── Table ─────────────────────────────────────────────────────────────
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(80, 80, 100);
+      doc.text(`Period : ${fmtDate(filters.date_from)} \u2013 ${fmtDate(filters.date_to)}`, pageW - margin, y1 - 3, { align: 'right' });
+      doc.text(`Generated : ${new Date().toLocaleString('en-IN')}`, pageW - margin, y1 + 2, { align: 'right' });
+
+      // Thin rule
+      doc.setDrawColor(200, 210, 230); doc.setLineWidth(0.25);
+      doc.line(margin, y1 + 6, pageW - margin, y1 + 6);
+
+      // 4. Summary stat boxes
+      const boxY = y1 + 10;
+      const boxW = 44, boxH = 18, gap = 5;
+
+      const drawBox = (x, count, label, bg, border, numColor, lblColor) => {
+        doc.setFillColor(...bg); doc.setDrawColor(...border); doc.setLineWidth(0.3);
+        doc.roundedRect(x, boxY, boxW, boxH, 2, 2, 'FD');
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(16); doc.setTextColor(...numColor);
+        doc.text(String(count), x + boxW / 2, boxY + 10, { align: 'center' });
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(6.5); doc.setTextColor(...lblColor);
+        doc.text(label, x + boxW / 2, boxY + 15.5, { align: 'center' });
+      };
+
+      drawBox(margin,                  bookings.length, 'TOTAL BOOKINGS', [241,245,249],[203,213,225],[...navy],[71,85,105]);
+      drawBox(margin + boxW + gap,     confirmed,       'CONFIRMED',       [240,253,244],[187,247,208],[22,101,52],[21,128,61]);
+      drawBox(margin + (boxW+gap)*2,   cancelled,       'CANCELLED',       [255,241,242],[254,202,202],[153,27,27],[185,28,28]);
+
+      // 5. Bookings table
       autoTable(doc, {
-        startY: y0 + 18,
-        head: [['#', 'Hall', 'Staff', 'Dept', 'Date', 'Time', 'Purpose', 'Pax', 'Status']],
+        startY: boxY + boxH + 6,
+        margin: { left: margin, right: margin },
+        head: [['#', 'Hall', 'Staff Name', 'Department', 'Date', 'Time', 'Purpose', 'Pax', 'Status']],
         body: bookings.map((b, i) => [
           i + 1,
-          b.hall?.name || '',
-          `${b.user?.first_name || ''} ${b.user?.last_name || ''}`.trim(),
-          b.user?.department || '',
+          b.hall?.name || '\u2014',
+          `${b.user?.first_name || ''} ${b.user?.last_name || ''}`.trim() || '\u2014',
+          b.user?.department || '\u2014',
           fmtDate(b.date),
-          `${fmtTime(b.start_time)} – ${fmtTime(b.end_time)}`,
-          b.purpose,
-          b.participants,
-          b.status,
+          `${fmtTime(b.start_time)} \u2013 ${fmtTime(b.end_time)}`,
+          b.purpose || '\u2014',
+          b.participants ?? '\u2014',
+          b.status === 'confirmed' ? 'CONFIRMED' : 'CANCELLED',
         ]),
-        styles: { fontSize: 8, cellPadding: 3 },
-        headStyles: { fillColor: [29, 78, 216], textColor: 255, fontStyle: 'bold' },
-        alternateRowStyles: { fillColor: [245, 247, 255] },
-        // Footer on every page
-        didDrawPage: (data) => {
-          const pg = doc.internal.getCurrentPageInfo().pageNumber;
+        columnStyles: {
+          0: { cellWidth: 8,  halign: 'center' },
+          1: { cellWidth: 30 },
+          2: { cellWidth: 36 },
+          3: { cellWidth: 28 },
+          4: { cellWidth: 24, halign: 'center' },
+          5: { cellWidth: 36, halign: 'center' },
+          6: { cellWidth: 55 },
+          7: { cellWidth: 12, halign: 'center' },
+          8: { cellWidth: 24, halign: 'center' },
+        },
+        styles: {
+          fontSize: 8,
+          cellPadding: { top: 4, bottom: 4, left: 3, right: 3 },
+          lineColor: [226, 232, 240],
+          lineWidth: 0.2,
+          font: 'helvetica',
+          textColor: [30, 41, 59],
+          overflow: 'linebreak',
+        },
+        headStyles: {
+          fillColor: navy,
+          textColor: [255, 255, 255],
+          fontStyle: 'bold',
+          fontSize: 8,
+          halign: 'center',
+          cellPadding: { top: 5, bottom: 5, left: 3, right: 3 },
+        },
+        alternateRowStyles: { fillColor: [248, 250, 252] },
+        didParseCell: (data) => {
+          if (data.section !== 'body') return;
+          if (data.column.index === 0) {
+            data.cell.styles.textColor = [148, 163, 184];
+          }
+          if (data.column.index === 8) {
+            if (data.cell.raw === 'CONFIRMED') {
+              data.cell.styles.textColor = [22, 101, 52];
+              data.cell.styles.fillColor = [240, 253, 244];
+              data.cell.styles.fontStyle = 'bold';
+            } else {
+              data.cell.styles.textColor = [153, 27, 27];
+              data.cell.styles.fillColor = [255, 241, 242];
+              data.cell.styles.fontStyle = 'bold';
+            }
+          }
+        },
+        didDrawPage: () => {
+          const pg    = doc.internal.getCurrentPageInfo().pageNumber;
           const total = doc.internal.getNumberOfPages();
-          doc.setFontSize(8); doc.setTextColor(150);
-          doc.text(
-            `Page ${pg} of ${total}  ·  Velalar College of Engineering and Technology (Autonomous)`,
-            pageW / 2, doc.internal.pageSize.getHeight() - 8,
-            { align: 'center' }
-          );
-        }
+          doc.setDrawColor(203, 213, 225); doc.setLineWidth(0.25);
+          doc.line(margin, pageH - 11, pageW - margin, pageH - 11);
+          doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(148, 163, 184);
+          doc.text('Velalar College of Engineering and Technology (Autonomous) \u2014 Hall Reservation System', margin, pageH - 7);
+          doc.text('CONFIDENTIAL', pageW / 2, pageH - 7, { align: 'center' });
+          doc.text(`Page ${pg} of ${total}`, pageW - margin, pageH - 7, { align: 'right' });
+        },
       });
 
       doc.save(`VCET-Hall-Bookings-${filters.date_from}-to-${filters.date_to}.pdf`);
     };
 
-    // Fallback if image fails to load
-    img.onerror = () => {
-      doc.setFontSize(16); doc.setTextColor(29, 78, 216);
-      doc.text('VCET Hall Reservation System', 14, 18);
-      doc.setFontSize(11); doc.setTextColor(30, 30, 30);
-      doc.text('Hall Booking Report', 14, 28);
-      autoTable(doc, {
-        startY: 36,
-        head: [['#', 'Hall', 'Staff', 'Dept', 'Date', 'Time', 'Purpose', 'Pax', 'Status']],
-        body: bookings.map((b, i) => [
-          i + 1, b.hall?.name || '',
-          `${b.user?.first_name || ''} ${b.user?.last_name || ''}`.trim(),
-          b.user?.department || '', fmtDate(b.date),
-          `${fmtTime(b.start_time)} – ${fmtTime(b.end_time)}`,
-          b.purpose, b.participants, b.status,
-        ]),
-        styles: { fontSize: 8, cellPadding: 3 },
-        headStyles: { fillColor: [29, 78, 216], textColor: 255, fontStyle: 'bold' },
-        alternateRowStyles: { fillColor: [245, 247, 255] },
-      });
-      doc.save(`VCET-Hall-Bookings-${filters.date_from}-to-${filters.date_to}.pdf`);
-    };
+    const img = new Image();
+    img.src = '/vcet-banner.png';
+    img.onload  = () => renderPDF(img);
+    img.onerror = () => renderPDF(null);
   };
 
   const handleFilter = (e) => {
