@@ -1,5 +1,5 @@
 const supabase = require('../config/db');
-const { sendAdminCancellationEmail } = require('../services/emailService');
+const { sendAdminCancellationEmail, sendSupervisorNotification } = require('../services/emailService');
 
 // ── GET /api/admin/bookings ──────────────────────────────────────────────────
 // All bookings with optional filters: date_from, date_to, hall_id, status
@@ -67,10 +67,13 @@ const cancelBookingAsAdmin = async (req, res) => {
 
     if (updateErr) throw updateErr;
 
-    // Send email to staff (non-blocking)
+    // Send email to staff + supervisors (non-blocking)
     if (booking.user && booking.hall) {
       sendAdminCancellationEmail(booking.user, booking, booking.hall).catch(e =>
         console.error('Admin cancellation email failed:', e.message)
+      );
+      sendSupervisorNotification('cancelled', booking.user, booking, booking.hall).catch(e =>
+        console.error('Supervisor notification (admin cancel) failed:', e.message)
       );
     }
 

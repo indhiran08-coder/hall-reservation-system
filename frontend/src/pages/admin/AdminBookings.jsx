@@ -70,34 +70,88 @@ const AdminBookings = () => {
   };
 
   const exportPDF = () => {
-    const doc = new jsPDF();
-    doc.setFontSize(18); doc.setTextColor(37, 99, 235);
-    doc.text('VCET Hall Reservation System', 14, 18);
-    doc.setFontSize(13); doc.setTextColor(30, 30, 30);
-    doc.text('Hall Booking Report', 14, 28);
-    doc.setFontSize(10); doc.setTextColor(100, 100, 100);
-    doc.text(`${fmtDate(filters.date_from)} – ${fmtDate(filters.date_to)}`, 14, 36);
-    doc.text(`Generated: ${new Date().toLocaleString('en-IN')}`, 14, 42);
-    doc.text(`Total: ${bookings.length} bookings`, 14, 48);
-    autoTable(doc, {
-      startY: 56,
-      head: [['#', 'Hall', 'Staff', 'Dept', 'Date', 'Time', 'Purpose', 'Pax', 'Status']],
-      body: bookings.map((b, i) => [
-        i + 1,
-        b.hall?.name || '',
-        `${b.user?.first_name || ''} ${b.user?.last_name || ''}`.trim(),
-        b.user?.department || '',
-        fmtDate(b.date),
-        `${fmtTime(b.start_time)} – ${fmtTime(b.end_time)}`,
-        b.purpose,
-        b.participants,
-        b.status,
-      ]),
-      styles: { fontSize: 8, cellPadding: 3 },
-      headStyles: { fillColor: [37, 99, 235], textColor: 255, fontStyle: 'bold' },
-      alternateRowStyles: { fillColor: [245, 247, 255] },
-    });
-    doc.save(`hall-bookings-${filters.date_from}-to-${filters.date_to}.pdf`);
+    const doc = new jsPDF({ orientation: 'landscape' });
+    const pageW = doc.internal.pageSize.getWidth();
+
+    // ── Load and embed the VCET banner image ──────────────────────────────────
+    const img = new Image();
+    img.src = '/vcet-banner.png';
+    img.onload = () => {
+      // Draw banner spanning full page width at top
+      const bannerH = 22; // height in mm
+      const bannerW = pageW;
+      doc.addImage(img, 'PNG', 0, 0, bannerW, bannerH);
+
+      // Blue subtitle bar
+      doc.setFillColor(29, 78, 216);
+      doc.rect(0, bannerH, pageW, 7, 'F');
+      doc.setFontSize(9); doc.setTextColor(255, 255, 255);
+      doc.text('HALL RESERVATION SYSTEM  ·  BOOKING REPORT', pageW / 2, bannerH + 4.5, { align: 'center' });
+
+      // ── Report metadata ────────────────────────────────────────────────────
+      const y0 = bannerH + 13;
+      doc.setFontSize(11); doc.setTextColor(30, 30, 30);
+      doc.text(`Period: ${fmtDate(filters.date_from)} – ${fmtDate(filters.date_to)}`, 14, y0);
+      doc.setFontSize(9); doc.setTextColor(100, 100, 100);
+      doc.text(`Generated: ${new Date().toLocaleString('en-IN')}`, 14, y0 + 6);
+      doc.text(`Total Bookings: ${bookings.length}`, 14, y0 + 12);
+
+      // ── Table ─────────────────────────────────────────────────────────────
+      autoTable(doc, {
+        startY: y0 + 18,
+        head: [['#', 'Hall', 'Staff', 'Dept', 'Date', 'Time', 'Purpose', 'Pax', 'Status']],
+        body: bookings.map((b, i) => [
+          i + 1,
+          b.hall?.name || '',
+          `${b.user?.first_name || ''} ${b.user?.last_name || ''}`.trim(),
+          b.user?.department || '',
+          fmtDate(b.date),
+          `${fmtTime(b.start_time)} – ${fmtTime(b.end_time)}`,
+          b.purpose,
+          b.participants,
+          b.status,
+        ]),
+        styles: { fontSize: 8, cellPadding: 3 },
+        headStyles: { fillColor: [29, 78, 216], textColor: 255, fontStyle: 'bold' },
+        alternateRowStyles: { fillColor: [245, 247, 255] },
+        // Footer on every page
+        didDrawPage: (data) => {
+          const pg = doc.internal.getCurrentPageInfo().pageNumber;
+          const total = doc.internal.getNumberOfPages();
+          doc.setFontSize(8); doc.setTextColor(150);
+          doc.text(
+            `Page ${pg} of ${total}  ·  Velalar College of Engineering and Technology (Autonomous)`,
+            pageW / 2, doc.internal.pageSize.getHeight() - 8,
+            { align: 'center' }
+          );
+        }
+      });
+
+      doc.save(`VCET-Hall-Bookings-${filters.date_from}-to-${filters.date_to}.pdf`);
+    };
+
+    // Fallback if image fails to load
+    img.onerror = () => {
+      doc.setFontSize(16); doc.setTextColor(29, 78, 216);
+      doc.text('VCET Hall Reservation System', 14, 18);
+      doc.setFontSize(11); doc.setTextColor(30, 30, 30);
+      doc.text('Hall Booking Report', 14, 28);
+      autoTable(doc, {
+        startY: 36,
+        head: [['#', 'Hall', 'Staff', 'Dept', 'Date', 'Time', 'Purpose', 'Pax', 'Status']],
+        body: bookings.map((b, i) => [
+          i + 1, b.hall?.name || '',
+          `${b.user?.first_name || ''} ${b.user?.last_name || ''}`.trim(),
+          b.user?.department || '', fmtDate(b.date),
+          `${fmtTime(b.start_time)} – ${fmtTime(b.end_time)}`,
+          b.purpose, b.participants, b.status,
+        ]),
+        styles: { fontSize: 8, cellPadding: 3 },
+        headStyles: { fillColor: [29, 78, 216], textColor: 255, fontStyle: 'bold' },
+        alternateRowStyles: { fillColor: [245, 247, 255] },
+      });
+      doc.save(`VCET-Hall-Bookings-${filters.date_from}-to-${filters.date_to}.pdf`);
+    };
   };
 
   const handleFilter = (e) => {

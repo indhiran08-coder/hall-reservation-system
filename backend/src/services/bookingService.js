@@ -1,5 +1,9 @@
 const supabase = require('../config/db');
-const { sendBookingConfirmationEmail, sendBookingCancellationEmail } = require('./emailService');
+const {
+  sendBookingConfirmationEmail,
+  sendBookingCancellationEmail,
+  sendSupervisorNotification
+} = require('./emailService');
 
 /**
  * Creates a booking after checking for time conflicts.
@@ -62,9 +66,12 @@ const createBooking = async (userId, bookingData) => {
     supabase.from('users').select('*').eq('id', userId).single()
   ]);
 
-  // ── Send confirmation email (non-blocking) ─────────────────────────────────
+  // ── Send confirmation email + supervisor notification (non-blocking) ─────────────
   sendBookingConfirmationEmail(user, booking, hall).catch((e) =>
     console.error('Confirmation email failed:', e.message)
+  );
+  sendSupervisorNotification('confirmed', user, booking, hall).catch((e) =>
+    console.error('Supervisor notification (create) failed:', e.message)
   );
 
   return { booking, hall };
@@ -129,7 +136,7 @@ const cancelBooking = async (bookingId, userId) => {
 
   if (updateError) throw new Error('Failed to cancel booking. Please try again.');
 
-  // Fetch related data and send cancellation email (non-blocking)
+  // Fetch related data and send cancellation email + supervisor notification (non-blocking)
   Promise.all([
     supabase.from('halls').select('*').eq('id', booking.hall_id).single(),
     supabase.from('users').select('*').eq('id', userId).single()
@@ -137,6 +144,9 @@ const cancelBooking = async (bookingId, userId) => {
     if (hall && user) {
       sendBookingCancellationEmail(user, booking, hall).catch((e) =>
         console.error('Cancellation email failed:', e.message)
+      );
+      sendSupervisorNotification('cancelled', user, booking, hall).catch((e) =>
+        console.error('Supervisor notification (cancel) failed:', e.message)
       );
     }
   });
