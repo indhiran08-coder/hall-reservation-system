@@ -1,9 +1,10 @@
 const supabase = require('../config/db');
 const {
   sendBookingConfirmationEmail,
-  sendBookingCancellationEmail,
-  sendSupervisorNotification
+  sendBookingCancellationEmail
 } = require('./emailService');
+const { sendSupervisorNotification } = require('./twilioService');
+
 
 /**
  * Creates a booking after checking for time conflicts.

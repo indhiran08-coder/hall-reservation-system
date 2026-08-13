@@ -4,13 +4,6 @@ const { sendMail } = require('../utils/email');
 const FROM = 'VCET Hall Reservation <indhirans@velalarengg.ac.in>';
 const YEAR = new Date().getFullYear();
 
-// ─── Supervisors to notify on every booking / cancellation ─────────────────────
-const SUPERVISORS = [
-  { name: 'K.R.Dhivin',      email: 'krdhivin@gmail.com' },
-  { name: 'G.Aasaithambi',   email: 'aasaithambieee@gmail.com' },
-  { name: 'N.Jeganathan',    email: 'jeganathan1990@gmail.com' },
-];
-
 // ─── Shared HTML Shell ────────────────────────────────────────────────────────
 const wrapEmail = (headerColor, headerTitle, bodyContent) => `
 <!DOCTYPE html>
@@ -182,45 +175,11 @@ const sendPasswordResetEmail = async (collegeEmail, firstName, otp) => {
   });
 };
 
-// ─── 6. Supervisor Notification Email ───────────────────────────────────────────
-const sendSupervisorNotification = async (type, user, booking, hall) => {
-  const staffName = [user.first_name, user.last_name].filter(Boolean).join(' ');
-  const isConfirmed = type === 'confirmed';
-  const headerColor = isConfirmed ? '#16a34a' : '#dc2626';
-  const action = isConfirmed ? 'New Booking Confirmed' : 'Booking Cancelled';
-  const actionColor = isConfirmed ? '#16a34a' : '#dc2626';
-
-  const body = `
-    <p style="color:#374151;font-size:15px;">A hall booking has been <strong style="color:${actionColor};">${isConfirmed ? 'confirmed' : 'cancelled'}</strong>.</p>
-    <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin:20px 0;">
-      ${row('Staff Member', staffName, false)}
-      ${row('Department', user.department || 'N/A', true)}
-      ${row('College Email', user.college_email, false)}
-      ${row('Hall', hall.name, true)}
-      ${row('Floor / Location', `${hall.floor} — ${hall.location}`, false)}
-      ${row('Date', fmtDate(booking.date), true)}
-      ${row('Time', `${booking.start_time} – ${booking.end_time}`, false)}
-      ${row('Purpose', booking.purpose, true)}
-      ${row('Participants', booking.participants, false)}
-      ${row('Status', booking.status.toUpperCase(), true)}
-    </table>
-    <p style="color:#9ca3af;font-size:12px;">This is an automated notification from VCET Hall Reservation System.</p>`;
-
-  // Send to all supervisors in parallel
-  const supervisorEmails = SUPERVISORS.map(s => s.email);
-  await sendMail({
-    from: FROM,
-    to: supervisorEmails,
-    subject: `${isConfirmed ? '\u2705' : '\u274c'} ${action} — ${hall.name} on ${fmtDate(booking.date)}`,
-    html: wrapEmail(headerColor, action, body)
-  });
-};
-
 module.exports = {
   sendOTPEmail,
   sendBookingConfirmationEmail,
   sendBookingCancellationEmail,
   sendAdminCancellationEmail,
-  sendPasswordResetEmail,
-  sendSupervisorNotification
+  sendPasswordResetEmail
 };
+
