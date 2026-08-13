@@ -3,7 +3,7 @@ const {
   sendBookingConfirmationEmail,
   sendBookingCancellationEmail
 } = require('./emailService');
-const { sendSupervisorNotification } = require('./twilioService');
+const { sendSupervisorNotification } = require('./telegramService');
 
 
 /**

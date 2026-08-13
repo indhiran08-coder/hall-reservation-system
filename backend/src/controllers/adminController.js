@@ -1,6 +1,6 @@
 const supabase = require('../config/db');
 const { sendAdminCancellationEmail } = require('../services/emailService');
-const { sendSupervisorNotification } = require('../services/twilioService');
+const { sendSupervisorNotification } = require('../services/telegramService');
 
 
 // ── GET /api/admin/bookings ──────────────────────────────────────────────────
