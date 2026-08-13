@@ -32,10 +32,10 @@ const RefinedInput = ({ label, error, helper, type = 'text', icon, required = tr
         )}
         <input
           type={isPassword ? (showPwd ? 'text' : 'password') : type}
-          className={`w-full rounded-xl text-sm text-slate-900 placeholder-slate-400
+          className={`w-full rounded-xl text-sm text-slate-900 placeholder-slate-400/70
             bg-slate-50 border border-slate-200
             focus:outline-none focus:border-blue-600 focus:bg-white focus:ring-4 focus:ring-blue-600/10
-            transition-all duration-200 py-3 ${icon ? 'pl-10.5' : 'pl-3.5'} ${isPassword ? 'pr-10.5' : 'pr-3.5'}`}
+            transition-all duration-200 py-3 ${icon ? 'pl-11' : 'pl-4'} ${isPassword ? 'pr-11' : 'pr-4'}`}
           {...props}
         />
         {isPassword && (
