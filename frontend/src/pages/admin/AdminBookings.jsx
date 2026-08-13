@@ -202,63 +202,50 @@ const AdminBookings = () => {
       });
 
       // ── 6. Signature Section (last page, after table) ────────────────────────
-      const tableEndY = doc.lastAutoTable?.finalY ?? 140;
-      const sigSectionH = 42; // height needed for signature block
-      const footerH     = 18; // space reserved for the footer
+      const tableEndY   = doc.lastAutoTable?.finalY ?? 140;
+      const sigSectionH = 30;
+      const footerH     = 18;
 
-      // If not enough room on current page, add a new page
-      let sigY = tableEndY + 12;
+      let sigY = tableEndY + 10;
       if (sigY + sigSectionH > pageH - footerH) {
         doc.addPage();
         sigY = 20;
       }
 
-      // Section heading
+      // Thin separator + heading
       doc.setDrawColor(200, 210, 230); doc.setLineWidth(0.25);
       doc.line(margin, sigY, pageW - margin, sigY);
-      doc.setFont('helvetica', 'bold'); doc.setFontSize(8); doc.setTextColor(...navy);
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5); doc.setTextColor(...navy);
       doc.text('AUTHORISATION & SIGNATURES', margin, sigY + 5);
-      doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(120, 130, 150);
-      doc.text('This report has been verified and approved by the undersigned authorities of Velalar College of Engineering and Technology (Autonomous)', margin, sigY + 10);
 
-      // Three signature blocks — evenly distributed
+      // Three flat signature columns
       const sigTitles = ['Dean', 'Admin Manager', 'Principal'];
-      const blockW    = (pageW - margin * 2 - 20) / 3; // width of each block
-      const gapX      = 10;
-      const sigBoxTop = sigY + 16;
-      const lineY     = sigBoxTop + 18; // y of the signature underline
+      const colW      = (pageW - margin * 2) / 3;
+      const sigLineY  = sigY + 18; // y of the signature underline
 
       sigTitles.forEach((title, i) => {
-        const bx = margin + i * (blockW + gapX); // left edge of each block
-
-        // Light background box
-        doc.setFillColor(248, 250, 252); doc.setDrawColor(220, 228, 240); doc.setLineWidth(0.3);
-        doc.roundedRect(bx, sigBoxTop, blockW, 26, 2, 2, 'FD');
+        const cx   = margin + i * colW;         // left edge of column
+        const midX = cx + colW / 2;             // centre of column
+        const lPad = 10, rPad = 10;
 
         // Signature line
-        doc.setDrawColor(...navy); doc.setLineWidth(0.5);
-        const lineLeft  = bx + 8;
-        const lineRight = bx + blockW - 8;
-        doc.line(lineLeft, lineY, lineRight, lineY);
+        doc.setDrawColor(...navy); doc.setLineWidth(0.4);
+        doc.line(cx + lPad, sigLineY, cx + colW - rPad, sigLineY);
 
-        // Label above the line (small, grey)
-        doc.setFont('helvetica', 'normal'); doc.setFontSize(6.5); doc.setTextColor(160, 170, 185);
-        doc.text('Signature', bx + blockW / 2, lineY - 2, { align: 'center' });
+        // "Signature" label (tiny, above line)
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(6); doc.setTextColor(160, 170, 185);
+        doc.text('Signature', midX, sigLineY - 2, { align: 'center' });
 
-        // Date line
-        const dateLabelY = lineY + 5;
-        doc.setDrawColor(200, 210, 225); doc.setLineWidth(0.3);
-        doc.line(lineLeft + 14, dateLabelY, lineRight, dateLabelY);
+        // Date line (below signature line)
+        const dateY = sigLineY + 6;
+        doc.setDrawColor(190, 200, 218); doc.setLineWidth(0.3);
+        doc.line(cx + lPad + 10, dateY, cx + colW - rPad, dateY);
         doc.setFontSize(6); doc.setTextColor(160, 170, 185);
-        doc.text('Date:', lineLeft, dateLabelY + 0.2);
+        doc.text('Date:', cx + lPad, dateY + 0.3);
 
-        // Title below box (bold, navy)
-        doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5); doc.setTextColor(...navy);
-        doc.text(title, bx + blockW / 2, sigBoxTop + 29, { align: 'center' });
-
-        // Subtitle
-        doc.setFont('helvetica', 'normal'); doc.setFontSize(6.5); doc.setTextColor(120, 130, 150);
-        doc.text('Velalar College of Engineering and Technology', bx + blockW / 2, sigBoxTop + 33.5, { align: 'center' });
+        // Role title (bold, navy) — below date line
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(8); doc.setTextColor(...navy);
+        doc.text(title, midX, dateY + 7, { align: 'center' });
       });
 
       doc.save(`VCET-Hall-Bookings-${filters.date_from}-to-${filters.date_to}.pdf`);
