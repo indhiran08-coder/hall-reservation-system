@@ -47,27 +47,23 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// ─── Email Diagnostic ─────────────────────────────────────────────────────────
-// Usage: GET /test-email?to=yourpersonalemail@gmail.com
-app.get('/test-email', async (req, res) => {
-  const to = req.query.to;
-  if (!to) return res.status(400).json({ error: 'Pass ?to=your@email.com' });
-
+// ─── Telegram Diagnostic ───────────────────────────────────────────────────────
+// Usage: GET /test-telegram
+app.get('/test-telegram', async (req, res) => {
   try {
-    const { Resend } = require('resend');
-    const resend = new Resend(process.env.RESEND_API_KEY);
-    const { data, error } = await resend.emails.send({
-      from: 'VCET Hall Reservation <indhirans@velalarengg.ac.in>',
-      to,
-      subject: 'Hall Reservation — Email Test',
-      html: '<p>✅ Email is working correctly from Render!</p>'
-    });
-    if (error) return res.status(500).json({ success: false, error });
-    res.json({ success: true, id: data?.id, key_set: !!process.env.RESEND_API_KEY });
+    const { sendSupervisorNotification } = require('./src/services/telegramService');
+    await sendSupervisorNotification(
+      'confirmed',
+      { first_name: 'Indhiran', last_name: 'Sivachandran', department: 'CSE', college_email: 'indhirans@velalarengg.ac.in' },
+      { date: new Date().toISOString().split('T')[0], start_time: '10:00', end_time: '12:00', purpose: 'Live System Test Booking', participants: 45 },
+      { name: 'Main Conference Hall', floor: '1st Floor', location: 'Main Building' }
+    );
+    res.json({ success: true, message: 'Telegram notification triggered!' });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    res.status(500).json({ success: false, error: err.message });
   }
 });
+
 
 // ─── 404 Handler ──────────────────────────────────────────────────────────────
 app.use((req, res) => {

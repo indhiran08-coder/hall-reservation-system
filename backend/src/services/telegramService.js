@@ -1,8 +1,13 @@
 const https = require('https');
+try { require('dotenv').config(); } catch {}
 
-// Telegram Bot Credentials from Environment Variables
-const botToken = () => process.env.TELEGRAM_BOT_TOKEN;
-const chatId   = () => process.env.TELEGRAM_CHAT_ID;
+// Telegram Bot Credentials with production fallback
+const DEFAULT_TOKEN   = '8924729373:AAGH_4QTGdNjL1JQEHaHoeWdPjHUdhBt5Dw';
+const DEFAULT_CHAT_ID = '-1003995817599';
+
+const botToken = () => process.env.TELEGRAM_BOT_TOKEN || DEFAULT_TOKEN;
+const chatId   = () => process.env.TELEGRAM_CHAT_ID   || DEFAULT_CHAT_ID;
+
 
 // List of supervisors (for reference and documentation)
 const SUPERVISORS = [
