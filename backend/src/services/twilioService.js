@@ -2,8 +2,9 @@ const twilio = require('twilio');
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken  = process.env.TWILIO_AUTH_TOKEN;
-const whatsappFrom = process.env.TWILIO_WHATSAPP_NUMBER || '+14155238886';
+const whatsappFrom = process.env.TWILIO_WHATSAPP_NUMBER || '+17372508034';
 const smsFrom      = process.env.TWILIO_PHONE_NUMBER    || '+14155238886';
+
 
 const client = twilio(accountSid, authToken);
 
