@@ -232,21 +232,21 @@ export default function ForgotPassword() {
 
   return (
     <div className="min-h-screen bg-slate-100 flex flex-col font-sans selection:bg-blue-600 selection:text-white">
-      {/* ── Top Header ── */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <img src="/vcet-logo.png" alt="VCET Logo" className="w-10 h-10 object-contain" />
-            <div>
-              <p className="text-sm font-bold text-slate-900 leading-tight">Velalar College of Engineering and Technology</p>
-              <p className="text-[11px] font-semibold text-blue-700 tracking-wide uppercase">Autonomous Institution • Accredited by NAAC 'A+'</p>
-            </div>
-          </div>
-          <div className="hidden md:flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
-              Account Recovery
-            </span>
-          </div>
+      {/* ── Official VCET Banner Header ── */}
+      <header className="relative z-30 w-full shrink-0">
+        <div className="bg-white border-b border-slate-200 flex items-center justify-center px-4 py-2 shadow-xs">
+          <img
+            src="/vcet-banner.png"
+            alt="Velalar College of Engineering and Technology"
+            className="w-full max-w-2xl h-auto object-contain"
+            style={{ maxHeight: '64px' }}
+          />
+        </div>
+        <div
+          className="py-1.5 text-center text-xs font-bold tracking-[0.25em] uppercase text-white shadow-xs"
+          style={{ background: 'linear-gradient(90deg, #1e3a8a, #4338ca, #1e3a8a)' }}
+        >
+          Hall Reservation System
         </div>
       </header>
 
