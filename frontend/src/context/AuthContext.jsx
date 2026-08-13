@@ -3,7 +3,7 @@ import { profileAPI } from '../services/api';
 
 const AuthContext = createContext(null);
 
-// ── Helpers: keep user cached in localStorage ─────────────────────────────────
+// ── Persist user in localStorage so role is available on first paint ──────────
 const STORAGE_KEY = 'auth_user';
 
 const loadCachedUser = () => {
@@ -15,22 +15,30 @@ const loadCachedUser = () => {
 
 const saveUser = (u) => {
   if (u) localStorage.setItem(STORAGE_KEY, JSON.stringify(u));
-  else localStorage.removeItem(STORAGE_KEY);
+  else    localStorage.removeItem(STORAGE_KEY);
 };
 
 /**
- * Provides authentication state (user, token) and actions (login, logout, updateUser)
- * to the entire app.
+ * AuthProvider — authentication state for the whole app.
  *
- * Strategy:
- *  1. Immediately load the cached user from localStorage → sidebar renders with
- *     the correct role on refresh (no flash of missing admin links).
- *  2. Re-validate with GET /profile in the background and update if needed.
+ * Two-phase strategy:
+ *  Phase 1 (synchronous, instant):
+ *    Read cached user + token from localStorage → correct role on first paint,
+ *    no flash of missing admin links.
+ *
+ *  Phase 2 (async, background):
+ *    Re-validate with GET /profile.
+ *    • 401 → token is truly invalid → clear session.
+ *    • Network / server error → backend may be sleeping → keep cache, don't clear.
+ *    • Success → refresh cache with latest profile data.
  */
 export const AuthProvider = ({ children }) => {
-  // Seed state from cache — prevents the admin-links-missing flash on refresh
-  const [user, setUser]       = useState(loadCachedUser);
-  const [loading, setLoading] = useState(true);
+  const cachedUser              = loadCachedUser();
+  const hasToken                = !!localStorage.getItem('token');
+
+  // Start loading=false if we already have cached data (no need to block the UI)
+  const [user, setUser]         = useState(cachedUser);
+  const [loading, setLoading]   = useState(!cachedUser && hasToken);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -41,16 +49,20 @@ export const AuthProvider = ({ children }) => {
       return;
     }
 
-    // Background re-validation
     profileAPI.get()
       .then(({ data }) => {
         setUser(data.user);
-        saveUser(data.user);          // keep cache fresh
+        saveUser(data.user);
       })
-      .catch(() => {
-        localStorage.removeItem('token');
-        saveUser(null);
-        setUser(null);
+      .catch((err) => {
+        // Only kill the session on a definitive 401 Unauthorized.
+        // Network errors, 5xx, timeouts (backend sleeping on free tier) → keep cache.
+        if (err.response?.status === 401) {
+          localStorage.removeItem('token');
+          saveUser(null);
+          setUser(null);
+        }
+        // For any other error, keep the cached user so the sidebar stays intact.
       })
       .finally(() => setLoading(false));
   }, []);
@@ -73,7 +85,9 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, updateUser, isAdmin: user?.role === 'admin' }}>
+    <AuthContext.Provider
+      value={{ user, loading, login, logout, updateUser, isAdmin: user?.role === 'admin' }}
+    >
       {children}
     </AuthContext.Provider>
   );
