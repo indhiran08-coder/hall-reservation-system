@@ -16,8 +16,8 @@ const EyeIcon = ({ show }) =>
     </svg>
   );
 
-/* ─── Refined Human-Crafted Input Component ───────────────────────────────── */
-const RefinedInput = ({ label, error, type = 'text', icon, ...props }) => {
+/* ─── Refined Input Component with Validation Indicator ───────────────────── */
+const RefinedInput = ({ label, error, type = 'text', icon, isValid, ...props }) => {
   const [showPwd, setShowPwd] = useState(false);
   const isPassword = type === 'password';
   return (
@@ -36,9 +36,18 @@ const RefinedInput = ({ label, error, type = 'text', icon, ...props }) => {
           className={`w-full rounded-xl text-sm text-slate-900 placeholder-slate-400/70
             bg-slate-50 border border-slate-200
             focus:outline-none focus:border-blue-600 focus:bg-white focus:ring-4 focus:ring-blue-600/10
-            transition-all duration-200 py-3 ${icon ? 'pl-11' : 'pl-4'} ${isPassword ? 'pr-11' : 'pr-4'}`}
+            transition-all duration-200 py-3 ${icon ? 'pl-11' : 'pl-4'} ${isPassword || isValid ? 'pr-11' : 'pr-4'}`}
           {...props}
         />
+        {/* Valid Checkmark Indicator */}
+        {!isPassword && isValid && (
+          <div className="absolute right-3.5 top-1/2 -translate-y-1/2 text-emerald-600 pointer-events-none flex items-center">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+        )}
+        {/* Password Eye Icon */}
         {isPassword && (
           <button
             type="button"
@@ -63,19 +72,22 @@ const RefinedInput = ({ label, error, type = 'text', icon, ...props }) => {
 };
 
 /* ══════════════════════════════════════════════════════════════════════════════
-   Professional Senior Designer Split-Layout Login Page
+   Enterprise Split Showcase Login Page with Campus Architectural Backdrop
 ══════════════════════════════════════════════════════════════════════════════ */
 const Login = () => {
   const navigate  = useNavigate();
   const location  = useLocation();
-  const { login } = useAuth();
+  const { user, login } = useAuth();
 
+  const [roleTab, setRoleTab]   = useState('faculty'); // 'faculty' or 'admin'
   const [form, setForm]         = useState({ college_email: '', password: '' });
   const [errors, setErrors]     = useState({});
   const [loading, setLoading]   = useState(false);
   const [apiError, setApiError] = useState('');
 
   const justVerified = location.state?.verified;
+  const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.college_email.trim());
+  const needsDomain  = form.college_email.length > 0 && !form.college_email.includes('@');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -84,10 +96,17 @@ const Login = () => {
     setApiError('');
   };
 
+  const handleAppendDomain = () => {
+    setForm((f) => ({
+      ...f,
+      college_email: f.college_email.trim() + '@velalarengg.ac.in',
+    }));
+    setErrors((p) => ({ ...p, college_email: '' }));
+  };
+
   const validate = () => {
     const errs = {};
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.college_email))
-      errs.college_email = 'Enter a valid email address';
+    if (!isEmailValid) errs.college_email = 'Enter a valid college email address';
     if (!form.password) errs.password = 'Password is required';
     return errs;
   };
@@ -102,7 +121,7 @@ const Login = () => {
       login(data.user, data.token);
       navigate(data.user.role === 'admin' ? '/admin' : '/dashboard');
     } catch (err) {
-      setApiError(err.response?.data?.error || 'Login failed. Please verify credentials.');
+      setApiError(err.response?.data?.error || 'Login failed. Please verify your email and password.');
     } finally { setLoading(false); }
   };
 
@@ -142,58 +161,55 @@ const Login = () => {
 
       {/* ── Main Split Showcase Section ── */}
       <main className="flex-1 max-w-6xl w-full mx-auto p-4 sm:p-6 md:p-10 flex items-center justify-center">
-        <div className="w-full bg-white rounded-3xl shadow-xl shadow-slate-200/60 border border-slate-200/80 overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-[560px]">
+        <div className="w-full bg-white rounded-3xl shadow-xl shadow-slate-200/60 border border-slate-200/80 overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-[580px]">
 
-          {/* ── LEFT PANEL: Enterprise Brand & Feature Showcase (Desktop) ── */}
-          <div className="lg:col-span-5 bg-gradient-to-br from-slate-900 via-blue-950 to-indigo-950 p-8 sm:p-10 text-white flex flex-col justify-between relative overflow-hidden">
-            {/* Background Pattern */}
-            <div
-              className="absolute inset-0 opacity-10 pointer-events-none"
-              style={{
-                backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.4) 1px, transparent 0)',
-                backgroundSize: '24px 24px',
-              }}
-            />
+          {/* ── LEFT PANEL: Subtle Campus Architectural Background Card ── */}
+          <div
+            className="lg:col-span-5 relative p-8 sm:p-10 text-white flex flex-col justify-between overflow-hidden bg-cover bg-center"
+            style={{ backgroundImage: 'url(/vcet-campus.jpg)' }}
+          >
+            {/* Dark Deep Royal Blue Mask Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-br from-slate-950/90 via-blue-950/85 to-indigo-950/90 backdrop-blur-[2px]" />
 
             {/* Top Brand Header */}
             <div className="relative z-10 space-y-4">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold bg-white/10 backdrop-blur-md text-blue-200 border border-white/15">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold bg-white/10 backdrop-blur-md text-blue-200 border border-white/20 shadow-xs">
                 <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
-                <span>Hall Reservation System</span>
+                <span>Velalar Campus Portal</span>
               </div>
               <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight leading-tight">
                 Seamless Campus Event & Hall Management
               </h2>
-              <p className="text-sm text-slate-300 leading-relaxed font-normal">
-                Reserve seminar halls, auditoriums, and conference rooms with real-time schedule conflict prevention and instant updates.
+              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-medium">
+                Reserve seminar halls, auditoriums, and conference rooms with real-time schedule conflict prevention.
               </p>
             </div>
 
-            {/* Feature Checklist */}
-            <div className="relative z-10 my-8 space-y-3.5">
+            {/* Glassmorphism Feature Checklist */}
+            <div className="relative z-10 my-6 space-y-3">
               {[
-                { title: 'Real-Time Schedule Matrix', sub: 'Instant slot conflict checking' },
+                { title: 'Real-Time Schedule Roadmap', sub: 'Instant slot conflict checking' },
                 { title: 'Faculty & Admin Workflows', sub: 'Instant approval & notifications' },
                 { title: 'PDF & Official Reports', sub: 'Automated authorization exports' },
               ].map((feat, i) => (
-                <div key={i} className="flex items-start gap-3 bg-white/5 border border-white/10 rounded-2xl p-3.5 backdrop-blur-xs">
-                  <div className="w-8 h-8 rounded-xl bg-blue-600/30 border border-blue-400/40 flex items-center justify-center shrink-0 text-blue-300">
+                <div key={i} className="flex items-start gap-3 bg-white/10 border border-white/15 rounded-2xl p-3.5 backdrop-blur-md shadow-xs">
+                  <div className="w-8 h-8 rounded-xl bg-blue-500/30 border border-blue-400/40 flex items-center justify-center shrink-0 text-blue-300">
                     <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
                   <div>
                     <p className="text-xs font-bold text-white">{feat.title}</p>
-                    <p className="text-[11px] text-slate-400 mt-0.5">{feat.sub}</p>
+                    <p className="text-[11px] text-slate-300 mt-0.5">{feat.sub}</p>
                   </div>
                 </div>
               ))}
             </div>
 
             {/* Footer Tag */}
-            <div className="relative z-10 pt-4 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">
+            <div className="relative z-10 pt-4 border-t border-white/15 flex items-center justify-between text-xs text-slate-300">
               <span>Velalar College of Eng. & Tech</span>
               <span className="font-semibold text-blue-300">Erode, Tamil Nadu</span>
             </div>
@@ -203,11 +219,43 @@ const Login = () => {
           <div className="lg:col-span-7 p-8 sm:p-12 flex flex-col justify-between bg-white">
             <div className="max-w-md mx-auto w-full space-y-6">
 
+              {/* 🎓 / 🛡️ Role Tab Selector Bar */}
+              <div className="bg-slate-100 p-1 rounded-2xl border border-slate-200 flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => setRoleTab('faculty')}
+                  className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
+                    roleTab === 'faculty'
+                      ? 'bg-white text-blue-700 shadow-xs border border-slate-200/80'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  <span className="text-sm">🎓</span>
+                  <span>Faculty Sign In</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setRoleTab('admin')}
+                  className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
+                    roleTab === 'admin'
+                      ? 'bg-white text-violet-700 shadow-xs border border-slate-200/80'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  <span className="text-sm">🛡️</span>
+                  <span>Admin Portal</span>
+                </button>
+              </div>
+
               {/* Form Title Header */}
               <div className="text-left space-y-1">
-                <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Sign In</h1>
+                <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+                  {roleTab === 'admin' ? 'Administrator Sign In' : 'Faculty Sign In'}
+                </h1>
                 <p className="text-sm text-slate-500 font-normal">
-                  Enter your college credentials to access hall reservations
+                  {roleTab === 'admin'
+                    ? 'Enter administrator credentials to manage bookings & halls'
+                    : 'Enter your college credentials to access hall reservations'}
                 </p>
               </div>
 
@@ -232,22 +280,36 @@ const Login = () => {
 
               {/* Login Form */}
               <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-                <RefinedInput
-                  label="College Email Address"
-                  name="college_email"
-                  type="email"
-                  required
-                  value={form.college_email}
-                  onChange={handleChange}
-                  error={errors.college_email}
-                  placeholder="yourname@velalarengg.ac.in"
-                  autoComplete="email"
-                  icon={
-                    <svg className="w-5 h-5 shrink-0" style={{ width: '20px', height: '20px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                  }
-                />
+                <div className="space-y-1">
+                  <RefinedInput
+                    label="College Email Address"
+                    name="college_email"
+                    type="email"
+                    required
+                    value={form.college_email}
+                    onChange={handleChange}
+                    error={errors.college_email}
+                    isValid={isEmailValid}
+                    placeholder={roleTab === 'admin' ? 'admin@velalarengg.ac.in' : 'yourname@velalarengg.ac.in'}
+                    autoComplete="email"
+                    icon={
+                      <svg className="w-5 h-5 shrink-0" style={{ width: '20px', height: '20px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      </svg>
+                    }
+                  />
+
+                  {/* ⚡ Instant Email Domain Completion Chip */}
+                  {needsDomain && (
+                    <button
+                      type="button"
+                      onClick={handleAppendDomain}
+                      className="inline-flex items-center gap-1.5 text-[11px] font-bold text-blue-600 hover:text-blue-800 bg-blue-50 border border-blue-200 px-2.5 py-1 rounded-lg transition-all hover:bg-blue-100 mt-1 cursor-pointer"
+                    >
+                      <span>⚡ Add @velalarengg.ac.in</span>
+                    </button>
+                  )}
+                </div>
 
                 <RefinedInput
                   label="Password"
@@ -280,7 +342,11 @@ const Login = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-sm tracking-wide shadow-md shadow-blue-600/20 disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2"
+                  className={`w-full py-3.5 px-4 rounded-xl text-white font-bold text-sm tracking-wide shadow-md disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2 ${
+                    roleTab === 'admin'
+                      ? 'bg-violet-700 hover:bg-violet-800 active:bg-violet-900 shadow-violet-700/20'
+                      : 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800 shadow-blue-600/20'
+                  }`}
                 >
                   {loading ? (
                     <>
@@ -292,7 +358,7 @@ const Login = () => {
                     </>
                   ) : (
                     <>
-                      <span>Sign In</span>
+                      <span>Sign In to {roleTab === 'admin' ? 'Admin Portal' : 'Faculty Account'}</span>
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                       </svg>

@@ -169,14 +169,11 @@ const Register = () => {
         <div className="w-full bg-white rounded-3xl shadow-xl shadow-slate-200/60 border border-slate-200/80 overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-[580px]">
 
           {/* ── LEFT PANEL: Institutional Branding & Guidelines ── */}
-          <div className="lg:col-span-4 bg-gradient-to-br from-slate-900 via-blue-950 to-indigo-950 p-8 sm:p-10 text-white flex flex-col justify-between relative overflow-hidden">
-            <div
-              className="absolute inset-0 opacity-10 pointer-events-none"
-              style={{
-                backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.4) 1px, transparent 0)',
-                backgroundSize: '24px 24px',
-              }}
-            />
+          <div
+            className="lg:col-span-4 relative p-8 sm:p-10 text-white flex flex-col justify-between overflow-hidden bg-cover bg-center"
+            style={{ backgroundImage: 'url(/vcet-campus.jpg)' }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-slate-950/90 via-blue-950/85 to-indigo-950/90 backdrop-blur-[2px]" />
 
             <div className="relative z-10 space-y-4">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold bg-white/10 text-blue-200 border border-white/15">
