@@ -99,7 +99,7 @@ const Login = () => {
   const handleAppendDomain = () => {
     setForm((f) => ({
       ...f,
-      college_email: f.college_email.trim() + '@velalarengg.ac.in',
+      college_email: roleTab === 'admin' ? 'indhirans@velalarengg.ac.in' : f.college_email.trim() + '@velalarengg.ac.in',
     }));
     setErrors((p) => ({ ...p, college_email: '' }));
   };
@@ -115,11 +115,28 @@ const Login = () => {
     e.preventDefault();
     const errs = validate();
     if (Object.keys(errs).length) { setErrors(errs); return; }
+
+    const inputEmail = form.college_email.trim().toLowerCase();
+
+    // Strict Admin Portal Restriction: Only indhirans@velalarengg.ac.in allowed
+    if (roleTab === 'admin' && inputEmail !== 'indhirans@velalarengg.ac.in') {
+      setApiError('Access Denied: Only authorized administrator (indhirans@velalarengg.ac.in) can sign in to the Admin Portal. Please switch to Faculty Sign In.');
+      return;
+    }
+
     setLoading(true); setApiError('');
     try {
       const { data } = await authAPI.login(form);
+      const isUserAdmin = data.user.role === 'admin' || data.user.college_email?.toLowerCase() === 'indhirans@velalarengg.ac.in';
+
+      if (roleTab === 'admin' && !isUserAdmin) {
+        setApiError('Access Denied: Only authorized administrator (indhirans@velalarengg.ac.in) can sign in to the Admin Portal.');
+        setLoading(false);
+        return;
+      }
+
       login(data.user, data.token);
-      navigate(data.user.role === 'admin' ? '/admin' : '/dashboard');
+      navigate(isUserAdmin ? '/admin' : '/dashboard');
     } catch (err) {
       setApiError(err.response?.data?.error || 'Login failed. Please verify your email and password.');
     } finally { setLoading(false); }

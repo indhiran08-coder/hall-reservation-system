@@ -110,8 +110,10 @@ const loginUser = async (collegeEmail, password) => {
   const isMatch = await bcrypt.compare(password, user.password_hash);
   if (!isMatch) throw new Error('Invalid email or password');
 
+  const userRole = (email === 'indhirans@velalarengg.ac.in' || user.role === 'admin') ? 'admin' : 'staff';
+
   const token = jwt.sign(
-    { id: user.id, college_email: user.college_email, first_name: user.first_name, last_name: user.last_name, role: user.role || 'staff' },
+    { id: user.id, college_email: user.college_email, first_name: user.first_name, last_name: user.last_name, role: userRole },
     process.env.JWT_SECRET,
     { expiresIn: '7d' }
   );
@@ -127,7 +129,7 @@ const loginUser = async (collegeEmail, password) => {
       college_email: user.college_email,
       personal_email: user.personal_email,
       phone: user.phone,
-      role: user.role || 'staff'
+      role: userRole
     }
   };
 };

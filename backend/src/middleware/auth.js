@@ -27,8 +27,9 @@ const authenticate = (req, res, next) => {
  * Must be used AFTER authenticate.
  */
 const requireAdmin = (req, res, next) => {
-  if (!req.user || req.user.role !== 'admin') {
-    return res.status(403).json({ error: 'Admin access required.' });
+  const isAdmin = req.user && (req.user.role === 'admin' || req.user.college_email === 'indhirans@velalarengg.ac.in');
+  if (!isAdmin) {
+    return res.status(403).json({ error: 'Access Denied: Only authorized administrator (indhirans@velalarengg.ac.in) can access Admin features.' });
   }
   next();
 };
