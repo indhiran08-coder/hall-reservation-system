@@ -96,14 +96,6 @@ const Login = () => {
     setApiError('');
   };
 
-  const handleAppendDomain = () => {
-    setForm((f) => ({
-      ...f,
-      college_email: roleTab === 'admin' ? 'indhirans@velalarengg.ac.in' : f.college_email.trim() + '@velalarengg.ac.in',
-    }));
-    setErrors((p) => ({ ...p, college_email: '' }));
-  };
-
   const validate = () => {
     const errs = {};
     if (!isEmailValid) errs.college_email = 'Enter a valid college email address';
@@ -118,9 +110,9 @@ const Login = () => {
 
     const inputEmail = form.college_email.trim().toLowerCase();
 
-    // Strict Admin Portal Restriction: Only indhirans@velalarengg.ac.in allowed
+    // Strict Admin Portal Restriction (Confidential)
     if (roleTab === 'admin' && inputEmail !== 'indhirans@velalarengg.ac.in') {
-      setApiError('Access Denied: Only authorized administrator (indhirans@velalarengg.ac.in) can sign in to the Admin Portal. Please switch to Faculty Sign In.');
+      setApiError('Access Denied: Invalid administrator credentials or unauthorized account.');
       return;
     }
 
@@ -130,7 +122,7 @@ const Login = () => {
       const isUserAdmin = data.user.role === 'admin' || data.user.college_email?.toLowerCase() === 'indhirans@velalarengg.ac.in';
 
       if (roleTab === 'admin' && !isUserAdmin) {
-        setApiError('Access Denied: Only authorized administrator (indhirans@velalarengg.ac.in) can sign in to the Admin Portal.');
+        setApiError('Access Denied: Invalid administrator credentials or unauthorized account.');
         setLoading(false);
         return;
       }
@@ -307,7 +299,7 @@ const Login = () => {
                     onChange={handleChange}
                     error={errors.college_email}
                     isValid={isEmailValid}
-                    placeholder={roleTab === 'admin' ? 'admin@velalarengg.ac.in' : 'yourname@velalarengg.ac.in'}
+                    placeholder="yourname@velalarengg.ac.in"
                     autoComplete="email"
                     icon={
                       <svg className="w-5 h-5 shrink-0" style={{ width: '20px', height: '20px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -315,17 +307,6 @@ const Login = () => {
                       </svg>
                     }
                   />
-
-                  {/* ⚡ Instant Email Domain Completion Chip */}
-                  {needsDomain && (
-                    <button
-                      type="button"
-                      onClick={handleAppendDomain}
-                      className="inline-flex items-center gap-1.5 text-[11px] font-bold text-blue-600 hover:text-blue-800 bg-blue-50 border border-blue-200 px-2.5 py-1 rounded-lg transition-all hover:bg-blue-100 mt-1 cursor-pointer"
-                    >
-                      <span>⚡ Add @velalarengg.ac.in</span>
-                    </button>
-                  )}
                 </div>
 
                 <RefinedInput
