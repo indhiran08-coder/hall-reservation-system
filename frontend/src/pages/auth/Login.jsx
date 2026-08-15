@@ -96,6 +96,14 @@ const Login = () => {
     setApiError('');
   };
 
+  const handleAppendDomain = () => {
+    setForm((f) => ({
+      ...f,
+      college_email: f.college_email.trim() + '@velalarengg.ac.in',
+    }));
+    setErrors((p) => ({ ...p, college_email: '' }));
+  };
+
   const validate = () => {
     const errs = {};
     if (!isEmailValid) errs.college_email = 'Enter a valid college email address';
@@ -307,6 +315,17 @@ const Login = () => {
                       </svg>
                     }
                   />
+
+                  {/* ⚡ Instant Email Domain Completion Chip */}
+                  {needsDomain && (
+                    <button
+                      type="button"
+                      onClick={handleAppendDomain}
+                      className="inline-flex items-center gap-1.5 text-[11px] font-bold text-blue-600 hover:text-blue-800 bg-blue-50 border border-blue-200 px-2.5 py-1 rounded-lg transition-all hover:bg-blue-100 mt-1 cursor-pointer"
+                    >
+                      <span>⚡ Add @velalarengg.ac.in</span>
+                    </button>
+                  )}
                 </div>
 
                 <RefinedInput
