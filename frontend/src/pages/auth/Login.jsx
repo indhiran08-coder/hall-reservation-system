@@ -111,12 +111,26 @@ const Login = () => {
       {/* ── Official VCET Banner Header ── */}
       <header className="relative z-30 w-full shrink-0">
         <div className="bg-white border-b border-slate-200 flex items-center justify-center px-4 py-2 shadow-xs">
-          <img
-            src="/vcet-banner.png"
-            alt="Velalar College of Engineering and Technology"
-            className="w-full max-w-2xl h-auto object-contain"
-            style={{ maxHeight: '64px' }}
-          />
+          <Link
+            to="/login"
+            onClick={(e) => {
+              if (user) {
+                e.preventDefault();
+                navigate('/dashboard');
+              } else {
+                window.location.href = '/login';
+              }
+            }}
+            className="cursor-pointer hover:opacity-95 transition-opacity"
+            title="Go to Login Page"
+          >
+            <img
+              src="/vcet-banner.png"
+              alt="Velalar College of Engineering and Technology"
+              className="w-full max-w-2xl h-auto object-contain cursor-pointer"
+              style={{ maxHeight: '64px' }}
+            />
+          </Link>
         </div>
         <div
           className="py-1.5 text-center text-xs font-bold tracking-[0.25em] uppercase text-white shadow-xs"

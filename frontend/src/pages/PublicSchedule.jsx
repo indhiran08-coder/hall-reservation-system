@@ -103,12 +103,19 @@ const PublicSchedule = () => {
       {/* ── Official VCET Banner Header ── */}
       <header className="bg-white border-b border-slate-200 shadow-xs sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <img
-            src="/vcet-banner.png"
-            alt="Velalar College of Engineering and Technology"
-            className="w-full sm:w-auto h-auto object-contain"
-            style={{ maxHeight: '56px' }}
-          />
+          <Link
+            to="/login"
+            onClick={() => { window.location.href = '/login'; }}
+            className="cursor-pointer hover:opacity-95 transition-opacity"
+            title="Go to Login Page"
+          >
+            <img
+              src="/vcet-banner.png"
+              alt="Velalar College of Engineering and Technology"
+              className="w-full sm:w-auto h-auto object-contain cursor-pointer"
+              style={{ maxHeight: '56px' }}
+            />
+          </Link>
           <Link
             to="/login"
             className="self-center sm:self-auto shrink-0 inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition-all shadow-xs"
