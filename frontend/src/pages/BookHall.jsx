@@ -5,14 +5,13 @@ import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
 import Spinner from '../components/ui/Spinner';
 import { hallsAPI, bookingsAPI } from '../services/api';
-import { today } from '../utils/formatters';
+import { today, formatDate, formatTimeRange } from '../utils/formatters';
+import { useAuth } from '../context/AuthContext';
 
 // ── Time picker helpers ────────────────────────────────────────────────────────
-// Booking window: 9:00 AM – 10:00 PM  (09:00 – 22:00)
 const BOOK_START = 9;   // 9 AM
 const BOOK_END   = 22;  // 10 PM
 
-// Hour options: 9 AM … 10 PM  → 24-h values 9…22
 const HOUR_OPTIONS = Array.from({ length: BOOK_END - BOOK_START + 1 }, (_, i) => {
   const h = BOOK_START + i;
   const period = h >= 12 ? 'PM' : 'AM';
@@ -20,48 +19,37 @@ const HOUR_OPTIONS = Array.from({ length: BOOK_END - BOOK_START + 1 }, (_, i) =>
   return { value: h, label };
 });
 
-// Minute options: 00, 05, 10 … 55  (5-minute steps)
 const MINUTE_OPTIONS = Array.from({ length: 12 }, (_, i) => ({
   value: i * 5,
   label: String(i * 5).padStart(2, '0'),
 }));
 
-/** Parse "HH:MM" → { hour: number, minute: number }  (defaults: 9 AM, :00) */
 const parseHHMM = (hhmm) => {
   if (!hhmm) return { hour: BOOK_START, minute: 0 };
   const [h, m] = hhmm.split(':').map(Number);
   return { hour: h, minute: m };
 };
 
-/** Format { hour, minute } back to "HH:MM" */
 const toHHMM = (hour, minute) =>
   `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
 
-/**
- * Two-dropdown time picker: Hour (9 AM – 10 PM) + Minute (00–55, 5-min steps).
- * Fires a synthetic onChange event with name + value="HH:MM", matching Input API.
- * maxHour / minAfter let the parent constrain which hours are selectable.
- */
 const TimeSelect = ({ name, value, onChange, label, error, minAfter = null, isEndTime = false }) => {
   const { hour, minute } = parseHHMM(value);
 
   const fireChange = (newHour, newMinute) => {
-    // Clamp to booking window
     const clampedHour   = Math.min(Math.max(newHour, BOOK_START), BOOK_END);
-    const clampedMinute = clampedHour === BOOK_END ? 0 : newMinute; // 22:00 is the max end
+    const clampedMinute = clampedHour === BOOK_END ? 0 : newMinute;
     onChange({ target: { name, value: toHHMM(clampedHour, clampedMinute) } });
   };
 
-  // For End Time: only show hours >= start hour
   const startHour   = minAfter ? parseHHMM(minAfter).hour : BOOK_START;
   const startMinute = minAfter ? parseHHMM(minAfter).minute : 0;
 
   const filteredHours = HOUR_OPTIONS.filter(({ value: h }) => {
-    if (!isEndTime) return h < BOOK_END;          // start: up to 9 PM
-    return h > startHour || (h === startHour && startMinute < 55); // end: must be after start
+    if (!isEndTime) return h < BOOK_END;
+    return h > startHour || (h === startHour && startMinute < 55);
   });
 
-  // For End Time with same hour as start: only show minutes > start minute
   const filteredMinutes = MINUTE_OPTIONS.filter(({ value: m }) => {
     if (!isEndTime || hour !== startHour) return true;
     return m > startMinute;
@@ -70,28 +58,24 @@ const TimeSelect = ({ name, value, onChange, label, error, minAfter = null, isEn
   return (
     <div>
       {label && (
-        <label className="label">
-          {label} <span className="text-red-500">*</span>
+        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+          {label} <span className="text-rose-500">*</span>
         </label>
       )}
-      <div className={`flex gap-1.5 ${error ? 'ring-1 ring-red-400 rounded-lg' : ''}`}>
-        {/* Hour */}
+      <div className={`flex gap-1.5 ${error ? 'ring-2 ring-rose-400 rounded-xl' : ''}`}>
         <select
           value={hour}
           onChange={(e) => fireChange(Number(e.target.value), minute)}
-          className="input-field flex-1 min-w-0"
-          aria-label={`${label} hour`}
+          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-semibold text-slate-900 focus:bg-white focus:border-blue-600 focus:outline-none transition-all"
         >
           {filteredHours.map(({ value: h, label: l }) => (
             <option key={h} value={h}>{l}</option>
           ))}
         </select>
-        {/* Minute */}
         <select
           value={minute}
           onChange={(e) => fireChange(hour, Number(e.target.value))}
-          className="input-field w-20"
-          aria-label={`${label} minute`}
+          className="w-20 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-semibold text-slate-900 focus:bg-white focus:border-blue-600 focus:outline-none transition-all"
           disabled={isEndTime && filteredMinutes.length === 0}
         >
           {filteredMinutes.map(({ value: m, label: l }) => (
@@ -99,21 +83,23 @@ const TimeSelect = ({ name, value, onChange, label, error, minAfter = null, isEn
           ))}
         </select>
       </div>
-      {error && <p className="mt-1.5 text-xs text-red-600">{error}</p>}
+      {error && <p className="mt-1 text-[11px] font-bold text-rose-600">{error}</p>}
     </div>
   );
 };
 
 const BookHall = () => {
   const navigate = useNavigate();
+  const { user }  = useAuth();
   const [searchParams] = useSearchParams();
   const preselectedHallId = searchParams.get('hall_id') || '';
 
-  const [halls, setHalls]     = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [wizardStep, setWizardStep] = useState(1); // 1, 2, 3
+  const [halls, setHalls]           = useState([]);
+  const [loading, setLoading]       = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError]     = useState('');
-  const [success, setSuccess] = useState(false);
+  const [error, setError]           = useState('');
+  const [success, setSuccess]       = useState(false);
 
   const [form, setForm] = useState({
     hall_id: preselectedHallId,
@@ -121,13 +107,12 @@ const BookHall = () => {
     date: today(),
     start_time: '09:00',
     end_time: '10:00',
-    participants: '',
+    participants: '50',
     requirements: ''
   });
   const [errors, setErrors] = useState({});
 
-  // Availability feedback
-  const [avail, setAvail]         = useState(null);
+  const [avail, setAvail]                 = useState(null);
   const [checkingAvail, setCheckingAvail] = useState(false);
 
   useEffect(() => {
@@ -136,7 +121,7 @@ const BookHall = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  // Check availability when hall/date/time changes
+  // Check availability
   useEffect(() => {
     if (!form.hall_id || !form.date || !form.start_time || !form.end_time) {
       setAvail(null);
@@ -159,7 +144,7 @@ const BookHall = () => {
       } finally {
         setCheckingAvail(false);
       }
-    }, 600); // debounce
+    }, 600);
 
     return () => clearTimeout(timer);
   }, [form.hall_id, form.date, form.start_time, form.end_time]);
@@ -171,31 +156,38 @@ const BookHall = () => {
     setError('');
   };
 
-  const validate = () => {
+  const validateStep1 = () => {
     const errs = {};
-    if (!form.hall_id)                         errs.hall_id = 'Please select a hall';
-    if (!form.purpose || form.purpose.trim().length < 5)
-                                               errs.purpose = 'At least 5 characters';
-    if (!form.date)                            errs.date = 'Date is required';
-    if (!form.start_time)                      errs.start_time = 'Required';
-    if (!form.end_time)                        errs.end_time = 'Required';
-    if (form.start_time && form.end_time && form.start_time >= form.end_time)
-                                               errs.end_time = 'Must be after start time';
-    // Enforce 9 AM – 10 PM window
-    if (form.start_time && (form.start_time < '09:00' || form.start_time > '22:00'))
-                                               errs.start_time = 'Must be between 9:00 AM and 10:00 PM';
-    if (form.end_time && (form.end_time < '09:00' || form.end_time > '22:00'))
-                                               errs.end_time = 'Must be between 9:00 AM and 10:00 PM';
-    if (!form.participants || Number(form.participants) < 1)
-                                               errs.participants = 'At least 1 participant';
+    if (!form.hall_id) errs.hall_id = 'Please select a hall';
+    if (!form.date)    errs.date = 'Date is required';
+    if (!form.start_time) errs.start_time = 'Required';
+    if (!form.end_time)   errs.end_time = 'Required';
+    if (form.start_time && form.end_time && form.start_time >= form.end_time) errs.end_time = 'Must be after start time';
+    if (avail?.available === false) errs.start_time = 'Selected slot is already booked';
     return errs;
+  };
+
+  const validateStep2 = () => {
+    const errs = {};
+    if (!form.purpose || form.purpose.trim().length < 5) errs.purpose = 'At least 5 characters required';
+    if (!form.participants || Number(form.participants) < 1) errs.participants = 'At least 1 participant required';
+    return errs;
+  };
+
+  const handleNextStep = () => {
+    if (wizardStep === 1) {
+      const errs = validateStep1();
+      if (Object.keys(errs).length) { setErrors(errs); return; }
+      setWizardStep(2);
+    } else if (wizardStep === 2) {
+      const errs = validateStep2();
+      if (Object.keys(errs).length) { setErrors(errs); return; }
+      setWizardStep(3);
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const errs = validate();
-    if (Object.keys(errs).length) { setErrors(errs); return; }
-
     setSubmitting(true);
     setError('');
     try {
@@ -209,6 +201,8 @@ const BookHall = () => {
     }
   };
 
+  const selectedHallObj = halls.find((h) => String(h.id) === String(form.hall_id));
+
   if (loading) {
     return (
       <DashboardLayout>
@@ -220,17 +214,17 @@ const BookHall = () => {
   if (success) {
     return (
       <DashboardLayout>
-        <div className="max-w-lg mx-auto mt-16 text-center card p-10">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+        <div className="max-w-lg mx-auto mt-16 text-center bg-white rounded-3xl p-10 border border-slate-200 shadow-xl space-y-4">
+          <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto text-emerald-600">
+            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Booking Confirmed!</h2>
-          <p className="text-gray-500 text-sm">
-            Your hall has been booked. A confirmation email has been sent to your college and personal email.
+          <h2 className="text-2xl font-extrabold text-slate-900">Booking Confirmed!</h2>
+          <p className="text-xs text-slate-500 font-medium">
+            Your hall reservation is authorized. A confirmation pass has been dispatched to your email.
           </p>
-          <p className="text-xs text-gray-400 mt-3">Redirecting to your bookings…</p>
+          <p className="text-[11px] font-bold text-blue-600 animate-pulse">Redirecting to your active passes…</p>
         </div>
       </DashboardLayout>
     );
@@ -238,134 +232,314 @@ const BookHall = () => {
 
   return (
     <DashboardLayout>
-      <div className="max-w-2xl mx-auto space-y-5">
-        {/* Breadcrumb */}
-        <nav className="flex items-center gap-2 text-sm text-gray-500">
-          <Link to="/halls" className="hover:text-blue-600">Halls</Link>
-          <span>/</span>
-          <span className="text-gray-900 font-medium">Book a Hall</span>
-        </nav>
-
-        <h1 className="page-title">Book a Hall</h1>
-
-        <form onSubmit={handleSubmit} className="space-y-5" noValidate>
-          {error && <div className="alert-error">{error}</div>}
-
-          {/* Hall selection */}
-          <div className="card p-5">
-            <h2 className="font-semibold text-gray-900 mb-4">Select Hall & Time</h2>
-
-            <div className="space-y-4">
-              <div>
-                <label className="label">Hall <span className="text-red-500">*</span></label>
-                <select
-                  name="hall_id"
-                  value={form.hall_id}
-                  onChange={handleChange}
-                  className={`input-field ${errors.hall_id ? 'input-error' : ''}`}
-                >
-                  <option value="">Choose a hall…</option>
-                  {halls.map((h) => (
-                    <option key={h.id} value={h.id}>
-                      {h.name} — {h.floor}
-                    </option>
-                  ))}
-                </select>
-                {errors.hall_id && <p className="mt-1.5 text-xs text-red-600">{errors.hall_id}</p>}
-              </div>
-
-              <Input
-                label="Date" name="date" type="date" required
-                value={form.date} onChange={handleChange}
-                error={errors.date} min={today()}
-              />
-
-              <div className="grid grid-cols-2 gap-3">
-                {/* Start Time — Hour + Minute dropdowns */}
-                <TimeSelect
-                  label="Start Time" name="start_time"
-                  value={form.start_time} onChange={handleChange}
-                  error={errors.start_time}
-                />
-                {/* End Time — filtered so it's always after Start Time */}
-                <TimeSelect
-                  label="End Time" name="end_time"
-                  value={form.end_time} onChange={handleChange}
-                  error={errors.end_time}
-                  isEndTime
-                  minAfter={form.start_time}
-                />
-              </div>
-
-              {/* Live availability indicator */}
-              {form.hall_id && form.date && form.start_time && form.end_time && form.start_time < form.end_time && (
-                <div className={`flex items-center gap-2 text-sm px-3 py-2.5 rounded-lg border ${
-                  checkingAvail ? 'bg-gray-50 border-gray-200 text-gray-500' :
-                  avail?.available === true  ? 'bg-green-50 border-green-200 text-green-700' :
-                  avail?.available === false ? 'bg-red-50 border-red-200 text-red-700' :
-                  'bg-gray-50 border-gray-200 text-gray-500'
-                }`}>
-                  {checkingAvail ? (
-                    <><Spinner size="sm" />Checking availability…</>
-                  ) : avail?.available === true ? (
-                    <>✓ This time slot is available</>
-                  ) : avail?.available === false ? (
-                    <>✗ This slot conflicts with an existing booking ({avail.conflict?.start_time}–{avail.conflict?.end_time})</>
-                  ) : null}
-                </div>
-              )}
-            </div>
+      <div className="max-w-6xl mx-auto space-y-6">
+        
+        {/* Header Breadcrumb */}
+        <div className="flex items-center justify-between">
+          <div>
+            <nav className="flex items-center gap-2 text-xs text-slate-400 font-semibold mb-1">
+              <Link to="/halls" className="hover:text-blue-600">Halls</Link>
+              <span>/</span>
+              <span className="text-slate-900">Guided Wizard</span>
+            </nav>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Reserve a Campus Hall</h1>
           </div>
+        </div>
 
-          {/* Booking details */}
-          <div className="card p-5">
-            <h2 className="font-semibold text-gray-900 mb-4">Booking Details</h2>
-            <div className="space-y-4">
-              <Input
-                label="Purpose" name="purpose" required
-                value={form.purpose} onChange={handleChange}
-                error={errors.purpose}
-                placeholder="e.g., Faculty Meeting, Workshop, Guest Lecture"
-              />
-              <Input
-                label="Expected Participants" name="participants" type="number" required
-                value={form.participants} onChange={handleChange}
-                error={errors.participants}
-                min={1} placeholder="e.g., 25"
-              />
-              <div>
-                <label className="label">Special Requirements <span className="text-gray-400 font-normal">(optional)</span></label>
-                <textarea
-                  name="requirements"
-                  value={form.requirements}
-                  onChange={handleChange}
-                  rows={3}
-                  className="input-field resize-none"
-                  placeholder="e.g., Projector needed, microphone setup, etc."
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="flex gap-3">
-            <Button
+        {/* ── 3-Step Visual Stepper Bar ── */}
+        <div className="bg-white rounded-3xl p-4 sm:p-5 border border-slate-200 shadow-xs grid grid-cols-3 gap-2">
+          {[
+            { step: 1, title: 'Slot & Hall', icon: '📍' },
+            { step: 2, title: 'Event Info', icon: '📝' },
+            { step: 3, title: 'Pass Review', icon: '📄' },
+          ].map((s) => (
+            <button
+              key={s.step}
               type="button"
-              variant="secondary"
-              onClick={() => navigate(-1)}
-              className="flex-1"
+              onClick={() => {
+                if (s.step < wizardStep) setWizardStep(s.step);
+              }}
+              className={`p-3 rounded-2xl flex items-center justify-center gap-2.5 transition-all text-xs font-extrabold ${
+                wizardStep === s.step
+                  ? 'bg-blue-600 text-white shadow-md'
+                  : wizardStep > s.step
+                  ? 'bg-emerald-50 text-emerald-800 border border-emerald-200 cursor-pointer'
+                  : 'bg-slate-50 text-slate-400 opacity-60 cursor-not-allowed'
+              }`}
             >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              variant="primary"
-              loading={submitting}
-              className="flex-1"
-            >
-              Confirm Booking
-            </Button>
+              <span>{s.icon}</span>
+              <span className="hidden sm:inline">Step {s.step}: {s.title}</span>
+              <span className="sm:hidden">{s.title}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* Main Grid: Form Wizard (Left) & Digital Pass Card Preview (Right) */}
+        <div className="grid lg:grid-cols-12 gap-6">
+
+          {/* Form Content Panel */}
+          <div className="lg:col-span-7 bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-xs space-y-6">
+            {error && (
+              <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-xs font-bold text-rose-800 flex items-center gap-2">
+                <span>⚠️ {error}</span>
+              </div>
+            )}
+
+            {/* STEP 1: Select Hall & Time */}
+            {wizardStep === 1 && (
+              <div className="space-y-5">
+                <div>
+                  <h2 className="text-lg font-extrabold text-slate-900">Step 1: Choose Hall & Time Window</h2>
+                  <p className="text-xs text-slate-500">Select the venue and exact date/time duration.</p>
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                      Hall Venue <span className="text-rose-500">*</span>
+                    </label>
+                    <select
+                      name="hall_id"
+                      value={form.hall_id}
+                      onChange={handleChange}
+                      className={`w-full bg-slate-50 border rounded-2xl p-3 text-xs font-bold text-slate-900 focus:bg-white focus:border-blue-600 focus:outline-none transition-all ${
+                        errors.hall_id ? 'border-rose-400 ring-2 ring-rose-200' : 'border-slate-200'
+                      }`}
+                    >
+                      <option value="">Choose a hall venue…</option>
+                      {halls.map((h) => (
+                        <option key={h.id} value={h.id}>
+                          {h.name} — {h.floor} ({h.capacity} Pax)
+                        </option>
+                      ))}
+                    </select>
+                    {errors.hall_id && <p className="mt-1 text-[11px] font-bold text-rose-600">{errors.hall_id}</p>}
+                  </div>
+
+                  <Input
+                    label="Reservation Date" name="date" type="date" required
+                    value={form.date} onChange={handleChange}
+                    error={errors.date} min={today()}
+                  />
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <TimeSelect
+                      label="Start Time" name="start_time"
+                      value={form.start_time} onChange={handleChange}
+                      error={errors.start_time}
+                    />
+                    <TimeSelect
+                      label="End Time" name="end_time"
+                      value={form.end_time} onChange={handleChange}
+                      error={errors.end_time}
+                      isEndTime
+                      minAfter={form.start_time}
+                    />
+                  </div>
+
+                  {/* Realtime Availability Feedback Badge */}
+                  {form.hall_id && form.date && form.start_time && form.end_time && form.start_time < form.end_time && (
+                    <div className={`p-3.5 rounded-2xl border text-xs font-bold flex items-center gap-2 ${
+                      checkingAvail ? 'bg-slate-50 border-slate-200 text-slate-500' :
+                      avail?.available === true  ? 'bg-emerald-50 border-emerald-200 text-emerald-800' :
+                      avail?.available === false ? 'bg-rose-50 border-rose-200 text-rose-800' :
+                      'bg-slate-50 border-slate-200 text-slate-500'
+                    }`}>
+                      {checkingAvail ? (
+                        <><Spinner size="sm" /><span>Checking live availability schedule…</span></>
+                      ) : avail?.available === true ? (
+                        <><span>✨ Slot is 100% Available — No Overlaps!</span></>
+                      ) : avail?.available === false ? (
+                        <><span>⚠️ Conflict detected with existing booking ({avail.conflict?.start_time}–{avail.conflict?.end_time})</span></>
+                      ) : null}
+                    </div>
+                  )}
+                </div>
+
+                <div className="pt-4 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={handleNextStep}
+                    className="px-6 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs shadow-md transition-all flex items-center gap-2"
+                  >
+                    <span>Proceed to Event Details</span>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* STEP 2: Event Details */}
+            {wizardStep === 2 && (
+              <div className="space-y-5">
+                <div>
+                  <h2 className="text-lg font-extrabold text-slate-900">Step 2: Enter Event Purpose & Attendees</h2>
+                  <p className="text-xs text-slate-500">Describe the function and expected attendance.</p>
+                </div>
+
+                <div className="space-y-4">
+                  <Input
+                    label="Event Purpose / Title" name="purpose" required
+                    value={form.purpose} onChange={handleChange}
+                    error={errors.purpose}
+                    placeholder="e.g., Department Association Inauguration & Guest Lecture"
+                  />
+
+                  <Input
+                    label="Expected Attendance (Pax)" name="participants" type="number" required
+                    value={form.participants} onChange={handleChange}
+                    error={errors.participants}
+                    min={1} placeholder="e.g., 120"
+                  />
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                      Special Requirements <span className="text-slate-400 font-normal">(Optional)</span>
+                    </label>
+                    <textarea
+                      name="requirements"
+                      value={form.requirements}
+                      onChange={handleChange}
+                      rows={3}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-3 text-xs font-medium text-slate-900 focus:bg-white focus:border-blue-600 focus:outline-none transition-all resize-none"
+                      placeholder="e.g., 2 wireless podium mics, projector screen enabled, central AC setup"
+                    />
+                  </div>
+                </div>
+
+                <div className="pt-4 flex items-center justify-between">
+                  <button
+                    type="button"
+                    onClick={() => setWizardStep(1)}
+                    className="px-5 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-all"
+                  >
+                    ← Back to Step 1
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleNextStep}
+                    className="px-6 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs shadow-md transition-all flex items-center gap-2"
+                  >
+                    <span>Preview Official Pass</span>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* STEP 3: Pass Review & Confirm */}
+            {wizardStep === 3 && (
+              <div className="space-y-5">
+                <div>
+                  <h2 className="text-lg font-extrabold text-slate-900">Step 3: Authorize & Confirm Reservation</h2>
+                  <p className="text-xs text-slate-500">Review your ticket details before final dispatch.</p>
+                </div>
+
+                <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200/80 space-y-3 text-xs">
+                  <div className="flex justify-between border-b border-slate-200 pb-2">
+                    <span className="font-bold text-slate-500">Hall Venue:</span>
+                    <span className="font-extrabold text-slate-900">{selectedHallObj?.name || 'Selected Hall'}</span>
+                  </div>
+                  <div className="flex justify-between border-b border-slate-200 pb-2">
+                    <span className="font-bold text-slate-500">Date & Slot:</span>
+                    <span className="font-bold text-blue-700">{formatDate(form.date)} • {formatTimeRange(form.start_time, form.end_time)}</span>
+                  </div>
+                  <div className="flex justify-between border-b border-slate-200 pb-2">
+                    <span className="font-bold text-slate-500">Purpose:</span>
+                    <span className="font-bold text-slate-800">{form.purpose || 'Not specified'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-bold text-slate-500">Faculty Host:</span>
+                    <span className="font-bold text-slate-900">{user?.first_name} {user?.last_name || ''} ({user?.department || 'VCET'})</span>
+                  </div>
+                </div>
+
+                <form onSubmit={handleSubmit} className="pt-2">
+                  <div className="flex items-center justify-between gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setWizardStep(2)}
+                      className="px-5 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-all"
+                    >
+                      ← Back to Edit
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={submitting}
+                      className="flex-1 py-3 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-extrabold text-xs shadow-md transition-all flex items-center justify-center gap-2"
+                    >
+                      {submitting ? (
+                        <>
+                          <Spinner size="sm" />
+                          <span>Dispatching Authorization…</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>Confirm & Dispatch Hall Pass</span>
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
+
           </div>
-        </form>
+
+          {/* Right Live Digital Pass Card Preview */}
+          <div className="lg:col-span-5 space-y-4">
+            <div className="bg-gradient-to-br from-slate-900 via-blue-950 to-indigo-950 rounded-3xl p-6 text-white shadow-xl border border-slate-800 relative overflow-hidden space-y-4">
+              
+              <div className="flex items-center justify-between border-b border-white/15 pb-4">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="text-[10px] font-bold tracking-widest uppercase text-blue-200">Official Campus Pass Preview</span>
+                </div>
+                <span className="text-[10px] font-mono text-slate-400">VCET-PASS</span>
+              </div>
+
+              <div>
+                <p className="text-xs text-slate-400 font-semibold">Reserved Venue</p>
+                <h3 className="text-xl font-extrabold text-white mt-0.5">
+                  {selectedHallObj?.name || 'Select a Hall…'}
+                </h3>
+                <p className="text-[11px] text-blue-300 font-medium">{selectedHallObj?.floor || 'Ground Floor'}</p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 pt-2">
+                <div className="bg-white/10 p-3 rounded-2xl border border-white/15">
+                  <p className="text-[10px] text-slate-300 font-bold uppercase">Date</p>
+                  <p className="text-xs font-extrabold text-white mt-0.5">{formatDate(form.date)}</p>
+                </div>
+                <div className="bg-white/10 p-3 rounded-2xl border border-white/15">
+                  <p className="text-[10px] text-slate-300 font-bold uppercase">Time Window</p>
+                  <p className="text-xs font-extrabold text-emerald-300 mt-0.5">{formatTimeRange(form.start_time, form.end_time)}</p>
+                </div>
+              </div>
+
+              <div className="bg-white/10 p-3.5 rounded-2xl border border-white/15 space-y-1">
+                <p className="text-[10px] text-slate-300 font-bold uppercase">Event Title / Purpose</p>
+                <p className="text-xs font-bold text-white truncate">
+                  {form.purpose || 'e.g., Faculty Meeting'}
+                </p>
+              </div>
+
+              <div className="pt-2 border-t border-white/15 flex items-center justify-between text-[11px] text-slate-300">
+                <span>Faculty: <strong>{user?.first_name} {user?.last_name || ''}</strong></span>
+                <span className="font-mono text-emerald-400 font-bold">READY</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
       </div>
     </DashboardLayout>
   );
