@@ -15,22 +15,15 @@ const LiveBadge = () => (
   </span>
 );
 
-const StatCard = ({ label, value, icon, color, trend }) => (
-  <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:shadow-md transition-all">
-    <div className="flex items-center gap-3">
-      <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center shrink-0 ${color} shadow-xs`}>
-        {icon}
-      </div>
-      <div className="min-w-0">
-        <p className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight leading-none">{value}</p>
-        <p className="text-[11px] sm:text-xs font-semibold text-slate-500 mt-1 truncate">{label}</p>
-      </div>
+const StatCard = ({ label, value, icon, color }) => (
+  <div className="bg-white rounded-2xl p-3.5 sm:p-5 border border-slate-200 shadow-xs flex items-center gap-3 hover:shadow-md transition-all">
+    <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center shrink-0 ${color} shadow-xs`}>
+      {icon}
     </div>
-    {trend && (
-      <span className="text-[10px] sm:text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 self-start sm:self-auto shrink-0">
-        {trend}
-      </span>
-    )}
+    <div className="min-w-0 flex-1">
+      <p className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight leading-none">{value}</p>
+      <p className="text-[11px] sm:text-xs font-semibold text-slate-500 mt-1 leading-tight">{label}</p>
+    </div>
   </div>
 );
 
@@ -136,7 +129,6 @@ const Dashboard = () => {
           <StatCard
             label="Total Reservations"
             value={confirmed.length}
-            trend="+12% Active"
             color="bg-blue-50 text-blue-700 border border-blue-100"
             icon={
               <svg className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -148,7 +140,6 @@ const Dashboard = () => {
           <StatCard
             label="Upcoming Events"
             value={upcoming.length}
-            trend="Scheduled"
             color="bg-purple-50 text-purple-700 border border-purple-100"
             icon={
               <svg className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -160,7 +151,6 @@ const Dashboard = () => {
           <StatCard
             label="Today's Bookings"
             value={todayBooked.length}
-            trend="Live Today"
             color="bg-amber-50 text-amber-700 border border-amber-100"
             icon={
               <svg className="w-5 h-5 sm:w-6 sm:h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -172,7 +162,6 @@ const Dashboard = () => {
           <StatCard
             label="Halls Available Now"
             value={availableNow.length}
-            trend="Ready for Use"
             color="bg-emerald-50 text-emerald-700 border border-emerald-100"
             icon={
               <svg className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -195,7 +184,7 @@ const Dashboard = () => {
                   <h2 className="text-sm sm:text-base font-extrabold text-slate-900">Upcoming Reservations</h2>
                   <LiveBadge />
                 </div>
-                <Link to="/bookings" className="text-xs font-bold text-blue-600 hover:underline">View all</Link>
+                <Link to="/schedule" className="text-xs font-bold text-blue-600 hover:underline">View all</Link>
               </div>
 
               {nextBookings.length === 0 ? (
