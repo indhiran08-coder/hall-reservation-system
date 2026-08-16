@@ -33,8 +33,12 @@ const parseHHMM = (hhmm) => {
 const toHHMM = (hour, minute) =>
   `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
 
-const TimeSelect = ({ name, value, onChange, label, error, minAfter = null, isEndTime = false }) => {
+const TimeSelect = ({ name, value, onChange, label, error, minAfter = null, isEndTime = false, selectedDate = null }) => {
   const { hour, minute } = parseHHMM(value);
+
+  const now = new Date();
+  const todayStr = today();
+  const currentHour = now.getHours();
 
   const fireChange = (newHour, newMinute) => {
     const clampedHour   = Math.min(Math.max(newHour, BOOK_START), BOOK_END);
@@ -46,6 +50,7 @@ const TimeSelect = ({ name, value, onChange, label, error, minAfter = null, isEn
   const startMinute = minAfter ? parseHHMM(minAfter).minute : 0;
 
   const filteredHours = HOUR_OPTIONS.filter(({ value: h }) => {
+    if (selectedDate === todayStr && !isEndTime && h < currentHour) return false;
     if (!isEndTime) return h < BOOK_END;
     return h > startHour || (h === startHour && startMinute < 55);
   });
@@ -158,11 +163,28 @@ const BookHall = () => {
 
   const validateStep1 = () => {
     const errs = {};
+    const todayStr = today();
+    const now = new Date();
+    const currentHHMM = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
     if (!form.hall_id) errs.hall_id = 'Please select a hall';
     if (!form.date)    errs.date = 'Date is required';
+
+    if (form.date && form.date < todayStr) {
+      errs.date = 'Cannot book a hall for a past date';
+    }
+
     if (!form.start_time) errs.start_time = 'Required';
     if (!form.end_time)   errs.end_time = 'Required';
-    if (form.start_time && form.end_time && form.start_time >= form.end_time) errs.end_time = 'Must be after start time';
+
+    if (form.date === todayStr && form.start_time && form.start_time < currentHHMM) {
+      errs.start_time = 'Start time cannot be in the past. Select a future time slot.';
+    }
+
+    if (form.start_time && form.end_time && form.start_time >= form.end_time) {
+      errs.end_time = 'End time must be after start time';
+    }
+
     if (avail?.available === false) errs.start_time = 'Selected slot is already booked';
     return errs;
   };
@@ -327,6 +349,7 @@ const BookHall = () => {
                       label="Start Time" name="start_time"
                       value={form.start_time} onChange={handleChange}
                       error={errors.start_time}
+                      selectedDate={form.date}
                     />
                     <TimeSelect
                       label="End Time" name="end_time"
@@ -334,6 +357,7 @@ const BookHall = () => {
                       error={errors.end_time}
                       isEndTime
                       minAfter={form.start_time}
+                      selectedDate={form.date}
                     />
                   </div>
 

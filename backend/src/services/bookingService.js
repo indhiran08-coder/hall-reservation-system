@@ -13,6 +13,19 @@ const { sendSupervisorNotification } = require('./telegramService');
 const createBooking = async (userId, bookingData) => {
   const { hall_id, purpose, date, start_time, end_time, participants, requirements } = bookingData;
 
+  // ── Enforce valid future date and time ───────────────────────────────────────
+  const now = new Date();
+  const todayStr = now.toISOString().split('T')[0];
+  const currentHHMM = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+  if (date < todayStr) {
+    throw new Error('Cannot book a hall for a past date');
+  }
+
+  if (date === todayStr && start_time < currentHHMM) {
+    throw new Error('Cannot book a hall for a past time slot today');
+  }
+
   // ── Enforce booking hours: 9:00 AM – 10:00 PM (09:00 – 22:00) ─────────────
   if (start_time < '09:00' || start_time > '22:00') {
     throw new Error('Start time must be between 9:00 AM and 10:00 PM');
