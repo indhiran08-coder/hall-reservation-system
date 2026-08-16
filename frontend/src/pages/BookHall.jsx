@@ -112,7 +112,7 @@ const BookHall = () => {
     date: today(),
     start_time: '09:00',
     end_time: '10:00',
-    participants: '50',
+    participants: '',
     requirements: ''
   });
   const [errors, setErrors] = useState({});
@@ -331,7 +331,7 @@ const BookHall = () => {
                       <option value="">Choose a hall venue…</option>
                       {halls.map((h) => (
                         <option key={h.id} value={h.id}>
-                          {h.name} — {h.floor} ({h.capacity} Pax)
+                          {h.name} — {h.floor}
                         </option>
                       ))}
                     </select>
