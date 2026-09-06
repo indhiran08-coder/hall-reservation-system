@@ -5,7 +5,7 @@ import BookingCard from '../components/BookingCard';
 import Spinner from '../components/ui/Spinner';
 import { useAuth } from '../context/AuthContext';
 import { bookingsAPI, hallsAPI } from '../services/api';
-import { formatDate, formatTimeRange } from '../utils/formatters';
+import { formatDate, formatTimeRange, today } from '../utils/formatters';
 import supabase from '../lib/supabase';
 
 const LiveBadge = () => (
@@ -60,7 +60,7 @@ const Dashboard = () => {
   }, [fetchData]);
 
   const now = new Date();
-  const todayStr = now.toISOString().split('T')[0];
+  const todayStr = today();
 
   const confirmed   = bookings.filter((b) => b.status === 'confirmed');
   const upcoming    = confirmed.filter((b) => new Date(`${b.date}T${b.start_time}`) > now);

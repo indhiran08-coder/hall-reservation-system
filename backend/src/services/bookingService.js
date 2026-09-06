@@ -15,7 +15,10 @@ const createBooking = async (userId, bookingData) => {
 
   // ── Enforce valid future date and time ───────────────────────────────────────
   const now = new Date();
-  const todayStr = now.toISOString().split('T')[0];
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  const todayStr = `${year}-${month}-${day}`;
   const currentHHMM = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 
   if (date < todayStr) {

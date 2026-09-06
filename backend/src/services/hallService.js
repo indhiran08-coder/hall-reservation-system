@@ -14,8 +14,11 @@ const getAllHalls = async () => {
 
   // Get currently active bookings (today, ongoing right now)
   const now = new Date();
-  const today = now.toISOString().split('T')[0];
-  const currentTime = now.toTimeString().slice(0, 5); // HH:MM
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  const today = `${year}-${month}-${day}`;
+  const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 
   const { data: activeBookings } = await supabase
     .from('bookings')
