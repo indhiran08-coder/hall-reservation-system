@@ -236,30 +236,28 @@ const Login = () => {
           <div className="lg:col-span-7 p-8 sm:p-12 flex flex-col justify-between bg-white">
             <div className="max-w-md mx-auto w-full space-y-6">
 
-              {/* 🎓 / 🛡️ Role Tab Selector Bar */}
+              {/* Role Tab Selector Bar */}
               <div className="bg-slate-100 p-1 rounded-2xl border border-slate-200 flex items-center gap-1">
                 <button
                   type="button"
                   onClick={() => setRoleTab('faculty')}
-                  className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
+                  className={`flex-1 py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center ${
                     roleTab === 'faculty'
                       ? 'bg-white text-blue-700 shadow-xs border border-slate-200/80'
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  <span className="text-sm">🎓</span>
                   <span>Faculty Sign In</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setRoleTab('admin')}
-                  className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
+                  className={`flex-1 py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center ${
                     roleTab === 'admin'
                       ? 'bg-white text-violet-700 shadow-xs border border-slate-200/80'
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  <span className="text-sm">🛡️</span>
                   <span>Admin Portal</span>
                 </button>
               </div>
