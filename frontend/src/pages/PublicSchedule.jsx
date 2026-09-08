@@ -360,12 +360,59 @@ const PublicSchedule = () => {
                               COMPLETED
                             </span>
                           )}
+                          {b.is_multiday && (
+                            <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-[11px] font-extrabold bg-indigo-100 text-indigo-800 border border-indigo-200 shadow-2xs">
+                              <span>🗓</span>
+                              <span>Multi-Day Event • Day {b.current_day_index} of {b.total_days}</span>
+                            </span>
+                          )}
                         </div>
 
                         {/* Purpose / Title */}
                         <h4 className="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight leading-snug mb-3">
                           {b.purpose}
                         </h4>
+
+                        {/* Multi-Day Event Banner & Date Switcher */}
+                        {b.is_multiday && (
+                          <div className="mb-3 p-3 rounded-xl bg-white/80 border border-indigo-200/80 shadow-2xs space-y-2">
+                            <div className="flex flex-wrap items-center justify-between gap-1">
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-xs">📅</span>
+                                <span className="text-[11px] font-bold text-indigo-900">
+                                  Full Event Duration: {new Date(b.start_date + 'T00:00:00').toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })} to {new Date(b.end_date + 'T00:00:00').toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' })} ({b.total_days} Consecutive Days)
+                                </span>
+                              </div>
+                              <span className="text-[10px] font-semibold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-100">
+                                {fmtTime(b.start_time)} – {fmtTime(b.end_time)} daily
+                              </span>
+                            </div>
+
+                            {/* Quick Day Jumper Buttons */}
+                            <div className="flex flex-wrap items-center gap-1.5 pt-1 border-t border-indigo-100/70">
+                              <span className="text-[10px] font-bold text-slate-400 uppercase mr-1">Switch Day:</span>
+                              {b.all_dates?.map((d, dIdx) => {
+                                const isThisDay = d === b.date;
+                                const shortDate = new Date(d + 'T00:00:00').toLocaleDateString('en-IN', { month: 'short', day: 'numeric' });
+                                return (
+                                  <button
+                                    key={d}
+                                    type="button"
+                                    onClick={() => setDate(d)}
+                                    title={`View Schedule for Day ${dIdx + 1}: ${shortDate}`}
+                                    className={`px-2.5 py-1 rounded-lg text-[11px] font-extrabold transition-all cursor-pointer ${
+                                      isThisDay
+                                        ? 'bg-indigo-600 text-white shadow-xs ring-2 ring-indigo-300'
+                                        : 'bg-white text-indigo-700 border border-indigo-200 hover:bg-indigo-50 active:scale-95'
+                                    }`}
+                                  >
+                                    Day {dIdx + 1} <span className="font-normal opacity-80 text-[10px]">({shortDate})</span>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
 
                         {/* Detail info grid */}
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-3">
