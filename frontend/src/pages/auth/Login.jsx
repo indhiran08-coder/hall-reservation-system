@@ -79,7 +79,6 @@ const Login = () => {
   const location  = useLocation();
   const { user, login } = useAuth();
 
-  const [roleTab, setRoleTab]   = useState('faculty'); // 'faculty' or 'admin'
   const [form, setForm]         = useState({ college_email: '', password: '' });
   const [errors, setErrors]     = useState({});
   const [loading, setLoading]   = useState(false);
@@ -97,7 +96,7 @@ const Login = () => {
 
   const validate = () => {
     const errs = {};
-    if (!isEmailValid) errs.college_email = 'Enter a valid college email address';
+    if (!isEmailValid) errs.college_email = 'Enter a valid email address';
     if (!form.password) errs.password = 'Password is required';
     return errs;
   };
@@ -107,29 +106,14 @@ const Login = () => {
     const errs = validate();
     if (Object.keys(errs).length) { setErrors(errs); return; }
 
-    const inputEmail = form.college_email.trim().toLowerCase();
-
-    // Strict Admin Portal Restriction (Confidential)
-    if (roleTab === 'admin' && inputEmail !== 'indhirans@velalarengg.ac.in') {
-      setApiError('Access Denied: Invalid administrator credentials or unauthorized account.');
-      return;
-    }
-
     setLoading(true); setApiError('');
     try {
       const { data } = await authAPI.login(form);
       const isUserAdmin = data.user.role === 'admin' || data.user.college_email?.toLowerCase() === 'indhirans@velalarengg.ac.in';
-
-      if (roleTab === 'admin' && !isUserAdmin) {
-        setApiError('Access Denied: Invalid administrator credentials or unauthorized account.');
-        setLoading(false);
-        return;
-      }
-
       login(data.user, data.token);
       navigate(isUserAdmin ? '/admin' : '/dashboard');
     } catch (err) {
-      setApiError(err.response?.data?.error || 'Login failed. Please verify your email and password.');
+      setApiError(err.response?.data?.error || 'Invalid email or password. Please try again.');
     } finally { setLoading(false); }
   };
 
@@ -223,58 +207,35 @@ const Login = () => {
             </div>
           </div>
 
-          {/* ── RIGHT PANEL: Clean Professional Sign In Form ── */}
-          <div className="lg:col-span-7 p-8 sm:p-12 flex flex-col justify-between bg-white">
-            <div className="max-w-md mx-auto w-full space-y-6">
+          {/* ── RIGHT PANEL: Clean Single Login Form ── */}
+          <div className="lg:col-span-7 p-8 sm:p-10 flex flex-col justify-between bg-white">
+            <div className="max-w-sm mx-auto w-full space-y-6">
 
-              {/* Role Tab Selector Bar */}
-              <div className="bg-slate-100 p-1 rounded-2xl border border-slate-200 flex items-center gap-1">
-                <button
-                  type="button"
-                  onClick={() => setRoleTab('faculty')}
-                  className={`flex-1 py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center ${
-                    roleTab === 'faculty'
-                      ? 'bg-white text-blue-700 shadow-xs border border-slate-200/80'
-                      : 'text-slate-600 hover:text-slate-900'
-                  }`}
+              {/* Top: Welcome + Check Halls button */}
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Welcome Back</h1>
+                  <p className="text-sm text-slate-500 mt-1">Login to VCET Hall Reservation Portal</p>
+                </div>
+                <Link
+                  to="/schedule"
+                  className="shrink-0 px-4 py-2 rounded-full border-2 border-slate-800 text-xs font-bold text-slate-800 hover:bg-slate-800 hover:text-white transition-all duration-200 whitespace-nowrap"
                 >
-                  <span>Staff Sign In</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setRoleTab('admin')}
-                  className={`flex-1 py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center ${
-                    roleTab === 'admin'
-                      ? 'bg-white text-violet-700 shadow-xs border border-slate-200/80'
-                      : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  <span>Admin Portal</span>
-                </button>
+                  Check Halls
+                </Link>
               </div>
 
-              {/* Form Title Header */}
-              <div className="text-left space-y-1">
-                <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-                  {roleTab === 'admin' ? 'Administrator Sign In' : 'Staff Sign In'}
-                </h1>
-                <p className="text-sm text-slate-500 font-normal">
-                  {roleTab === 'admin'
-                    ? 'Enter administrator credentials to manage bookings & halls'
-                    : 'Enter your college credentials to access hall reservations'}
-                </p>
-              </div>
-
-              {/* Success / Error Alerts */}
+              {/* Success Alert */}
               {justVerified && (
                 <div className="flex items-center gap-3 p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs font-semibold text-emerald-800">
                   <svg className="w-5 h-5 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
-                  <span>Account verified successfully! You can now sign in below.</span>
+                  <span>Account verified! You can now sign in.</span>
                 </div>
               )}
 
+              {/* Error Alert */}
               {apiError && (
                 <div className="flex items-center gap-3 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-xs font-semibold text-rose-800">
                   <svg className="w-5 h-5 text-rose-600 shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -285,9 +246,9 @@ const Login = () => {
               )}
 
               {/* Login Form */}
-              <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+              <form onSubmit={handleSubmit} className="space-y-5" noValidate>
                 <RefinedInput
-                  label="Email Address"
+                  label="EMAIL ADDRESS"
                   name="college_email"
                   type="email"
                   required
@@ -295,7 +256,7 @@ const Login = () => {
                   onChange={handleChange}
                   error={errors.college_email}
                   isValid={isEmailValid}
-                  placeholder={roleTab === 'admin' ? 'Enter your email' : 'yourname@velalarengg.ac.in'}
+                  placeholder="Enter your email"
                   autoComplete="email"
                   icon={
                     <svg className="w-5 h-5 shrink-0" style={{ width: '20px', height: '20px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -305,14 +266,14 @@ const Login = () => {
                 />
 
                 <RefinedInput
-                  label="Password"
+                  label="PASSWORD"
                   name="password"
                   type="password"
                   required
                   value={form.password}
                   onChange={handleChange}
                   error={errors.password}
-                  placeholder="••••••••••••"
+                  placeholder="Enter your password"
                   autoComplete="current-password"
                   icon={
                     <svg className="w-5 h-5 shrink-0" style={{ width: '20px', height: '20px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -321,84 +282,47 @@ const Login = () => {
                   }
                 />
 
-                {/* Forgot Password Link */}
-                <div className="flex items-center justify-end text-xs">
-                  <Link
-                    to="/forgot-password"
-                    className="font-semibold text-blue-600 hover:text-blue-800 transition-colors hover:underline"
-                  >
+                {/* Forgot Password */}
+                <div className="flex justify-end">
+                  <Link to="/forgot-password" className="text-xs font-semibold text-blue-600 hover:text-blue-800 hover:underline transition-colors">
                     Forgot password?
                   </Link>
                 </div>
 
-                {/* Sign In Button */}
+                {/* Secure Login Button */}
                 <button
                   type="submit"
                   disabled={loading}
-                  className={`w-full py-3.5 px-4 rounded-xl text-white font-bold text-sm tracking-wide shadow-md disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2 ${
-                    roleTab === 'admin'
-                      ? 'bg-violet-700 hover:bg-violet-800 active:bg-violet-900 shadow-violet-700/20'
-                      : 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800 shadow-blue-600/20'
-                  }`}
+                  className="w-full py-3.5 px-4 rounded-xl text-white font-bold text-sm tracking-wide shadow-md disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2"
+                  style={{ background: 'linear-gradient(135deg, #1e3a5f 0%, #1e3a8a 100%)' }}
                 >
                   {loading ? (
                     <>
-                      <svg className="w-5 h-5 animate-spin shrink-0" style={{ width: '20px', height: '20px' }} fill="none" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 animate-spin shrink-0" fill="none" viewBox="0 0 24 24">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                       </svg>
                       <span>Authenticating…</span>
                     </>
                   ) : (
-                    <>
-                      <span>Sign In to {roleTab === 'admin' ? 'Admin Portal' : 'Staff Account'}</span>
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                      </svg>
-                    </>
+                    <span>Secure Login</span>
                   )}
                 </button>
               </form>
 
               {/* Create Account Link */}
-              <div className="text-center pt-2">
-                <p className="text-xs sm:text-sm text-slate-500">
-                  Don't have an account?{' '}
-                  <Link to="/register" className="font-bold text-blue-600 hover:text-blue-800 hover:underline">
-                    Create Staff Account
-                  </Link>
-                </p>
-              </div>
-
-              {/* View Schedule Direct Banner */}
-              <div className="pt-4 border-t border-slate-100">
-                <Link
-                  to="/schedule"
-                  className="group flex items-center gap-3 w-full bg-slate-50 hover:bg-blue-50/60 border border-slate-200 hover:border-blue-300 rounded-2xl p-3.5 transition-all duration-200"
-                >
-                  <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shrink-0 shadow-xs group-hover:scale-105 transition-transform">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                  <div className="flex-1 text-left">
-                    <p className="text-xs font-bold text-slate-900 group-hover:text-blue-700 transition-colors">View Live Hall Schedule</p>
-                    <p className="text-[11px] font-medium text-emerald-600 flex items-center gap-1.5 mt-0.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                      Public Access • No Login Required
-                    </p>
-                  </div>
-                  <svg className="w-5 h-5 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all shrink-0" style={{ width: '20px', height: '20px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
+              <p className="text-center text-xs sm:text-sm text-slate-500">
+                Don't have an account?{' '}
+                <Link to="/register" className="font-bold text-blue-700 hover:text-blue-900 hover:underline">
+                  Create Staff Account
                 </Link>
-              </div>
+              </p>
 
             </div>
 
-            {/* Bottom Institutional Copyright */}
-            <div className="mt-8 pt-4 border-t border-slate-100 text-center text-xs text-slate-400">
-              © {new Date().getFullYear()} 
+            {/* Bottom Copyright */}
+            <div className="mt-6 pt-4 border-t border-slate-100 text-center text-xs text-slate-400">
+              © {new Date().getFullYear()} VCET. All rights reserved.
             </div>
           </div>
 
