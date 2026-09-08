@@ -388,26 +388,23 @@ const PublicSchedule = () => {
                               </span>
                             </div>
 
-                            {/* Quick Day Jumper Buttons */}
+                            {/* Informative Day Pills */}
                             <div className="flex flex-wrap items-center gap-1.5 pt-1 border-t border-indigo-100/70">
-                              <span className="text-[10px] font-bold text-slate-400 uppercase mr-1">Switch Day:</span>
+                              <span className="text-[10px] font-bold text-slate-400 uppercase mr-1">Scheduled Days:</span>
                               {b.all_dates?.map((d, dIdx) => {
                                 const isThisDay = d === b.date;
                                 const shortDate = new Date(d + 'T00:00:00').toLocaleDateString('en-IN', { month: 'short', day: 'numeric' });
                                 return (
-                                  <button
+                                  <span
                                     key={d}
-                                    type="button"
-                                    onClick={() => setDate(d)}
-                                    title={`View Schedule for Day ${dIdx + 1}: ${shortDate}`}
-                                    className={`px-2.5 py-1 rounded-lg text-[11px] font-extrabold transition-all cursor-pointer ${
+                                    className={`px-2.5 py-1 rounded-lg text-[11px] font-extrabold cursor-default select-none ${
                                       isThisDay
-                                        ? 'bg-indigo-600 text-white shadow-xs ring-2 ring-indigo-300'
-                                        : 'bg-white text-indigo-700 border border-indigo-200 hover:bg-indigo-50 active:scale-95'
+                                        ? 'bg-indigo-600 text-white shadow-xs'
+                                        : 'bg-white text-indigo-700 border border-indigo-200'
                                     }`}
                                   >
                                     Day {dIdx + 1} <span className="font-normal opacity-80 text-[10px]">({shortDate})</span>
-                                  </button>
+                                  </span>
                                 );
                               })}
                             </div>
