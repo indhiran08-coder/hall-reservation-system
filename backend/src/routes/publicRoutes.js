@@ -30,7 +30,7 @@ router.get('/schedule', async (req, res) => {
 
     const { data: bookings, error } = await supabase
       .from('bookings')
-      .select('id, hall_id, purpose, date, start_time, end_time, participants, status, hall:halls(id, name, floor, location)')
+      .select('id, hall_id, purpose, date, start_time, end_time, participants, status, hall:halls(id, name, floor, location, capacity), user:users(first_name, last_name, department)')
       .eq('date', date)
       .eq('status', 'confirmed')
       .order('start_time');

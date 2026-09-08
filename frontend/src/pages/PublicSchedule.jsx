@@ -303,6 +303,18 @@ const PublicSchedule = () => {
                   const c = COLORS[hallIndex >= 0 ? hallIndex % COLORS.length : 0];
                   const status = getEventStatus(date, b.start_time, b.end_time);
 
+                  // Calculate duration in minutes
+                  const startMins = timeToMins(b.start_time);
+                  const endMins   = timeToMins(b.end_time);
+                  const durMins   = endMins - startMins;
+                  const durLabel  = durMins >= 60
+                    ? `${Math.floor(durMins / 60)}h${durMins % 60 > 0 ? ` ${durMins % 60}m` : ''}`
+                    : `${durMins}m`;
+
+                  const bookerName = b.user
+                    ? [b.user.first_name, b.user.last_name].filter(Boolean).join(' ')
+                    : null;
+
                   return (
                     <div key={b.id || idx} className="relative group">
                       
@@ -320,79 +332,83 @@ const PublicSchedule = () => {
                       </div>
 
                       {/* Roadmap Node Card */}
-                      <div
-                        className={`rounded-2xl border ${c.border} ${c.bg} p-5 sm:p-6 transition-all duration-200 shadow-xs hover:shadow-md hover:-translate-y-0.5`}
-                      >
-                        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
-                          
-                          {/* Left Content */}
-                          <div className="space-y-2 flex-1">
-                            
-                            {/* Hall Badge & Status Indicator */}
-                            <div className="flex flex-wrap items-center gap-2">
-                              <span className={`px-3 py-1 rounded-full text-xs font-bold ${c.badge} border ${c.border}`}>
-                                🏛️ {b.hall?.name || 'Hall'}
-                              </span>
+                      <div className={`rounded-2xl border ${c.border} ${c.bg} p-5 sm:p-6 transition-all duration-200 shadow-xs hover:shadow-md hover:-translate-y-0.5`}>
 
-                              {b.hall?.floor && (
-                                <span className="text-xs text-slate-500 font-medium">
-                                  {b.hall.floor} — {b.hall.location}
-                                </span>
-                              )}
-
-                              {/* Status Pills */}
-                              {status === 'ongoing' && (
-                                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-600 text-white shadow-xs">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
-                                  ONGOING NOW
-                                </span>
-                              )}
-                              {status === 'upcoming' && (
-                                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-700">
-                                  UPCOMING
-                                </span>
-                              )}
-                              {status === 'completed' && (
-                                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-200 text-slate-600">
-                                  COMPLETED
-                                </span>
-                              )}
-                            </div>
-
-                            {/* Event Purpose */}
-                            <h4 className="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight leading-snug">
-                              {b.purpose}
-                            </h4>
-
-                            {/* User & Department Info */}
-                            {b.user && (
-                              <div className="flex items-center gap-2 text-xs text-slate-600 font-medium pt-1">
-                                <span className="font-bold text-slate-800">
-                                  👤 {[b.user.first_name, b.user.last_name].filter(Boolean).join(' ') || 'Faculty'}
-                                </span>
-                                {b.user.department && (
-                                  <>
-                                    <span>•</span>
-                                    <span>{b.user.department}</span>
-                                  </>
-                                )}
-                              </div>
-                            )}
-
-                          </div>
-
-                          {/* Right Time Column */}
-                          <div className="shrink-0 bg-white/80 backdrop-blur-xs rounded-xl p-3 border border-slate-200/80 text-left sm:text-right min-w-[150px]">
-                            <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">Time Slot</div>
-                            <div className="text-sm font-extrabold text-blue-700 mt-0.5">
-                              {fmtTime(b.start_time)} – {fmtTime(b.end_time)}
-                            </div>
-                            <div className="text-[11px] font-semibold text-slate-500 mt-1 flex items-center sm:justify-end gap-1">
-                              <span>👥 {b.participants ?? 'N/A'} Participants</span>
-                            </div>
-                          </div>
-
+                        {/* Top row: Hall badge + status */}
+                        <div className="flex flex-wrap items-center gap-2 mb-3">
+                          <span className={`px-3 py-1 rounded-full text-xs font-bold ${c.badge} border ${c.border}`}>
+                            🏛 {b.hall?.name || 'Hall'}
+                          </span>
+                          {b.hall?.floor && (
+                            <span className="text-xs text-slate-500 font-medium">
+                              {b.hall.floor}{b.hall.location ? ` — ${b.hall.location}` : ''}
+                            </span>
+                          )}
+                          {status === 'ongoing' && (
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-600 text-white shadow-xs">
+                              <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
+                              ONGOING NOW
+                            </span>
+                          )}
+                          {status === 'upcoming' && (
+                            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-700">
+                              UPCOMING
+                            </span>
+                          )}
+                          {status === 'completed' && (
+                            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-200 text-slate-600">
+                              COMPLETED
+                            </span>
+                          )}
                         </div>
+
+                        {/* Purpose / Title */}
+                        <h4 className="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight leading-snug mb-3">
+                          {b.purpose}
+                        </h4>
+
+                        {/* Detail info grid */}
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-3">
+                          {/* Timing */}
+                          <div className="bg-white/70 rounded-xl px-3 py-2 border border-white/80">
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Timing</p>
+                            <p className="text-xs font-extrabold text-blue-700 mt-0.5">
+                              {fmtTime(b.start_time)} – {fmtTime(b.end_time)}
+                            </p>
+                          </div>
+                          {/* Duration */}
+                          <div className="bg-white/70 rounded-xl px-3 py-2 border border-white/80">
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Duration</p>
+                            <p className="text-xs font-extrabold text-slate-800 mt-0.5">{durLabel}</p>
+                          </div>
+                          {/* Participants */}
+                          <div className="bg-white/70 rounded-xl px-3 py-2 border border-white/80">
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Participants</p>
+                            <p className="text-xs font-extrabold text-slate-800 mt-0.5">
+                              {b.participants ? `${b.participants} pax` : 'N/A'}
+                            </p>
+                          </div>
+                          {/* Hall Capacity */}
+                          {b.hall?.capacity && (
+                            <div className="bg-white/70 rounded-xl px-3 py-2 border border-white/80">
+                              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Hall Cap.</p>
+                              <p className="text-xs font-extrabold text-slate-800 mt-0.5">{b.hall.capacity} pax</p>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Booker info row */}
+                        {(bookerName || b.user?.department) && (
+                          <div className="flex items-center gap-2 pt-2 border-t border-slate-200/60 text-xs text-slate-600">
+                            <svg className="w-3.5 h-3.5 shrink-0 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                            {bookerName && <span className="font-bold text-slate-800">{bookerName}</span>}
+                            {bookerName && b.user?.department && <span className="text-slate-400">•</span>}
+                            {b.user?.department && <span className="font-medium">{b.user.department}</span>}
+                          </div>
+                        )}
+
                       </div>
 
                     </div>
