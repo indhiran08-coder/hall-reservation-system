@@ -87,21 +87,12 @@ const Login = () => {
 
   const justVerified = location.state?.verified;
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.college_email.trim());
-  const needsDomain  = form.college_email.length > 0 && !form.college_email.includes('@');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((f) => ({ ...f, [name]: value }));
     setErrors((p) => ({ ...p, [name]: '' }));
     setApiError('');
-  };
-
-  const handleAppendDomain = () => {
-    setForm((f) => ({
-      ...f,
-      college_email: f.college_email.trim() + '@velalarengg.ac.in',
-    }));
-    setErrors((p) => ({ ...p, college_email: '' }));
   };
 
   const validate = () => {
@@ -295,36 +286,23 @@ const Login = () => {
 
               {/* Login Form */}
               <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-                <div className="space-y-1">
-                  <RefinedInput
-                    label="College Email Address"
-                    name="college_email"
-                    type="email"
-                    required
-                    value={form.college_email}
-                    onChange={handleChange}
-                    error={errors.college_email}
-                    isValid={isEmailValid}
-                    placeholder="yourname@velalarengg.ac.in"
-                    autoComplete="email"
-                    icon={
-                      <svg className="w-5 h-5 shrink-0" style={{ width: '20px', height: '20px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                      </svg>
-                    }
-                  />
-
-                  {/* ⚡ Instant Email Domain Completion Chip */}
-                  {needsDomain && (
-                    <button
-                      type="button"
-                      onClick={handleAppendDomain}
-                      className="inline-flex items-center gap-1.5 text-[11px] font-bold text-blue-600 hover:text-blue-800 bg-blue-50 border border-blue-200 px-2.5 py-1 rounded-lg transition-all hover:bg-blue-100 mt-1 cursor-pointer"
-                    >
-                      <span>⚡ Add @velalarengg.ac.in</span>
-                    </button>
-                  )}
-                </div>
+                <RefinedInput
+                  label="Email Address"
+                  name="college_email"
+                  type="email"
+                  required
+                  value={form.college_email}
+                  onChange={handleChange}
+                  error={errors.college_email}
+                  isValid={isEmailValid}
+                  placeholder={roleTab === 'admin' ? 'Enter your email' : 'yourname@velalarengg.ac.in'}
+                  autoComplete="email"
+                  icon={
+                    <svg className="w-5 h-5 shrink-0" style={{ width: '20px', height: '20px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                  }
+                />
 
                 <RefinedInput
                   label="Password"
