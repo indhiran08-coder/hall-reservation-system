@@ -331,7 +331,7 @@ const BookHall = () => {
                       <option value="">Choose a hall venue…</option>
                       {halls.map((h) => (
                         <option key={h.id} value={h.id}>
-                          {h.name} — {h.floor}
+                          {h.name} — {h.floor}{h.capacity ? ` · ${h.capacity} pax` : ''}
                         </option>
                       ))}
                     </select>
@@ -477,7 +477,7 @@ const BookHall = () => {
                     <span className="font-bold text-slate-800">{form.purpose || 'Not specified'}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="font-bold text-slate-500">Faculty Host:</span>
+                    <span className="font-bold text-slate-500">Staff Host:</span>
                     <span className="font-bold text-slate-900">{user?.first_name} {user?.last_name || ''} ({user?.department || 'VCET'})</span>
                   </div>
                 </div>
@@ -535,6 +535,9 @@ const BookHall = () => {
                   {selectedHallObj?.name || 'Select a Hall…'}
                 </h3>
                 <p className="text-[11px] text-blue-300 font-medium">{selectedHallObj?.floor || 'Ground Floor'}</p>
+                {selectedHallObj?.capacity && (
+                  <p className="text-[11px] text-slate-400 font-medium mt-0.5">{selectedHallObj.capacity} pax capacity</p>
+                )}
               </div>
 
               <div className="grid grid-cols-2 gap-3 pt-2">
@@ -551,12 +554,12 @@ const BookHall = () => {
               <div className="bg-white/10 p-3.5 rounded-2xl border border-white/15 space-y-1">
                 <p className="text-[10px] text-slate-300 font-bold uppercase">Event Title / Purpose</p>
                 <p className="text-xs font-bold text-white truncate">
-                  {form.purpose || 'e.g., Faculty Meeting'}
+                  {form.purpose || 'e.g., Staff Meeting'}
                 </p>
               </div>
 
               <div className="pt-2 border-t border-white/15 flex items-center justify-between text-[11px] text-slate-300">
-                <span>Faculty: <strong>{user?.first_name} {user?.last_name || ''}</strong></span>
+                <span>Staff: <strong>{user?.first_name} {user?.last_name || ''}</strong></span>
                 <span className="font-mono text-emerald-400 font-bold">READY</span>
               </div>
             </div>
