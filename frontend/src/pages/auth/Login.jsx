@@ -219,7 +219,7 @@ const Login = () => {
             {/* Footer Tag */}
             <div className="relative z-10 pt-4 border-t border-white/15 flex items-center justify-between text-xs text-slate-300">
               <span>© 2026 VCET. All rights reserved.</span>
-              <span className="font-semibold text-blue-300">Erode, Tamil Nadu</span>
+              <span className="font-semibold text-blue-300"></span>
             </div>
           </div>
 
@@ -398,7 +398,7 @@ const Login = () => {
 
             {/* Bottom Institutional Copyright */}
             <div className="mt-8 pt-4 border-t border-slate-100 text-center text-xs text-slate-400">
-              © {new Date().getFullYear()} Velalar College of Engineering and Technology. All rights reserved.
+              © {new Date().getFullYear()} 
             </div>
           </div>
 
