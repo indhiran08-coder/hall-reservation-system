@@ -105,11 +105,13 @@ const BookHall = () => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError]           = useState('');
   const [success, setSuccess]       = useState(false);
+  const [isMultiDay, setIsMultiDay] = useState(false);
 
   const [form, setForm] = useState({
     hall_id: preselectedHallId,
     purpose: '',
     date: today(),
+    end_date: '',
     start_time: '09:00',
     end_time: '10:00',
     participants: '',
@@ -120,15 +122,24 @@ const BookHall = () => {
   const [avail, setAvail]                 = useState(null);
   const [checkingAvail, setCheckingAvail] = useState(false);
 
+  const isMultiDayActive = isMultiDay && form.end_date && form.end_date >= form.date;
+  const totalDays = isMultiDayActive
+    ? Math.round((new Date(form.end_date + 'T00:00:00') - new Date(form.date + 'T00:00:00')) / (1000 * 60 * 60 * 24)) + 1
+    : 1;
+
   useEffect(() => {
     hallsAPI.getAll()
       .then(({ data }) => setHalls(data.halls || []))
       .finally(() => setLoading(false));
   }, []);
 
-  // Check availability
+  // Check availability (supports single day or date range)
   useEffect(() => {
     if (!form.hall_id || !form.date || !form.start_time || !form.end_time) {
+      setAvail(null);
+      return;
+    }
+    if (isMultiDay && (!form.end_date || form.end_date < form.date)) {
       setAvail(null);
       return;
     }
@@ -140,6 +151,7 @@ const BookHall = () => {
         const { data } = await hallsAPI.getAvailability({
           hall_id: form.hall_id,
           date: form.date,
+          end_date: isMultiDay ? form.end_date : undefined,
           start_time: form.start_time,
           end_time: form.end_time
         });
@@ -152,11 +164,18 @@ const BookHall = () => {
     }, 600);
 
     return () => clearTimeout(timer);
-  }, [form.hall_id, form.date, form.start_time, form.end_time]);
+  }, [form.hall_id, form.date, form.end_date, form.start_time, form.end_time, isMultiDay]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((f) => ({ ...f, [name]: value }));
+    setForm((f) => {
+      const updated = { ...f, [name]: value };
+      // If start date is moved past end date in multi-day mode, sync end_date
+      if (name === 'date' && isMultiDay && f.end_date && value > f.end_date) {
+        updated.end_date = value;
+      }
+      return updated;
+    });
     setErrors((prev) => ({ ...prev, [name]: '' }));
     setError('');
   };
@@ -174,6 +193,19 @@ const BookHall = () => {
       errs.date = 'Cannot book a hall for a past date';
     }
 
+    if (isMultiDay) {
+      if (!form.end_date) {
+        errs.end_date = 'End date is required for multi-day booking';
+      } else if (form.end_date < form.date) {
+        errs.end_date = 'End date must be on or after start date';
+      } else {
+        const diffDays = Math.round((new Date(form.end_date + 'T00:00:00') - new Date(form.date + 'T00:00:00')) / (1000 * 60 * 60 * 24)) + 1;
+        if (diffDays > 30) {
+          errs.end_date = 'Multi-day booking cannot exceed 30 consecutive days';
+        }
+      }
+    }
+
     if (!form.start_time) errs.start_time = 'Required';
     if (!form.end_time)   errs.end_time = 'Required';
 
@@ -185,7 +217,7 @@ const BookHall = () => {
       errs.end_time = 'End time must be after start time';
     }
 
-    if (avail?.available === false) errs.start_time = 'Selected slot is already booked';
+    if (avail?.available === false) errs.start_time = 'Selected slot is already booked on one or more dates';
     return errs;
   };
 
@@ -213,7 +245,11 @@ const BookHall = () => {
     setSubmitting(true);
     setError('');
     try {
-      await bookingsAPI.create(form);
+      const payload = {
+        ...form,
+        end_date: isMultiDay ? form.end_date : undefined
+      };
+      await bookingsAPI.create(payload);
       setSuccess(true);
       setTimeout(() => navigate('/bookings'), 2000);
     } catch (err) {
@@ -242,9 +278,13 @@ const BookHall = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h2 className="text-2xl font-extrabold text-slate-900">Booking Confirmed!</h2>
-          <p className="text-xs text-slate-500 font-medium">
-            Your hall reservation is authorized. A confirmation pass has been dispatched to your email.
+          <h2 className="text-2xl font-extrabold text-slate-900">
+            {isMultiDayActive && totalDays > 1 ? `${totalDays}-Day Booking Confirmed!` : 'Booking Confirmed!'}
+          </h2>
+          <p className="text-xs text-slate-500 font-medium leading-relaxed">
+            {isMultiDayActive && totalDays > 1
+              ? `Your hall reservations for ${totalDays} consecutive days (${formatDate(form.date)} to ${formatDate(form.end_date)}) are authorized. Daily passes have been dispatched to your email.`
+              : 'Your hall reservation is authorized. A confirmation pass has been dispatched to your email.'}
           </p>
           <p className="text-[11px] font-bold text-blue-600 animate-pulse">Redirecting to your active passes…</p>
         </div>
@@ -312,7 +352,7 @@ const BookHall = () => {
               <div className="space-y-5">
                 <div>
                   <h2 className="text-lg font-extrabold text-slate-900">Step 1: Choose Hall & Time Window</h2>
-                  <p className="text-xs text-slate-500">Select the venue and exact date/time duration.</p>
+                  <p className="text-xs text-slate-500">Select the venue, duration type, and date/time window.</p>
                 </div>
 
                 <div className="space-y-4">
@@ -338,21 +378,90 @@ const BookHall = () => {
                     {errors.hall_id && <p className="mt-1 text-[11px] font-bold text-rose-600">{errors.hall_id}</p>}
                   </div>
 
-                  <Input
-                    label="Reservation Date" name="date" type="date" required
-                    value={form.date} onChange={handleChange}
-                    error={errors.date} min={today()}
-                  />
+                  {/* Booking Duration Segmented Toggle */}
+                  <div className="flex items-center justify-between p-3.5 bg-slate-50 border border-slate-200 rounded-2xl">
+                    <div>
+                      <p className="text-xs font-bold text-slate-800">Booking Duration</p>
+                      <p className="text-[11px] text-slate-500 font-medium">Single day or multi-day recurring event</p>
+                    </div>
+                    <div className="flex items-center bg-white border border-slate-200 p-1 rounded-xl shadow-xs">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsMultiDay(false);
+                          setForm((f) => ({ ...f, end_date: '' }));
+                          setErrors((prev) => ({ ...prev, end_date: '' }));
+                        }}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                          !isMultiDay
+                            ? 'bg-blue-600 text-white shadow-xs'
+                            : 'text-slate-600 hover:text-slate-900'
+                        }`}
+                      >
+                        Single Day
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsMultiDay(true);
+                          if (!form.end_date) {
+                            setForm((f) => ({ ...f, end_date: f.date || today() }));
+                          }
+                        }}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                          isMultiDay
+                            ? 'bg-blue-600 text-white shadow-xs'
+                            : 'text-slate-600 hover:text-slate-900'
+                        }`}
+                      >
+                        🗓 Multi-Day Event
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Date Input(s) */}
+                  {!isMultiDay ? (
+                    <Input
+                      label="Reservation Date" name="date" type="date" required
+                      value={form.date} onChange={handleChange}
+                      error={errors.date} min={today()}
+                    />
+                  ) : (
+                    <div className="space-y-2">
+                      <div className="grid grid-cols-2 gap-3">
+                        <Input
+                          label="From Date (Start)" name="date" type="date" required
+                          value={form.date} onChange={handleChange}
+                          error={errors.date} min={today()}
+                        />
+                        <Input
+                          label="To Date (End)" name="end_date" type="date" required
+                          value={form.end_date} onChange={handleChange}
+                          error={errors.end_date} min={form.date || today()}
+                        />
+                      </div>
+                      {isMultiDayActive && (
+                        <div className="p-3 bg-blue-50/70 border border-blue-200/80 rounded-xl text-xs text-blue-900 flex items-center justify-between">
+                          <span className="font-bold">
+                            📅 {totalDays} Consecutive Days Selected
+                          </span>
+                          <span className="text-[11px] font-medium text-blue-700">
+                            {formatDate(form.date)} → {formatDate(form.end_date)}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  )}
 
                   <div className="grid grid-cols-2 gap-3">
                     <TimeSelect
-                      label="Start Time" name="start_time"
+                      label={isMultiDay ? "Daily Start Time" : "Start Time"} name="start_time"
                       value={form.start_time} onChange={handleChange}
                       error={errors.start_time}
                       selectedDate={form.date}
                     />
                     <TimeSelect
-                      label="End Time" name="end_time"
+                      label={isMultiDay ? "Daily End Time" : "End Time"} name="end_time"
                       value={form.end_time} onChange={handleChange}
                       error={errors.end_time}
                       isEndTime
@@ -362,7 +471,7 @@ const BookHall = () => {
                   </div>
 
                   {/* Realtime Availability Feedback Badge */}
-                  {form.hall_id && form.date && form.start_time && form.end_time && form.start_time < form.end_time && (
+                  {form.hall_id && form.date && form.start_time && form.end_time && form.start_time < form.end_time && (!isMultiDay || form.end_date) && (
                     <div className={`p-3.5 rounded-2xl border text-xs font-bold flex items-center gap-2 ${
                       checkingAvail ? 'bg-slate-50 border-slate-200 text-slate-500' :
                       avail?.available === true  ? 'bg-emerald-50 border-emerald-200 text-emerald-800' :
@@ -370,11 +479,11 @@ const BookHall = () => {
                       'bg-slate-50 border-slate-200 text-slate-500'
                     }`}>
                       {checkingAvail ? (
-                        <><Spinner size="sm" /><span>Checking live availability schedule…</span></>
+                        <><Spinner size="sm" /><span>Checking live availability schedule{isMultiDayActive && totalDays > 1 ? ` across all ${totalDays} days` : ''}…</span></>
                       ) : avail?.available === true ? (
-                        <><span>✨ Slot is 100% Available — No Overlaps!</span></>
+                        <><span>✨ {isMultiDayActive && totalDays > 1 ? `All ${totalDays} days are 100% Available — No Overlaps!` : 'Slot is 100% Available — No Overlaps!'}</span></>
                       ) : avail?.available === false ? (
-                        <><span>⚠️ Conflict detected with existing booking ({avail.conflict?.start_time}–{avail.conflict?.end_time})</span></>
+                        <><span>⚠️ Conflict detected with existing booking{avail.conflict?.date ? ` on ${formatDate(avail.conflict.date)}` : ''} ({avail.conflict?.start_time}–{avail.conflict?.end_time})</span></>
                       ) : null}
                     </div>
                   )}
@@ -470,7 +579,11 @@ const BookHall = () => {
                   </div>
                   <div className="flex justify-between border-b border-slate-200 pb-2">
                     <span className="font-bold text-slate-500">Date & Slot:</span>
-                    <span className="font-bold text-blue-700">{formatDate(form.date)} • {formatTimeRange(form.start_time, form.end_time)}</span>
+                    <span className="font-bold text-blue-700">
+                      {isMultiDayActive && totalDays > 1
+                        ? `${formatDate(form.date)} to ${formatDate(form.end_date)} (${totalDays} Days) • ${formatTimeRange(form.start_time, form.end_time)} daily`
+                        : `${formatDate(form.date)} • ${formatTimeRange(form.start_time, form.end_time)}`}
+                    </span>
                   </div>
                   <div className="flex justify-between border-b border-slate-200 pb-2">
                     <span className="font-bold text-slate-500">Purpose:</span>
@@ -503,7 +616,9 @@ const BookHall = () => {
                         </>
                       ) : (
                         <>
-                          <span>Confirm & Dispatch Hall Pass</span>
+                          <span>
+                            {isMultiDayActive && totalDays > 1 ? `Confirm & Dispatch ${totalDays} Hall Passes` : 'Confirm & Dispatch Hall Pass'}
+                          </span>
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                           </svg>
@@ -524,7 +639,9 @@ const BookHall = () => {
               <div className="flex items-center justify-between border-b border-white/15 pb-4">
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <span className="text-[10px] font-bold tracking-widest uppercase text-blue-200">Official Campus Pass Preview</span>
+                  <span className="text-[10px] font-bold tracking-widest uppercase text-blue-200">
+                    {isMultiDayActive && totalDays > 1 ? `Official Multi-Day Pass (${totalDays} Days)` : 'Official Campus Pass Preview'}
+                  </span>
                 </div>
                 <span className="text-[10px] font-mono text-slate-400">VCET-PASS</span>
               </div>
@@ -542,12 +659,20 @@ const BookHall = () => {
 
               <div className="grid grid-cols-2 gap-3 pt-2">
                 <div className="bg-white/10 p-3 rounded-2xl border border-white/15">
-                  <p className="text-[10px] text-slate-300 font-bold uppercase">Date</p>
-                  <p className="text-xs font-extrabold text-white mt-0.5">{formatDate(form.date)}</p>
+                  <p className="text-[10px] text-slate-300 font-bold uppercase">
+                    {isMultiDayActive && totalDays > 1 ? `Date Range (${totalDays} Days)` : 'Date'}
+                  </p>
+                  <p className="text-xs font-extrabold text-white mt-0.5">
+                    {isMultiDayActive && totalDays > 1
+                      ? `${formatDate(form.date)} – ${formatDate(form.end_date)}`
+                      : formatDate(form.date)}
+                  </p>
                 </div>
                 <div className="bg-white/10 p-3 rounded-2xl border border-white/15">
                   <p className="text-[10px] text-slate-300 font-bold uppercase">Time Window</p>
-                  <p className="text-xs font-extrabold text-emerald-300 mt-0.5">{formatTimeRange(form.start_time, form.end_time)}</p>
+                  <p className="text-xs font-extrabold text-emerald-300 mt-0.5">
+                    {formatTimeRange(form.start_time, form.end_time)}{isMultiDayActive && totalDays > 1 ? ' daily' : ''}
+                  </p>
                 </div>
               </div>
 

@@ -11,7 +11,22 @@ const { sendSupervisorNotification } = require('./telegramService');
  * Emails are sent asynchronously; a failure won't roll back the booking.
  */
 const createBooking = async (userId, bookingData) => {
-  const { hall_id, purpose, date, start_time, end_time, participants, requirements } = bookingData;
+  const { hall_id, purpose, date, end_date, start_time, end_time, participants, requirements } = bookingData;
+
+  // ── Calculate list of dates (single or multi-day range) ────────────────────
+  let dates = [date];
+  if (end_date && end_date > date) {
+    dates = [];
+    const curr = new Date(date + 'T00:00:00');
+    const stop = new Date(end_date + 'T00:00:00');
+    while (curr <= stop) {
+      const y = curr.getFullYear();
+      const m = String(curr.getMonth() + 1).padStart(2, '0');
+      const d = String(curr.getDate()).padStart(2, '0');
+      dates.push(`${y}-${m}-${d}`);
+      curr.setDate(curr.getDate() + 1);
+    }
+  }
 
   // ── Enforce valid future date and time ───────────────────────────────────────
   const now = new Date();
@@ -21,12 +36,13 @@ const createBooking = async (userId, bookingData) => {
   const todayStr = `${year}-${month}-${day}`;
   const currentHHMM = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 
-  if (date < todayStr) {
-    throw new Error('Cannot book a hall for a past date');
-  }
-
-  if (date === todayStr && start_time < currentHHMM) {
-    throw new Error('Cannot book a hall for a past time slot today');
+  for (const d of dates) {
+    if (d < todayStr) {
+      throw new Error(`Cannot book a hall for a past date (${d})`);
+    }
+    if (d === todayStr && start_time < currentHHMM) {
+      throw new Error('Cannot book a hall for a past time slot today');
+    }
   }
 
   // ── Enforce booking hours: 9:00 AM – 10:00 PM (09:00 – 22:00) ─────────────
@@ -40,42 +56,59 @@ const createBooking = async (userId, bookingData) => {
     throw new Error('End time must be after start time');
   }
 
-  // ── Conflict check: any confirmed booking overlapping this time? ────────────
-  // Overlap condition: existing.start < new.end  AND  existing.end > new.start
-  const { data: conflicts, error: conflictError } = await supabase
+  // ── Conflict check: any confirmed booking overlapping this time across any selected date? ────
+  let conflictQuery = supabase
     .from('bookings')
-    .select('id, start_time, end_time')
+    .select('id, date, start_time, end_time')
     .eq('hall_id', hall_id)
-    .eq('date', date)
     .eq('status', 'confirmed')
     .lt('start_time', end_time)
     .gt('end_time', start_time);
 
+  if (dates.length === 1) {
+    conflictQuery = conflictQuery.eq('date', dates[0]);
+  } else {
+    conflictQuery = conflictQuery.in('date', dates);
+  }
+
+  const { data: conflicts, error: conflictError } = await conflictQuery;
+
   if (conflictError) throw new Error('Failed to check booking conflicts');
   if (conflicts && conflicts.length > 0) {
+    const c = conflicts[0];
     throw new Error(
-      `Hall already booked for selected time (${conflicts[0].start_time}–${conflicts[0].end_time})`
+      `Hall already booked on ${c.date} for selected time (${c.start_time}–${c.end_time})`
     );
   }
 
-  // ── Create booking ─────────────────────────────────────────────────────────
-  const { data: booking, error: insertError } = await supabase
-    .from('bookings')
-    .insert({
-      user_id: userId,
-      hall_id,
-      purpose: purpose.trim(),
-      date,
-      start_time,
-      end_time,
-      participants: parseInt(participants, 10),
-      requirements: requirements ? requirements.trim() : null,
-      status: 'confirmed'
-    })
-    .select()
-    .single();
+  // ── Create bookings (batch insert for multi-day) ───────────────────────────
+  const insertRows = dates.map((d) => ({
+    user_id: userId,
+    hall_id,
+    purpose: purpose.trim(),
+    date: d,
+    start_time,
+    end_time,
+    participants: parseInt(participants, 10),
+    requirements: requirements ? requirements.trim() : null,
+    status: 'confirmed'
+  }));
 
-  if (insertError) throw new Error('Failed to create booking. Please try again.');
+  const { data: createdBookings, error: insertError } = await supabase
+    .from('bookings')
+    .insert(insertRows)
+    .select();
+
+  if (insertError || !createdBookings || createdBookings.length === 0) {
+    throw new Error('Failed to create booking. Please try again.');
+  }
+
+  const primaryBooking = {
+    ...createdBookings[0],
+    start_date: dates[0],
+    end_date: dates[dates.length - 1],
+    total_days: dates.length
+  };
 
   // ── Fetch related data for email ───────────────────────────────────────────
   const [{ data: hall }, { data: user }] = await Promise.all([
@@ -83,15 +116,15 @@ const createBooking = async (userId, bookingData) => {
     supabase.from('users').select('*').eq('id', userId).single()
   ]);
 
-  // ── Send confirmation email + supervisor notification (non-blocking) ─────────────
-  sendBookingConfirmationEmail(user, booking, hall).catch((e) =>
+  // ── Send confirmation email + supervisor notification (non-blocking) ──────
+  sendBookingConfirmationEmail(user, primaryBooking, hall).catch((e) =>
     console.error('Confirmation email failed:', e.message)
   );
-  sendSupervisorNotification('confirmed', user, booking, hall).catch((e) =>
+  sendSupervisorNotification('confirmed', user, primaryBooking, hall).catch((e) =>
     console.error('Supervisor notification (create) failed:', e.message)
   );
 
-  return { booking, hall };
+  return { booking: primaryBooking, bookings: createdBookings, total_days: dates.length, hall };
 };
 
 /**

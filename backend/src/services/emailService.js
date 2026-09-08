@@ -77,20 +77,31 @@ const sendOTPEmail = async (personalEmail, firstName, otp) => {
 // ─── 2. Booking Confirmation Email ────────────────────────────────────────────
 const sendBookingConfirmationEmail = async (user, booking, hall) => {
   const name = [user.first_name, user.last_name].filter(Boolean).join(' ');
+  const isMultiDay = booking.total_days && booking.total_days > 1;
+  const dateDisplay = isMultiDay
+    ? `${fmtDate(booking.start_date || booking.date)} to ${fmtDate(booking.end_date)} (${booking.total_days} Consecutive Days)`
+    : fmtDate(booking.date);
+  const timeDisplay = isMultiDay
+    ? `${booking.start_time} – ${booking.end_time} (Daily)`
+    : `${booking.start_time} – ${booking.end_time}`;
+  const subjectDate = isMultiDay
+    ? `${fmtDate(booking.start_date || booking.date)} to ${fmtDate(booking.end_date)} (${booking.total_days} Days)`
+    : fmtDate(booking.date);
+
   const body = `
     <p style="color:#374151;font-size:16px;">Hello <strong>${name}</strong>,</p>
     <p style="color:#6b7280;">Your hall booking has been <strong style="color:#16a34a;">confirmed</strong>. Details below:</p>
     <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin:20px 0;">
       ${row('Hall', hall.name, false)}
       ${row('Floor / Location', `${hall.floor} — ${hall.location}`, true)}
-      ${row('Date', fmtDate(booking.date), false)}
-      ${row('Time', `${booking.start_time} – ${booking.end_time}`, true)}
+      ${row('Date', dateDisplay, false)}
+      ${row('Time', timeDisplay, true)}
       ${row('Purpose', booking.purpose, false)}
       ${row('Participants', booking.participants, true)}
       ${row('Booking ID', `<code style="font-size:12px;">${booking.id}</code>`, false)}
     </table>
     <div style="background:#dcfce7;border:1px solid #86efac;border-radius:8px;padding:14px;margin-top:16px;">
-      <p style="color:#166534;margin:0;font-size:14px;">✓ Your slot is reserved. Please arrive on time.</p>
+      <p style="color:#166534;margin:0;font-size:14px;">✓ Your slots are reserved. Please arrive on time.</p>
     </div>
     <p style="color:#9ca3af;font-size:13px;margin-top:20px;">To cancel, visit the Hall Reservation System and go to My Bookings.</p>`;
 
@@ -99,7 +110,7 @@ const sendBookingConfirmationEmail = async (user, booking, hall) => {
   await sendMail({
     from: FROM,
     to: recipients,
-    subject: `✅ Booking Confirmed — ${hall.name} on ${fmtDate(booking.date)}`,
+    subject: `✅ Booking Confirmed — ${hall.name} on ${subjectDate}`,
     html: wrapEmail('#2563eb', 'Booking Confirmed ✓', body)
   });
 };

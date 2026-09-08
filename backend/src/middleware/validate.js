@@ -80,7 +80,7 @@ const validateLogin = (req, res, next) => {
 
 // ─── Booking ──────────────────────────────────────────────────────────────────
 const validateBooking = (req, res, next) => {
-  const { hall_id, purpose, date, start_time, end_time, participants } = req.body;
+  const { hall_id, purpose, date, end_date, start_time, end_time, participants } = req.body;
 
   const errors = [];
 
@@ -91,11 +91,26 @@ const validateBooking = (req, res, next) => {
   if (!date) {
     errors.push('Date is required');
   } else {
-    const bookingDate = new Date(date);
+    const bookingDate = new Date(date + 'T00:00:00');
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     if (isNaN(bookingDate.getTime())) errors.push('Invalid date format');
     else if (bookingDate < today) errors.push('Booking date cannot be in the past');
+  }
+
+  if (end_date) {
+    const endDateObj = new Date(end_date + 'T00:00:00');
+    const startDateObj = new Date(date + 'T00:00:00');
+    if (isNaN(endDateObj.getTime())) {
+      errors.push('Invalid end date format');
+    } else if (endDateObj < startDateObj) {
+      errors.push('End date must be on or after start date');
+    } else {
+      const diffDays = Math.round((endDateObj - startDateObj) / (1000 * 60 * 60 * 24)) + 1;
+      if (diffDays > 30) {
+        errors.push('Multi-day booking cannot exceed 30 consecutive days');
+      }
+    }
   }
 
   if (!start_time || !TIME_REGEX.test(start_time))

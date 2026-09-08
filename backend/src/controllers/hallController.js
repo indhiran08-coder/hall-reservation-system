@@ -11,13 +11,13 @@ const getHalls = async (req, res) => {
 
 const getAvailability = async (req, res) => {
   try {
-    const { hall_id, date, start_time, end_time } = req.query;
+    const { hall_id, date, end_date, start_time, end_time } = req.query;
 
     if (!hall_id || !date) {
       return res.status(400).json({ error: 'hall_id and date are required query parameters' });
     }
 
-    const result = await checkAvailability(hall_id, date, start_time, end_time);
+    const result = await checkAvailability(hall_id, date, start_time, end_time, end_date);
     res.status(200).json(result);
   } catch (err) {
     res.status(500).json({ error: err.message });
