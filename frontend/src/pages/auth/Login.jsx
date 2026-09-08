@@ -185,7 +185,7 @@ const Login = () => {
                 <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
-                <span>Velalar Campus Portal</span>
+                <span>VCET Campus Portal</span>
               </div>
               <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight leading-tight">
                 Seamless Campus Event & Hall Management
@@ -218,7 +218,7 @@ const Login = () => {
 
             {/* Footer Tag */}
             <div className="relative z-10 pt-4 border-t border-white/15 flex items-center justify-between text-xs text-slate-300">
-              <span>Velalar College of Eng. & Tech</span>
+              <span>© 2026 VCET. All rights reserved.</span>
               <span className="font-semibold text-blue-300">Erode, Tamil Nadu</span>
             </div>
           </div>
