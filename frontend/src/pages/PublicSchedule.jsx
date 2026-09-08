@@ -118,7 +118,8 @@ const PublicSchedule = () => {
           </Link>
           <Link
             to="/login"
-            className="self-center sm:self-auto shrink-0 inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition-all shadow-xs"
+            className="self-center sm:self-auto shrink-0 inline-flex items-center gap-1.5 text-white text-xs font-bold px-4 py-2 rounded-xl transition-all shadow-xs hover:brightness-110"
+            style={{ background: '#2957a4' }}
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14" />
@@ -126,7 +127,10 @@ const PublicSchedule = () => {
             Sign In
           </Link>
         </div>
-        <div className="bg-gradient-to-r from-blue-900 via-indigo-900 to-blue-900 text-white text-center py-1.5 text-[11px] font-bold tracking-[0.2em] uppercase shadow-inner">
+        <div
+          className="text-white text-center py-1.5 text-[11px] font-bold tracking-[0.2em] uppercase shadow-xs"
+          style={{ background: '#2957a4' }}
+        >
           Hall Reservation System — Live Schedule Roadmap
         </div>
       </header>

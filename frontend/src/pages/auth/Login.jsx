@@ -145,7 +145,7 @@ const Login = () => {
         </div>
         <div
           className="py-1.5 text-center text-xs font-bold tracking-[0.25em] uppercase text-white shadow-xs"
-          style={{ background: 'linear-gradient(90deg, #1e3a8a, #4338ca, #1e3a8a)' }}
+          style={{ background: '#2957a4' }}
         >
           Hall Reservation System
         </div>
@@ -293,8 +293,8 @@ const Login = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3.5 px-4 rounded-xl text-white font-bold text-sm tracking-wide shadow-md disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2"
-                  style={{ background: 'linear-gradient(135deg, #1e3a5f 0%, #1e3a8a 100%)' }}
+                  className="w-full py-3.5 px-4 rounded-xl text-white font-bold text-sm tracking-wide shadow-md hover:brightness-110 active:brightness-95 disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"
+                  style={{ background: '#2957a4' }}
                 >
                   {loading ? (
                     <>

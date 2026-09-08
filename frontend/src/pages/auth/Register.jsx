@@ -158,7 +158,7 @@ const Register = () => {
         </div>
         <div
           className="py-1.5 text-center text-xs font-bold tracking-[0.25em] uppercase text-white shadow-xs"
-          style={{ background: 'linear-gradient(90deg, #1e3a8a, #4338ca, #1e3a8a)' }}
+          style={{ background: '#2957a4' }}
         >
           Hall Reservation System
         </div>
