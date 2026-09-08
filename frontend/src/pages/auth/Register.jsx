@@ -180,13 +180,13 @@ const Register = () => {
                 <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                 </svg>
-                <span>Faculty Registration</span>
+                <span>Staff Registration</span>
               </div>
               <h2 className="text-2xl font-extrabold text-white tracking-tight leading-tight">
                 Create Your Official VCET Account
               </h2>
               <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                Register as an authorized faculty member to manage and reserve campus halls, auditoriums, and seminar facilities.
+                Register as an authorized staff member to manage and reserve campus halls, auditoriums, and seminar facilities.
               </p>
             </div>
 
@@ -216,7 +216,7 @@ const Register = () => {
 
               <div className="text-left space-y-1">
                 <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Create Account</h1>
-                <p className="text-sm text-slate-500">Register your faculty details to begin hall reservations</p>
+                <p className="text-sm text-slate-500">Register your staff details to begin hall reservations</p>
               </div>
 
               {apiError && (

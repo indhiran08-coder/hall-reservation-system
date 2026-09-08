@@ -238,7 +238,7 @@ const Login = () => {
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  <span>Faculty Sign In</span>
+                  <span>Staff Sign In</span>
                 </button>
                 <button
                   type="button"
@@ -256,7 +256,7 @@ const Login = () => {
               {/* Form Title Header */}
               <div className="text-left space-y-1">
                 <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-                  {roleTab === 'admin' ? 'Administrator Sign In' : 'Faculty Sign In'}
+                  {roleTab === 'admin' ? 'Administrator Sign In' : 'Staff Sign In'}
                 </h1>
                 <p className="text-sm text-slate-500 font-normal">
                   {roleTab === 'admin'
@@ -351,7 +351,7 @@ const Login = () => {
                     </>
                   ) : (
                     <>
-                      <span>Sign In to {roleTab === 'admin' ? 'Admin Portal' : 'Faculty Account'}</span>
+                      <span>Sign In to {roleTab === 'admin' ? 'Admin Portal' : 'Staff Account'}</span>
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                       </svg>
@@ -365,7 +365,7 @@ const Login = () => {
                 <p className="text-xs sm:text-sm text-slate-500">
                   Don't have an account?{' '}
                   <Link to="/register" className="font-bold text-blue-600 hover:text-blue-800 hover:underline">
-                    Create Faculty Account
+                    Create Staff Account
                   </Link>
                 </p>
               </div>
