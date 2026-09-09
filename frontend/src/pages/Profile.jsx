@@ -66,9 +66,9 @@ const Profile = () => {
     if (Object.keys(errs).length) { setErrors(errs); return; }
 
     const payload = {};
-    if (form.personal_email) payload.personal_email = form.personal_email;
+    if (isAdmin && form.personal_email) payload.personal_email = form.personal_email;
     if (form.phone)          payload.phone          = form.phone;
-    if (form.department)     payload.department     = form.department;
+    if (isAdmin && form.department)     payload.department     = form.department;
     if (isAdmin && form.new_password) {
       payload.password     = form.password;
       payload.new_password = form.new_password;
@@ -120,19 +120,20 @@ const Profile = () => {
           </div>
           <div className="card-body grid sm:grid-cols-2 gap-4">
             {[
-              { label: 'Staff ID',      value: user?.staff_id },
+              { label: 'Staff ID',      value: user?.staff_id || '—' },
               { label: 'College Email', value: user?.college_email },
-              { label: 'Member Since',  value: formatDate(user?.created_at?.split('T')[0]) }
+              { label: 'Department',    value: user?.department },
+              { label: 'Member Since',  value: formatDate(user?.created_at?.split('T')[0]) || '—' }
             ].map(({ label, value }) => (
               <div key={label}>
                 <p className="text-xs text-gray-400 mb-0.5">{label}</p>
                 <p className="text-sm font-medium text-gray-900">{value}</p>
               </div>
             ))}
-            <div>
-              <p className="text-xs text-gray-400 mb-1">Account Security</p>
-              <p className="text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded border border-gray-200 inline-block">
-                {isAdmin ? 'Administrator account' : 'Department account — password managed by administrator'}
+            <div className="sm:col-span-2">
+              <p className="text-xs text-gray-400 mb-1">Account Security & Policy</p>
+              <p className="text-xs text-gray-500 bg-gray-50 px-2.5 py-1.5 rounded-lg border border-gray-200 inline-block">
+                {isAdmin ? 'Administrator account with full permissions' : 'Department account — department, email, and password are fixed and managed by administrator'}
               </p>
             </div>
           </div>
@@ -151,6 +152,8 @@ const Profile = () => {
               value={form.personal_email} onChange={handleChange}
               error={errors.personal_email}
               placeholder="your@gmail.com"
+              disabled={!isAdmin}
+              helper={!isAdmin ? 'Official department email managed by college administration (read-only)' : undefined}
             />
 
             <Input
@@ -158,6 +161,7 @@ const Profile = () => {
               value={form.phone} onChange={handleChange}
               error={errors.phone}
               placeholder="9876543210" maxLength={10}
+              helper="Staff contact number for reservation notifications"
             />
 
             <Input
@@ -165,6 +169,8 @@ const Profile = () => {
               value={form.department} onChange={handleChange}
               error={errors.department}
               placeholder="e.g. Computer Science, EEE, MBA…"
+              disabled={!isAdmin}
+              helper={!isAdmin ? 'Official assigned department (read-only)' : undefined}
             />
           </div>
 

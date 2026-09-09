@@ -21,14 +21,19 @@ const updateProfile = async (req, res) => {
   try {
     const { personal_email, phone, department, password, new_password } = req.body;
 
+    const isAdmin = req.user && (req.user.role === 'admin' || req.user.college_email === 'indhirans@velalarengg.ac.in');
+
     const updates = {};
-    if (personal_email) updates.personal_email = personal_email.trim().toLowerCase();
+    // Only administrator can modify personal_email or department
+    if (isAdmin) {
+      if (personal_email) updates.personal_email = personal_email.trim().toLowerCase();
+      if (department) updates.department = department.trim();
+    }
+    // Staff & admin can update mobile number
     if (phone) updates.phone = phone.trim();
-    if (department) updates.department = department.trim();
 
     // Password change flow — Administrator only
     if (new_password && password) {
-      const isAdmin = req.user && (req.user.role === 'admin' || req.user.college_email === 'indhirans@velalarengg.ac.in');
       if (!isAdmin) {
         return res.status(403).json({ error: 'Staff members are not permitted to change their password.' });
       }
