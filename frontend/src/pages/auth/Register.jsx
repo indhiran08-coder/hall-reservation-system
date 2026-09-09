@@ -21,8 +21,8 @@ const RefinedInput = ({ label, error, helper, type = 'text', icon, required = tr
   const isPassword = type === 'password';
   return (
     <div className="space-y-1.5 text-left">
-      <label className="block text-xs font-semibold text-slate-700 tracking-wide">
-        {label} {required && <span className="text-rose-500">*</span>}
+      <label className="block text-xs font-bold text-slate-700 tracking-wider uppercase">
+        {label}
       </label>
       <div className="relative group">
         {icon && (
@@ -99,8 +99,8 @@ const Register = () => {
       errs.email = 'Enter a valid email address';
     if (!/^[6-9]\d{9}$/.test(form.phone))
       errs.phone = 'Enter a valid 10-digit mobile number';
-    if (!form.password || form.password.length < 8)
-      errs.password = 'Minimum 8 characters';
+    if (!form.password || form.password.length < 6)
+      errs.password = 'Minimum 6 characters';
     if (form.password !== form.confirm_password)
       errs.confirm_password = 'Passwords do not match';
     return errs;
@@ -240,36 +240,35 @@ const Register = () => {
               <form onSubmit={handleSubmit} className="space-y-4" noValidate autoComplete="off">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <RefinedInput
-                    label="Organization / Company Name"
+                    label="ORGANIZATION / GUEST NAME"
                     name="organization_name"
                     value={form.organization_name}
                     onChange={handleChange}
                     error={errors.organization_name}
-                    placeholder="e.g. Infosys / Rotary Club"
+                    placeholder="e.g. Rotary Club / Guest Speaker"
                   />
                   <RefinedInput
-                    label="Contact Person Name"
+                    label="CONTACT PERSON NAME"
                     name="contact_person"
                     value={form.contact_person}
                     onChange={handleChange}
                     error={errors.contact_person}
-                    placeholder="e.g. Ramesh Kumar"
+                    placeholder="e.g. Indhiran Sivachandran"
                   />
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <RefinedInput
-                    label="Official / Contact Email"
+                    label="CONTACT EMAIL ADDRESS"
                     name="email"
                     type="email"
                     value={form.email}
                     onChange={handleChange}
                     error={errors.email}
-                    placeholder="contact@organization.com"
-                    helper="Used for sign-in & OTP verification"
+                    placeholder="email@example.com"
                   />
                   <RefinedInput
-                    label="Mobile Number"
+                    label="CONTACT PHONE NUMBER"
                     name="phone"
                     type="tel"
                     value={form.phone}
@@ -283,17 +282,17 @@ const Register = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <RefinedInput
-                    label="Password"
+                    label="PASSWORD"
                     name="password"
                     type="password"
                     value={form.password}
                     onChange={handleChange}
                     error={errors.password}
-                    placeholder="Min. 8 characters"
+                    placeholder="Minimum 6 characters"
                     autoComplete="new-password"
                   />
                   <RefinedInput
-                    label="Confirm Password"
+                    label="CONFIRM PASSWORD"
                     name="confirm_password"
                     type="password"
                     value={form.confirm_password}

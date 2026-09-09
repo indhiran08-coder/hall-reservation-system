@@ -33,8 +33,8 @@ const validateRegister = (req, res, next) => {
   if (!phone || !PHONE_REGEX.test(phone))
     errors.push('Valid 10-digit mobile number starting with 6–9 is required');
 
-  if (!password || password.length < 8)
-    errors.push('Password must be at least 8 characters');
+  if (!password || password.length < 6)
+    errors.push('Password must be at least 6 characters');
   if (password !== confirm_password)
     errors.push('Passwords do not match');
 
