@@ -32,11 +32,11 @@ const Navbar = ({ onMenuClick }) => {
 
       {/* Logo — visible on mobile */}
       <div className="lg:hidden flex items-center gap-2">
-        <img src="/vcet-logo.png" alt="VCET" className="w-7 h-7 object-contain shrink-0" />
-        <div className="leading-tight">
-          <p className="text-xs font-bold text-gray-900 tracking-tight leading-none">VCET Hall</p>
-          <p className="text-xs font-semibold text-blue-600 tracking-wide uppercase leading-none mt-0.5">Reservation</p>
-        </div>
+        <img
+          src="/vcet-logo.png"
+          alt="VCET"
+          className="h-8 w-auto max-w-[160px] object-contain object-left shrink-0"
+        />
       </div>
 
       {/* Spacer */}

@@ -141,12 +141,18 @@ const Sidebar = ({ isOpen, onClose }) => {
         `}
       >
         {/* Logo / Brand */}
-        <div className="px-5 py-5 border-b border-gray-100">
-          <div className="flex items-center gap-2.5">
-            <img src="/vcet-logo.png" alt="VCET" className="w-10 h-10 object-contain shrink-0" />
-            <div className="leading-tight">
-              <p className="text-sm font-bold text-gray-900 tracking-tight">VCET Hall</p>
-              <p className="text-xs font-semibold text-blue-600 tracking-wide uppercase">Reservation</p>
+        <div className="px-5 py-4 border-b border-gray-100 bg-white">
+          <div className="flex flex-col gap-2">
+            <img
+              src="/vcet-logo.png"
+              alt="VCET - Empowering the Next Generation"
+              className="h-11 w-auto max-w-full object-contain object-left"
+            />
+            <div className="flex items-center justify-between pt-1.5 border-t border-slate-100">
+              <span className="text-[11px] font-bold text-slate-700 tracking-wider uppercase">Hall Reservation</span>
+              <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100">
+                {isAdmin ? 'Admin Portal' : 'Staff Portal'}
+              </span>
             </div>
           </div>
         </div>

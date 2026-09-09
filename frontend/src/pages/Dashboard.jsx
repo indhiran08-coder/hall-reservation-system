@@ -87,15 +87,24 @@ const Dashboard = () => {
       <div className="max-w-6xl mx-auto space-y-4 sm:space-y-6 px-1 sm:px-0">
         
         {/* Top Header Banner */}
-        <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-indigo-950 rounded-2xl sm:rounded-3xl p-5 sm:p-8 text-white shadow-md relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6">
-          <div className="relative z-10 space-y-1 sm:space-y-2">
-            <h1 className="text-xl sm:text-3xl font-extrabold tracking-tight">
-              Good {now.getHours() < 12 ? 'Morning' : now.getHours() < 17 ? 'Afternoon' : 'Evening'},{' '}
-              {user?.first_name}!
-            </h1>
-            <p className="text-xs sm:text-sm text-slate-300">
-              Live campus hall utilization and real-time event status.
-            </p>
+        <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-indigo-950 rounded-2xl sm:rounded-3xl p-5 sm:p-7 text-white shadow-md relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6">
+          <div className="relative z-10 flex items-center gap-4">
+            <div className="hidden sm:flex bg-white p-2 sm:p-2.5 rounded-2xl shadow-sm shrink-0">
+              <img
+                src="/vcet-logo.png"
+                alt="VCET"
+                className="h-10 sm:h-12 w-auto object-contain"
+              />
+            </div>
+            <div className="space-y-1 sm:space-y-2">
+              <h1 className="text-xl sm:text-3xl font-extrabold tracking-tight">
+                Good {now.getHours() < 12 ? 'Morning' : now.getHours() < 17 ? 'Afternoon' : 'Evening'},{' '}
+                {user?.first_name}!
+              </h1>
+              <p className="text-xs sm:text-sm text-slate-300">
+                Live campus hall utilization and real-time event status.
+              </p>
+            </div>
           </div>
 
           {/* Quick Action Buttons */}
