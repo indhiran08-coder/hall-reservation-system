@@ -458,7 +458,7 @@ const PublicSchedule = () => {
 
         {/* ── Footer ── */}
         <div className="text-center text-xs text-slate-400 pt-3 pb-6 border-t border-slate-200">
-          VCET Hall Reservation System • For queries, contact campus hall administration.{' '}
+          VCET Hall Reservation System{' '}
           <Link to="/login" className="font-bold hover:underline" style={{ color: '#2957a4' }}>
             Sign In
           </Link>

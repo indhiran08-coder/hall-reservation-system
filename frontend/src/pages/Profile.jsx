@@ -10,7 +10,7 @@ import { formatDate } from '../utils/formatters';
 
 
 const Profile = () => {
-  const { user, updateUser } = useAuth();
+  const { user, updateUser, isAdmin } = useAuth();
 
   const [form, setForm]       = useState({
     personal_email: '', phone: '', department: '',
@@ -49,12 +49,14 @@ const Profile = () => {
       errs.personal_email = 'Enter a valid email address';
     if (form.phone && !/^[6-9]\d{9}$/.test(form.phone))
       errs.phone = 'Enter a valid 10-digit mobile number';
-    if (form.new_password && form.new_password.length < 8)
-      errs.new_password = 'Minimum 8 characters';
-    if (form.new_password && form.new_password !== form.confirm_new)
-      errs.confirm_new = 'Passwords do not match';
-    if (form.new_password && !form.password)
-      errs.password = 'Current password required';
+    if (isAdmin && form.new_password) {
+      if (form.new_password.length < 6)
+        errs.new_password = 'Minimum 6 characters';
+      if (form.new_password !== form.confirm_new)
+        errs.confirm_new = 'Passwords do not match';
+      if (!form.password)
+        errs.password = 'Current password required';
+    }
     return errs;
   };
 
@@ -67,7 +69,7 @@ const Profile = () => {
     if (form.personal_email) payload.personal_email = form.personal_email;
     if (form.phone)          payload.phone          = form.phone;
     if (form.department)     payload.department     = form.department;
-    if (form.new_password) {
+    if (isAdmin && form.new_password) {
       payload.password     = form.password;
       payload.new_password = form.new_password;
     }
@@ -128,9 +130,9 @@ const Profile = () => {
               </div>
             ))}
             <div>
-              <p className="text-xs text-gray-400 mb-1">These fields are read-only</p>
+              <p className="text-xs text-gray-400 mb-1">Account Security</p>
               <p className="text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded border border-gray-200 inline-block">
-                Staff ID and college email cannot be changed
+                {isAdmin ? 'Administrator account' : 'Department account — password managed by administrator'}
               </p>
             </div>
           </div>
@@ -166,27 +168,29 @@ const Profile = () => {
             />
           </div>
 
-          {/* Password change */}
-          <div className="card p-5 space-y-4">
-            <h2 className="font-semibold text-gray-900">Change Password</h2>
-            <p className="text-sm text-gray-500">Leave blank if you don't want to change your password.</p>
+          {/* Password change — Administrator only */}
+          {isAdmin && (
+            <div className="card p-5 space-y-4">
+              <h2 className="font-semibold text-gray-900">Change Password</h2>
+              <p className="text-sm text-gray-500">Leave blank if you don't want to change your password.</p>
 
-            <Input
-              label="Current Password" name="password" type="password"
-              value={form.password} onChange={handleChange}
-              error={errors.password} placeholder="Your current password"
-            />
-            <Input
-              label="New Password" name="new_password" type="password"
-              value={form.new_password} onChange={handleChange}
-              error={errors.new_password} placeholder="Min. 8 characters"
-            />
-            <Input
-              label="Confirm New Password" name="confirm_new" type="password"
-              value={form.confirm_new} onChange={handleChange}
-              error={errors.confirm_new} placeholder="Repeat new password"
-            />
-          </div>
+              <Input
+                label="Current Password" name="password" type="password"
+                value={form.password} onChange={handleChange}
+                error={errors.password} placeholder="Your current password"
+              />
+              <Input
+                label="New Password" name="new_password" type="password"
+                value={form.new_password} onChange={handleChange}
+                error={errors.new_password} placeholder="Min. 6 characters"
+              />
+              <Input
+                label="Confirm New Password" name="confirm_new" type="password"
+                value={form.confirm_new} onChange={handleChange}
+                error={errors.confirm_new} placeholder="Repeat new password"
+              />
+            </div>
+          )}
 
           <Button type="submit" variant="primary" loading={saving} className="w-full">
             Save Changes

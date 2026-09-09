@@ -26,8 +26,13 @@ const updateProfile = async (req, res) => {
     if (phone) updates.phone = phone.trim();
     if (department) updates.department = department.trim();
 
-    // Password change flow
+    // Password change flow — Administrator only
     if (new_password && password) {
+      const isAdmin = req.user && (req.user.role === 'admin' || req.user.college_email === 'indhirans@velalarengg.ac.in');
+      if (!isAdmin) {
+        return res.status(403).json({ error: 'Staff members are not permitted to change their password.' });
+      }
+
       const { data: user } = await supabase
         .from('users')
         .select('password_hash')
