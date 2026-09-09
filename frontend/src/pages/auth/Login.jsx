@@ -310,11 +310,11 @@ const Login = () => {
                 </button>
               </form>
 
-              {/* Create Account Link */}
-              <p className="text-center text-xs sm:text-sm text-slate-500">
-                Don't have an account?{' '}
-                <Link to="/register" className="font-bold text-blue-700 hover:text-blue-900 hover:underline">
-                  Create Staff Account
+              {/* Register as Guest Link */}
+              <p className="text-center text-xs sm:text-sm text-slate-600">
+                External organization?{' '}
+                <Link to="/register" className="font-bold hover:underline" style={{ color: '#2957a4' }}>
+                  Register as Guest
                 </Link>
               </p>
 

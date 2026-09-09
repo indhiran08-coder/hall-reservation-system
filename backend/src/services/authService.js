@@ -8,51 +8,90 @@ const { sendOTPEmail, sendPasswordResetEmail } = require('./emailService');
  * Step 1: Validate uniqueness, generate OTP, store temporarily, send email.
  * The full registration data is stored in otp.metadata until OTP is verified.
  */
-const initiateRegistration = async (userData) => {
-  const { first_name, last_name = '', staff_id = '', department, college_email, personal_email, phone, password } = userData;
+const ALLOWED_DEPARTMENT_EMAILS = new Set([
+  'hodaids@velalarengg.ac.in',
+  'hodaiml@velalarengg.ac.in',
+  'hodbme@velalarengg.ac.in',
+  'hodchemistry@velalarengg.ac.in',
+  'hodcse@velalarengg.ac.in',
+  'hodece@velalarengg.ac.in',
+  'hodeee@velalarengg.ac.in',
+  'hodenglish@velalarengg.ac.in',
+  'hodit@velalarengg.ac.in',
+  'hodmba@velalarengg.ac.in',
+  'hodmde@velalarengg.ac.in',
+  'hodmech@velalarengg.ac.in',
+  'hodphysics@velalarengg.ac.in',
+  'hodsh@velalarengg.ac.in',
+  'hodcivil@velalarengg.ac.in',
+  'vcetevents@velalarengg.ac.in',
+  'idealab@velalarengg.ac.in',
+  'vcetiic@velalarengg.ac.in',
+  'ieduihub@velalarengg.ac.in',
+  'industrialvisits@velalarengg.ac.in',
+  'iqac@velalarengg.ac.in',
+  'vcetcdc@velalarengg.ac.in',
+  'placement@velalarengg.ac.in',
+  'indhirans@velalarengg.ac.in' // admin
+]);
 
-  // Check college email uniqueness
+/**
+ * Step 1: Validate uniqueness, generate OTP, store temporarily, send email.
+ * Supports Guest registration (external organization).
+ */
+const initiateRegistration = async (userData) => {
+  const {
+    organization_name, contact_person,
+    first_name, department,
+    college_email, personal_email, email,
+    phone, password
+  } = userData;
+
+  const orgName = (organization_name || department || '').trim();
+  const personName = (contact_person || first_name || '').trim();
+  const targetEmail = (email || personal_email || college_email || '').trim().toLowerCase();
+
+  // Check email uniqueness
   const { data: byEmail } = await supabase
     .from('users')
     .select('id')
-    .eq('college_email', college_email.toLowerCase())
+    .or(`college_email.eq.${targetEmail},personal_email.eq.${targetEmail}`)
     .maybeSingle();
 
-  if (byEmail) throw new Error('An account with this college email already exists');
+  if (byEmail) throw new Error('An account with this email already exists. Please login.');
 
-  // Generate OTP and store (upsert by personal_email so re-registration works)
+  // Generate OTP and store (upsert by targetEmail so re-registration works)
   const otp = generateOTP();
   const expires_at = getOTPExpiry();
 
   const metadata = JSON.stringify({
-    first_name: first_name.trim(),
-    last_name: (last_name || '').trim() || null,
-    staff_id: (staff_id || '').trim() || null,
-    department: department.trim(),
-    college_email: college_email.trim().toLowerCase(),
-    phone: phone.trim(),
-    password
+    first_name: personName,
+    department: orgName,
+    email: targetEmail,
+    phone: (phone || '').trim(),
+    password,
+    role: 'guest'
   });
 
   const { error: otpError } = await supabase
     .from('otp')
     .upsert(
-      { personal_email: personal_email.trim().toLowerCase(), otp, expires_at, verified: false, metadata },
+      { personal_email: targetEmail, otp, expires_at, verified: false, metadata },
       { onConflict: 'personal_email' }
     );
 
   if (otpError) throw new Error('Failed to generate OTP. Please try again.');
 
-  // Send OTP email NON-BLOCKING — respond immediately, email arrives shortly after
-  sendOTPEmail(personal_email, first_name.trim(), otp).catch((e) =>
+  // Send OTP email NON-BLOCKING
+  sendOTPEmail(targetEmail, personName, otp).catch((e) =>
     console.error('OTP email failed:', e.message)
   );
 
-  return { message: 'OTP sent to your personal email. It is valid for 10 minutes.' };
+  return { message: 'OTP sent to your email. It is valid for 10 minutes.' };
 };
 
 /**
- * Step 2: Verify OTP, create user account.
+ * Step 2: Verify OTP, create guest user account.
  */
 const verifyOTPAndCreateUser = async (personalEmail, otpInput) => {
   const email = personalEmail.trim().toLowerCase();
@@ -69,7 +108,7 @@ const verifyOTPAndCreateUser = async (personalEmail, otpInput) => {
   if (record.otp !== String(otpInput)) throw new Error('Incorrect OTP. Please try again.');
 
   // Parse stored registration data
-  const { first_name, last_name, staff_id, department, college_email, phone, password } =
+  const { first_name, department, email: targetEmail, phone, password, role = 'guest' } =
     JSON.parse(record.metadata);
 
   // Hash password with salt rounds = 12
@@ -77,24 +116,29 @@ const verifyOTPAndCreateUser = async (personalEmail, otpInput) => {
 
   // Insert user
   const { error: userError } = await supabase.from('users').insert({
-    first_name, last_name, staff_id, department,
-    college_email, personal_email: email, phone, password_hash
+    first_name,
+    department,
+    college_email: targetEmail,
+    personal_email: targetEmail,
+    phone,
+    password_hash,
+    role
   });
 
   if (userError) {
-    // Handle unique constraint violations gracefully
-    if (userError.code === '23505') throw new Error('An account with this email or Staff ID already exists.');
+    if (userError.code === '23505') throw new Error('An account with this email already exists.');
     throw new Error('Failed to create account. Please try again.');
   }
 
   // Mark OTP as verified
   await supabase.from('otp').update({ verified: true }).eq('personal_email', email);
 
-  return { message: 'Account created successfully. Please login.' };
+  return { message: 'Guest account created successfully. Please login.' };
 };
 
 /**
  * Authenticate user and return signed JWT.
+ * Enforces that only whitelisted department emails or registered guests can log in.
  */
 const loginUser = async (collegeEmail, password) => {
   const email = collegeEmail.trim().toLowerCase();
@@ -102,7 +146,7 @@ const loginUser = async (collegeEmail, password) => {
   const { data: user, error } = await supabase
     .from('users')
     .select('*')
-    .eq('college_email', email)
+    .or(`college_email.eq.${email},personal_email.eq.${email}`)
     .maybeSingle();
 
   if (error || !user) throw new Error('Invalid email or password');
@@ -110,10 +154,26 @@ const loginUser = async (collegeEmail, password) => {
   const isMatch = await bcrypt.compare(password, user.password_hash);
   if (!isMatch) throw new Error('Invalid email or password');
 
-  const userRole = (email === 'indhirans@velalarengg.ac.in' || user.role === 'admin') ? 'admin' : 'staff';
+  // Enforce access whitelist: only authorized department emails, guests, or admin
+  const isAllowedOfficial = ALLOWED_DEPARTMENT_EMAILS.has(user.college_email.toLowerCase());
+  const isGuest = user.role === 'guest';
+  const isAdmin = user.college_email.toLowerCase() === 'indhirans@velalarengg.ac.in' || user.role === 'admin';
+
+  if (!isAllowedOfficial && !isGuest && !isAdmin) {
+    throw new Error('Access restricted: Only authorized department emails and registered guests can access the portal.');
+  }
+
+  const userRole = isAdmin ? 'admin' : isGuest ? 'guest' : 'staff';
 
   const token = jwt.sign(
-    { id: user.id, college_email: user.college_email, first_name: user.first_name, last_name: user.last_name, role: userRole },
+    {
+      id: user.id,
+      college_email: user.college_email,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      department: user.department,
+      role: userRole
+    },
     process.env.JWT_SECRET,
     { expiresIn: '7d' }
   );

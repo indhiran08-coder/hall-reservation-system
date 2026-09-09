@@ -7,27 +7,28 @@ const PHONE_REGEX = /^[6-9]\d{9}$/;
  */
 const firstError = (errors) => (errors.length ? errors[0] : null);
 
-// ─── Registration ──────────────────────────────────────────────────────────────
+// ─── Registration (Guest & Staff) ───────────────────────────────────────────
 const validateRegister = (req, res, next) => {
   const {
+    organization_name, contact_person,
     first_name, department,
-    college_email, personal_email, phone,
-    password, confirm_password
+    college_email, personal_email, email,
+    phone, password, confirm_password
   } = req.body;
+
+  const orgName = organization_name || department;
+  const personName = contact_person || first_name;
+  const userEmail = email || personal_email || college_email;
 
   const errors = [];
 
-  if (!first_name || first_name.trim().length < 2)
-    errors.push('Full name must be at least 2 characters');
-  if (!department || department.trim().length < 2)
-    errors.push('Department is required');
+  if (!orgName || orgName.trim().length < 2)
+    errors.push('Organization / Department name must be at least 2 characters');
+  if (!personName || personName.trim().length < 2)
+    errors.push('Contact person name must be at least 2 characters');
 
-  if (!college_email || !EMAIL_REGEX.test(college_email))
-    errors.push('Valid college email is required');
-  if (!personal_email || !EMAIL_REGEX.test(personal_email))
-    errors.push('Valid personal email is required');
-  if (college_email && personal_email && college_email.toLowerCase() === personal_email.toLowerCase())
-    errors.push('College email and personal email must be different');
+  if (!userEmail || !EMAIL_REGEX.test(userEmail))
+    errors.push('Valid email address is required');
 
   if (!phone || !PHONE_REGEX.test(phone))
     errors.push('Valid 10-digit mobile number starting with 6–9 is required');

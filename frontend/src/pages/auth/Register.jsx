@@ -63,17 +63,16 @@ const RefinedInput = ({ label, error, helper, type = 'text', icon, required = tr
 };
 
 const initialForm = {
-  first_name: '',
-  department: '',
-  college_email: '',
-  personal_email: '',
+  organization_name: '',
+  contact_person: '',
+  email: '',
   phone: '',
   password: '',
   confirm_password: ''
 };
 
 /* ══════════════════════════════════════════════════════════════════════════════
-   Enterprise Register Page
+   Guest Registration Page for External Organizations
 ══════════════════════════════════════════════════════════════════════════════ */
 const Register = () => {
   const navigate = useNavigate();
@@ -92,15 +91,18 @@ const Register = () => {
 
   const validate = () => {
     const errs = {};
-    if (!form.first_name || form.first_name.trim().length < 2) errs.first_name = 'At least 2 characters required';
-    if (!form.department || form.department.trim().length < 2) errs.department = 'Department is required';
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.college_email)) errs.college_email = 'Enter a valid email';
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.personal_email)) errs.personal_email = 'Enter a valid email';
-    if (form.college_email && form.personal_email && form.college_email.toLowerCase() === form.personal_email.toLowerCase())
-      errs.personal_email = 'Must differ from college email';
-    if (!/^[6-9]\d{9}$/.test(form.phone)) errs.phone = 'Enter a valid 10-digit mobile number';
-    if (!form.password || form.password.length < 8) errs.password = 'Minimum 8 characters';
-    if (form.password !== form.confirm_password) errs.confirm_password = 'Passwords do not match';
+    if (!form.organization_name || form.organization_name.trim().length < 2)
+      errs.organization_name = 'Organization / Company name is required';
+    if (!form.contact_person || form.contact_person.trim().length < 2)
+      errs.contact_person = 'Contact person name is required';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
+      errs.email = 'Enter a valid email address';
+    if (!/^[6-9]\d{9}$/.test(form.phone))
+      errs.phone = 'Enter a valid 10-digit mobile number';
+    if (!form.password || form.password.length < 8)
+      errs.password = 'Minimum 8 characters';
+    if (form.password !== form.confirm_password)
+      errs.confirm_password = 'Passwords do not match';
     return errs;
   };
 
@@ -112,17 +114,14 @@ const Register = () => {
     const wakeTimer = setTimeout(() => setSlowWarning(true), 4000);
     try {
       await authAPI.register({
-        first_name: form.first_name.trim(),
-        last_name: '',
-        staff_id: '',
-        department: form.department.trim(),
-        college_email: form.college_email.trim(),
-        personal_email: form.personal_email.trim(),
+        organization_name: form.organization_name.trim(),
+        contact_person: form.contact_person.trim(),
+        email: form.email.trim(),
         phone: form.phone.trim(),
         password: form.password,
         confirm_password: form.confirm_password
       });
-      navigate('/verify-otp', { state: { personal_email: form.personal_email.trim() } });
+      navigate('/verify-otp', { state: { personal_email: form.email.trim() } });
     } catch (err) {
       const isTimeout = err.code === 'ECONNABORTED' || err.message?.includes('timeout');
       setApiError(
@@ -178,23 +177,23 @@ const Register = () => {
             <div className="relative z-10 space-y-4">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold bg-white/10 text-blue-200 border border-white/15">
                 <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
-                <span>Staff Registration</span>
+                <span>External Guest Access</span>
               </div>
               <h2 className="text-2xl font-extrabold text-white tracking-tight leading-tight">
-                Create Your Official VCET Account
+                Host Events at VCET Campus
               </h2>
               <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                Register as an authorized staff member to manage and reserve campus halls, auditoriums, and seminar facilities.
+                Register as an external organization, company, or guest organizer to book seminar halls, auditoriums, and convention facilities.
               </p>
             </div>
 
             <div className="relative z-10 my-6 space-y-3">
               {[
-                'Use your official college email (@velalarengg.ac.in)',
-                'OTP verification will be sent to your personal email',
-                'Instant access to real-time hall schedule matrix',
+                'Organization-based guest reservation account',
+                'Instant OTP verification sent to your official email',
+                'Direct access to live hall roadmaps & availability',
               ].map((item, idx) => (
                 <div key={idx} className="flex items-start gap-2.5 text-xs text-slate-300">
                   <div className="w-5 h-5 rounded-full bg-blue-600/40 border border-blue-400/50 flex items-center justify-center shrink-0 text-blue-300 mt-0.5">
@@ -206,7 +205,7 @@ const Register = () => {
             </div>
 
             <div className="relative z-10 pt-4 border-t border-white/10 text-xs text-slate-400">
-              Need assistance? Contact VCET IT Support
+              Need assistance? Contact VCET Hall Administration
             </div>
           </div>
 
@@ -215,8 +214,8 @@ const Register = () => {
             <div className="w-full space-y-6">
 
               <div className="text-left space-y-1">
-                <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Create Account</h1>
-                <p className="text-sm text-slate-500">Register your staff details to begin hall reservations</p>
+                <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Register as Guest</h1>
+                <p className="text-sm text-slate-500">Provide your organization and coordinator details to begin</p>
               </div>
 
               {apiError && (
@@ -241,58 +240,46 @@ const Register = () => {
               <form onSubmit={handleSubmit} className="space-y-4" noValidate autoComplete="off">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <RefinedInput
-                    label="Full Name"
-                    name="first_name"
-                    value={form.first_name}
+                    label="Organization / Company Name"
+                    name="organization_name"
+                    value={form.organization_name}
                     onChange={handleChange}
-                    error={errors.first_name}
-                    placeholder="e.g. Indhiran Sivachandran"
+                    error={errors.organization_name}
+                    placeholder="e.g. Infosys / Rotary Club"
                   />
                   <RefinedInput
-                    label="Department"
-                    name="department"
-                    value={form.department}
+                    label="Contact Person Name"
+                    name="contact_person"
+                    value={form.contact_person}
                     onChange={handleChange}
-                    error={errors.department}
-                    placeholder="e.g. Computer Science"
+                    error={errors.contact_person}
+                    placeholder="e.g. Ramesh Kumar"
                   />
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <RefinedInput
-                    label="College Email"
-                    name="college_email"
+                    label="Official / Contact Email"
+                    name="email"
                     type="email"
-                    value={form.college_email}
+                    value={form.email}
                     onChange={handleChange}
-                    error={errors.college_email}
-                    placeholder="you@velalarengg.ac.in"
-                    helper="Used for sign-in & official logs"
+                    error={errors.email}
+                    placeholder="contact@organization.com"
+                    helper="Used for sign-in & OTP verification"
                   />
                   <RefinedInput
-                    label="Personal Email"
-                    name="personal_email"
-                    type="email"
-                    value={form.personal_email}
+                    label="Mobile Number"
+                    name="phone"
+                    type="tel"
+                    value={form.phone}
                     onChange={handleChange}
-                    error={errors.personal_email}
-                    placeholder="you@gmail.com"
-                    helper="OTP verification sent here"
+                    error={errors.phone}
+                    placeholder="10-digit mobile number"
+                    maxLength={10}
+                    autoComplete="new-password"
                   />
                 </div>
-
-                <RefinedInput
-                  label="Mobile Number"
-                  name="phone"
-                  type="tel"
-                  value={form.phone}
-                  onChange={handleChange}
-                  error={errors.phone}
-                  placeholder="Enter 10-digit mobile number"
-                  maxLength={10}
-                  autoComplete="new-password"
-                  id="register_phone_field"
-                />
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <RefinedInput
@@ -320,7 +307,8 @@ const Register = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-sm tracking-wide shadow-md shadow-blue-600/20 disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2 mt-2"
+                  className="w-full py-3.5 px-4 rounded-xl text-white font-bold text-sm tracking-wide shadow-md hover:brightness-110 active:brightness-95 disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2 mt-2 cursor-pointer"
+                  style={{ background: '#2957a4' }}
                 >
                   {loading ? (
                     <>
@@ -332,7 +320,7 @@ const Register = () => {
                     </>
                   ) : (
                     <>
-                      <span>Send OTP & Continue</span>
+                      <span>Send OTP & Verify</span>
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                       </svg>
@@ -344,7 +332,7 @@ const Register = () => {
               <div className="text-center pt-2">
                 <p className="text-xs sm:text-sm text-slate-500">
                   Already registered?{' '}
-                  <Link to="/login" className="font-bold text-blue-600 hover:text-blue-800 hover:underline">
+                  <Link to="/login" className="font-bold hover:underline" style={{ color: '#2957a4' }}>
                     Sign in to your account
                   </Link>
                 </p>
