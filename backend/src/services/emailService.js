@@ -50,11 +50,24 @@ const row = (label, value, shade) =>
     <td style="padding:11px 14px;border:1px solid #e5e7eb;color:#374151;">${value}</td>
   </tr>`;
 
-// ─── Format date for display ──────────────────────────────────────────────────
+// ─── Format date and time for display ─────────────────────────────────────────
 const fmtDate = (dateStr) =>
   new Date(dateStr + 'T00:00:00').toLocaleDateString('en-IN', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
   });
+
+const fmtTime = (timeStr) => {
+  if (!timeStr) return '—';
+  const parts = timeStr.split(':');
+  const h = parseInt(parts[0], 10);
+  const m = parts[1] ? parseInt(parts[1], 10) : 0;
+  if (isNaN(h)) return timeStr;
+  const period = h >= 12 ? 'PM' : 'AM';
+  const hour = h % 12 || 12;
+  return `${hour}:${String(m).padStart(2, '0')} ${period}`;
+};
+
+const fmtTimeRange = (start, end) => `${fmtTime(start)} – ${fmtTime(end)}`;
 
 // ─── 1. OTP Email ─────────────────────────────────────────────────────────────
 const sendOTPEmail = async (personalEmail, firstName, otp) => {
@@ -82,8 +95,8 @@ const sendBookingConfirmationEmail = async (user, booking, hall) => {
     ? `${fmtDate(booking.start_date || booking.date)} to ${fmtDate(booking.end_date)} (${booking.total_days} Consecutive Days)`
     : fmtDate(booking.date);
   const timeDisplay = isMultiDay
-    ? `${booking.start_time} – ${booking.end_time} (Daily)`
-    : `${booking.start_time} – ${booking.end_time}`;
+    ? `${fmtTimeRange(booking.start_time, booking.end_time)} (Daily)`
+    : fmtTimeRange(booking.start_time, booking.end_time);
   const subjectDate = isMultiDay
     ? `${fmtDate(booking.start_date || booking.date)} to ${fmtDate(booking.end_date)} (${booking.total_days} Days)`
     : fmtDate(booking.date);
@@ -124,7 +137,7 @@ const sendBookingCancellationEmail = async (user, booking, hall) => {
     <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin:20px 0;">
       ${row('Hall', hall.name, false)}
       ${row('Date', fmtDate(booking.date), true)}
-      ${row('Time', `${booking.start_time} – ${booking.end_time}`, false)}
+      ${row('Time', fmtTimeRange(booking.start_time, booking.end_time), false)}
       ${row('Purpose', booking.purpose, true)}
       ${row('Booking ID', `<code style="font-size:12px;">${booking.id}</code>`, false)}
     </table>
@@ -150,7 +163,7 @@ const sendAdminCancellationEmail = async (user, booking, hall) => {
     <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin:20px 0;">
       ${row('Hall', hall.name, false)}
       ${row('Date', fmtDate(booking.date), true)}
-      ${row('Time', `${booking.start_time} – ${booking.end_time}`, false)}
+      ${row('Time', fmtTimeRange(booking.start_time, booking.end_time), false)}
       ${row('Purpose', booking.purpose, true)}
       ${row('Booking ID', `<code style="font-size:12px;">${booking.id}</code>`, false)}
     </table>

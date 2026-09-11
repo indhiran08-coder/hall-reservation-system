@@ -27,6 +27,19 @@ const fmtDate = (dateStr) => {
   }
 };
 
+const fmtTime = (timeStr) => {
+  if (!timeStr) return '';
+  const parts = timeStr.split(':');
+  const h = parseInt(parts[0], 10);
+  const m = parts[1] ? parseInt(parts[1], 10) : 0;
+  if (isNaN(h)) return timeStr;
+  const period = h >= 12 ? 'PM' : 'AM';
+  const hour = h % 12 || 12;
+  return `${hour}:${String(m).padStart(2, '0')} ${period}`;
+};
+
+const fmtTimeRange = (start, end) => `${fmtTime(start)} – ${fmtTime(end)}`;
+
 /**
  * Sends a message via Telegram Bot API using HTTPS POST
  * @param {string} text - HTML formatted text
@@ -113,7 +126,7 @@ const sendSupervisorNotification = async (type, user, booking, hall) => {
     `📍 <b>Hall Name:</b> ${hall.name}`,
     `🏫 <b>Location:</b> ${hall.floor} — ${hall.location}`,
     `📅 <b>Date:</b> ${booking.total_days && booking.total_days > 1 ? `${fmtDate(booking.start_date || booking.date)} to ${fmtDate(booking.end_date)} (${booking.total_days} Days)` : fmtDate(booking.date)}`,
-    `⏰ <b>Time Slot:</b> ${booking.start_time} – ${booking.end_time}${booking.total_days && booking.total_days > 1 ? ' (Daily)' : ''}`,
+    `⏰ <b>Time Slot:</b> ${fmtTimeRange(booking.start_time, booking.end_time)}${booking.total_days && booking.total_days > 1 ? ' (Daily)' : ''}`,
     `📝 <b>Purpose:</b> ${booking.purpose}`,
     `👥 <b>Participants:</b> ${booking.participants ?? 'N/A'}`,
     `━━━━━━━━━━━━━━━━━━━━━━`,
