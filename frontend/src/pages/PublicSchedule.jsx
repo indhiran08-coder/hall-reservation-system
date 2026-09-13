@@ -87,7 +87,7 @@ const PublicSchedule = () => {
   const isPast = date < toDateStr(new Date());
 
   return (
-    <div className="min-h-screen bg-slate-50 selection:bg-[#2957a4] selection:text-white flex flex-col font-sans antialiased text-slate-800">
+    <div className="min-h-screen bg-slate-50 selection:bg-[#2957a4] selection:text-white flex flex-col font-sans antialiased text-slate-800 relative overflow-x-hidden">
       
       {/* ── Official Institutional Top Bar ── */}
       <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
@@ -111,13 +111,14 @@ const PublicSchedule = () => {
             </span>
             <Link
               to="/login"
-              className="inline-flex items-center gap-2 text-white text-xs font-bold px-4 py-2 rounded-xl transition-all shadow-xs hover:brightness-110 active:scale-[0.98]"
+              className="relative overflow-hidden inline-flex items-center gap-2 text-white text-xs font-bold px-4 py-2 rounded-xl transition-all shadow-xs hover:shadow-md hover:brightness-110 active:scale-[0.98] group"
               style={{ background: '#2957a4' }}
             >
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <span className="absolute inset-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none animate-shimmer-sweep" />
+              <svg className="w-3.5 h-3.5 relative z-10 transition-transform duration-200 group-hover:-translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14" />
               </svg>
-              <span>Portal Sign In</span>
+              <span className="relative z-10">Portal Sign In</span>
             </Link>
           </div>
         </div>
@@ -133,8 +134,11 @@ const PublicSchedule = () => {
         </div>
       </header>
 
-      {/* ── Main Container ── */}
-      <main className="max-w-5xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6 flex-1">
+      {/* ── Main Container with Ambient Aurora Glow ── */}
+      <main className="relative max-w-5xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6 flex-1 animate-card-entrance">
+        {/* Ambient Aurora Glow Orbs */}
+        <div className="absolute top-12 -right-8 w-80 h-80 sm:w-96 sm:h-96 rounded-full bg-gradient-to-bl from-blue-600/12 via-indigo-500/8 to-transparent blur-3xl pointer-events-none animate-float-slow -z-10" />
+        <div className="absolute bottom-20 -left-8 w-72 h-72 sm:w-80 sm:h-80 rounded-full bg-gradient-to-tr from-sky-400/15 via-blue-600/8 to-transparent blur-3xl pointer-events-none animate-float-slow-reverse -z-10" />
         
         {/* ── Date Navigator & Status Bar ── */}
         <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">

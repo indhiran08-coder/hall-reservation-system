@@ -82,7 +82,7 @@ const VerifyOTP = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 flex flex-col font-sans selection:bg-[#2957a4] selection:text-white">
+    <div className="min-h-screen bg-slate-100 flex flex-col font-sans selection:bg-[#2957a4] selection:text-white overflow-x-hidden relative">
       
       {/* ── Official VCET Banner Header ── */}
       <header className="relative z-30 w-full shrink-0">
@@ -108,13 +108,17 @@ const VerifyOTP = () => {
         </div>
       </header>
 
-      {/* ── Main Split Showcase Section ── */}
-      <main className="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 md:p-8 flex items-center justify-center">
-        <div className="w-full bg-white rounded-3xl shadow-xl shadow-slate-200/60 border border-slate-200/80 overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-[520px]">
+      {/* ── Main Split Showcase Section with Ambient Glow ── */}
+      <main className="relative flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 md:p-8 flex items-center justify-center">
+        {/* Ambient Aurora Glow Orbs */}
+        <div className="absolute top-1/4 -left-8 w-72 h-72 sm:w-96 sm:h-96 rounded-full bg-gradient-to-tr from-blue-600/20 via-indigo-500/15 to-transparent blur-3xl pointer-events-none animate-float-slow -z-10" />
+        <div className="absolute bottom-1/4 -right-8 w-80 h-80 sm:w-[400px] sm:h-[400px] rounded-full bg-gradient-to-bl from-sky-400/25 via-blue-700/15 to-transparent blur-3xl pointer-events-none animate-float-slow-reverse -z-10" />
+
+        <div className="w-full bg-white rounded-3xl shadow-xl shadow-slate-200/70 border border-slate-200/80 overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-[520px] animate-card-entrance">
           
           {/* ── LEFT PANEL: Showcase Architectural Background ── */}
           <div
-            className="lg:col-span-5 relative p-8 sm:p-10 text-white flex flex-col justify-between overflow-hidden bg-cover bg-center"
+            className="lg:col-span-5 relative p-8 sm:p-10 text-white flex flex-col justify-between overflow-hidden bg-cover bg-center animate-fade-in-left animation-delay-100"
             style={{ backgroundImage: 'url(/vcet-campus.jpg)' }}
           >
             <div className="absolute inset-0 bg-gradient-to-br from-slate-950/90 via-blue-950/85 to-indigo-950/90 backdrop-blur-[2px]" />
@@ -161,7 +165,7 @@ const VerifyOTP = () => {
             <div className="max-w-md mx-auto w-full space-y-6">
               
               {/* Header */}
-              <div className="text-center space-y-2">
+              <div className="text-center space-y-2 animate-fade-in-right animation-delay-150">
                 <div
                   className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-2 border shadow-xs"
                   style={{ background: '#f0f4fa', borderColor: '#d3e0f3', color: '#2957a4' }}
@@ -183,7 +187,7 @@ const VerifyOTP = () => {
 
               {/* Alert Messages */}
               {error && (
-                <div className="flex items-center gap-3 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-xs font-semibold text-rose-800">
+                <div className="flex items-center gap-3 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-xs font-semibold text-rose-800 animate-fade-in-right">
                   <svg className="w-5 h-5 text-rose-600 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                   </svg>
@@ -192,7 +196,7 @@ const VerifyOTP = () => {
               )}
 
               {success && (
-                <div className="flex items-center gap-3 p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs font-semibold text-emerald-800">
+                <div className="flex items-center gap-3 p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs font-semibold text-emerald-800 animate-fade-in-right">
                   <svg className="w-5 h-5 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
@@ -201,7 +205,7 @@ const VerifyOTP = () => {
               )}
 
               {/* OTP Form */}
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-6 animate-fade-in-right animation-delay-250">
                 
                 {/* 6 Digit Inputs */}
                 <div className="flex justify-center gap-2 sm:gap-3" onPaste={handlePaste}>
@@ -229,28 +233,31 @@ const VerifyOTP = () => {
                   OTP code is valid for <strong className="text-slate-700">10 minutes</strong>
                 </p>
 
-                {/* Submit Action */}
+                {/* Submit Action with Shimmer Sweep */}
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3.5 px-4 rounded-xl text-white font-bold text-sm tracking-wide shadow-md hover:brightness-110 active:brightness-95 disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"
+                  className="relative overflow-hidden w-full py-3.5 px-4 rounded-xl text-white font-bold text-sm tracking-wide shadow-md hover:shadow-xl hover:shadow-blue-900/25 hover:brightness-105 hover:scale-[1.01] active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer group"
                   style={{ background: '#2957a4' }}
                 >
+                  {/* Subtle Light Shimmer Sweep */}
+                  <span className="absolute inset-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none animate-shimmer-sweep" />
+
                   {loading ? (
                     <>
-                      <svg className="w-5 h-5 animate-spin shrink-0" style={{ width: '20px', height: '20px' }} fill="none" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 animate-spin shrink-0 relative z-10" style={{ width: '20px', height: '20px' }} fill="none" viewBox="0 0 24 24">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                       </svg>
-                      <span>Verifying OTP…</span>
+                      <span className="relative z-10">Verifying OTP…</span>
                     </>
                   ) : (
-                    <>
+                    <span className="relative z-10 flex items-center gap-2">
                       <span>Verify & Create Account</span>
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                       </svg>
-                    </>
+                    </span>
                   )}
                 </button>
 

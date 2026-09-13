@@ -231,7 +231,7 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 flex flex-col font-sans selection:bg-blue-600 selection:text-white">
+    <div className="min-h-screen bg-slate-100 flex flex-col font-sans selection:bg-blue-600 selection:text-white relative overflow-x-hidden">
       {/* ── Official VCET Banner Header ── */}
       <header className="relative z-30 w-full shrink-0">
         <div className="bg-white border-b border-slate-200 flex items-center justify-center px-4 py-2 shadow-xs">
@@ -257,9 +257,13 @@ export default function ForgotPassword() {
         </div>
       </header>
 
-      {/* ── Main Container ── */}
-      <main className="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 md:p-10 flex items-center justify-center">
-        <div className="w-full max-w-md bg-white rounded-3xl shadow-xl shadow-slate-200/60 border border-slate-200/80 p-8 sm:p-10 space-y-6">
+      {/* ── Main Container with Ambient Glow ── */}
+      <main className="relative flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 md:p-10 flex items-center justify-center">
+        {/* Ambient Aurora Glow Orbs */}
+        <div className="absolute top-1/4 -left-8 w-72 h-72 sm:w-96 sm:h-96 rounded-full bg-gradient-to-tr from-blue-600/20 via-indigo-500/15 to-transparent blur-3xl pointer-events-none animate-float-slow -z-10" />
+        <div className="absolute bottom-1/4 -right-8 w-80 h-80 sm:w-[400px] sm:h-[400px] rounded-full bg-gradient-to-bl from-sky-400/25 via-blue-700/15 to-transparent blur-3xl pointer-events-none animate-float-slow-reverse -z-10" />
+
+        <div className="w-full max-w-md bg-white rounded-3xl shadow-xl shadow-slate-200/70 border border-slate-200/80 p-8 sm:p-10 space-y-6 animate-card-entrance">
 
           <div className="text-center space-y-1">
             <div className="mx-auto w-12 h-12 rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 mb-3">
@@ -303,9 +307,10 @@ export default function ForgotPassword() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-sm tracking-wide shadow-md shadow-blue-600/20 disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2"
+                className="relative overflow-hidden w-full py-3.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-sm tracking-wide shadow-md shadow-blue-600/20 hover:shadow-lg hover:scale-[1.01] active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2 group cursor-pointer"
               >
-                {loading ? 'Sending OTP…' : 'Send Recovery OTP'}
+                <span className="absolute inset-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none animate-shimmer-sweep" />
+                <span className="relative z-10">{loading ? 'Sending OTP…' : 'Send Recovery OTP'}</span>
               </button>
               <div className="text-center pt-2">
                 <Link to="/login" className="text-xs font-semibold text-slate-500 hover:text-blue-600 transition-colors">
@@ -322,9 +327,10 @@ export default function ForgotPassword() {
               <button
                 type="submit"
                 disabled={otp.replace(/\D/g, '').length < 6}
-                className="w-full py-3.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-sm tracking-wide shadow-md shadow-blue-600/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                className="relative overflow-hidden w-full py-3.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-sm tracking-wide shadow-md shadow-blue-600/20 hover:shadow-lg hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2 group cursor-pointer"
               >
-                Verify OTP
+                <span className="absolute inset-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none animate-shimmer-sweep" />
+                <span className="relative z-10">Verify OTP</span>
               </button>
               <div className="text-center text-xs text-slate-500 space-y-2">
                 <p>
@@ -374,9 +380,10 @@ export default function ForgotPassword() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-sm tracking-wide shadow-md shadow-blue-600/20 disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200"
+                className="relative overflow-hidden w-full py-3.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-sm tracking-wide shadow-md shadow-blue-600/20 hover:shadow-lg hover:scale-[1.01] active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2 group cursor-pointer"
               >
-                {loading ? 'Updating Password…' : 'Reset Password'}
+                <span className="absolute inset-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none animate-shimmer-sweep" />
+                <span className="relative z-10">{loading ? 'Updating Password…' : 'Reset Password'}</span>
               </button>
             </form>
           )}
