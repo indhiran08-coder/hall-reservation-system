@@ -4,6 +4,7 @@ import DashboardLayout from '../layouts/DashboardLayout';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
 import Spinner from '../components/ui/Spinner';
+import DateRangePicker from '../components/ui/DateRangePicker';
 import { hallsAPI, bookingsAPI } from '../services/api';
 import { today, formatDate, formatTimeRange } from '../utils/formatters';
 import { useAuth } from '../context/AuthContext';
@@ -428,19 +429,19 @@ const BookHall = () => {
                     />
                   ) : (
                     <div className="space-y-2">
-                      <div className="grid grid-cols-2 gap-3">
-                        <Input
-                          label="From Date (Start)" name="date" type="date" required
-                          value={form.date} onChange={handleChange}
-                          error={errors.date} min={today()}
-                        />
-                        <Input
-                          label="To Date (End)" name="end_date" type="date" required
-                          value={form.end_date} onChange={handleChange}
-                          error={errors.end_date} min={form.date || today()}
-                        />
-                      </div>
-                      {isMultiDayActive && (
+                      <DateRangePicker
+                        label="Multi-Day Date Range"
+                        startDate={form.date}
+                        endDate={form.end_date}
+                        onChange={({ startDate, endDate }) => {
+                          setForm((f) => ({ ...f, date: startDate, end_date: endDate }));
+                          setErrors((prev) => ({ ...prev, date: '', end_date: '' }));
+                        }}
+                        minDate={today()}
+                        error={errors.date || errors.end_date}
+                        required
+                      />
+                      {isMultiDayActive && totalDays > 1 && (
                         <div className="p-3 bg-blue-50/70 border border-blue-200/80 rounded-xl text-xs text-blue-900 flex items-center justify-between">
                           <span className="font-bold">
                             📅 {totalDays} Consecutive Days Selected
