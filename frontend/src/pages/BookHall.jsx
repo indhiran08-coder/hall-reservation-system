@@ -6,6 +6,7 @@ import Button from '../components/ui/Button';
 import Spinner from '../components/ui/Spinner';
 import DateRangePicker from '../components/ui/DateRangePicker';
 import SingleDatePicker from '../components/ui/SingleDatePicker';
+import HallCombobox from '../components/ui/HallCombobox';
 import { hallsAPI, bookingsAPI } from '../services/api';
 import { today, formatDate, formatTimeRange } from '../utils/formatters';
 import { useAuth } from '../context/AuthContext';
@@ -358,27 +359,17 @@ const BookHall = () => {
                 </div>
 
                 <div className="space-y-4">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                      Hall Venue <span className="text-rose-500">*</span>
-                    </label>
-                    <select
-                      name="hall_id"
-                      value={form.hall_id}
-                      onChange={handleChange}
-                      className={`w-full bg-slate-50 border rounded-2xl p-3 text-xs font-bold text-slate-900 focus:bg-white focus:border-blue-600 focus:outline-none transition-all ${
-                        errors.hall_id ? 'border-rose-400 ring-2 ring-rose-200' : 'border-slate-200'
-                      }`}
-                    >
-                      <option value="">Choose a hall venue…</option>
-                      {halls.map((h) => (
-                        <option key={h.id} value={h.id}>
-                          {h.name} — {h.floor}{h.capacity ? ` · ${h.capacity} pax` : ''}
-                        </option>
-                      ))}
-                    </select>
-                    {errors.hall_id && <p className="mt-1 text-[11px] font-bold text-rose-600">{errors.hall_id}</p>}
-                  </div>
+                  <HallCombobox
+                    label="Hall Venue"
+                    halls={halls}
+                    value={form.hall_id}
+                    onChange={(hallId) => {
+                      setForm((f) => ({ ...f, hall_id: hallId }));
+                      setErrors((prev) => ({ ...prev, hall_id: '' }));
+                    }}
+                    error={errors.hall_id}
+                    required
+                  />
 
                   {/* Booking Duration Segmented Toggle */}
                   <div className="flex items-center justify-between p-3.5 bg-slate-50 border border-slate-200 rounded-2xl">
