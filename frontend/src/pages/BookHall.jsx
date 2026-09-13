@@ -5,6 +5,7 @@ import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
 import Spinner from '../components/ui/Spinner';
 import DateRangePicker from '../components/ui/DateRangePicker';
+import SingleDatePicker from '../components/ui/SingleDatePicker';
 import { hallsAPI, bookingsAPI } from '../services/api';
 import { today, formatDate, formatTimeRange } from '../utils/formatters';
 import { useAuth } from '../context/AuthContext';
@@ -422,10 +423,16 @@ const BookHall = () => {
 
                   {/* Date Input(s) */}
                   {!isMultiDay ? (
-                    <Input
-                      label="Reservation Date" name="date" type="date" required
-                      value={form.date} onChange={handleChange}
-                      error={errors.date} min={today()}
+                    <SingleDatePicker
+                      label="Reservation Date"
+                      value={form.date}
+                      onChange={(dateStr) => {
+                        setForm((f) => ({ ...f, date: dateStr }));
+                        setErrors((prev) => ({ ...prev, date: '' }));
+                      }}
+                      error={errors.date}
+                      minDate={today()}
+                      required
                     />
                   ) : (
                     <div className="space-y-2">
