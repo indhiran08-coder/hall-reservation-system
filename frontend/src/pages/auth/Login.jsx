@@ -52,7 +52,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 flex flex-col font-sans selection:bg-blue-600 selection:text-white">
+    <div className="min-h-screen bg-slate-100 flex flex-col font-sans selection:bg-blue-600 selection:text-white overflow-x-hidden relative">
       {/* ── Official VCET Banner Header ── */}
       <header className="relative z-30 w-full shrink-0">
         <div className="bg-white border-b border-slate-200 flex items-center justify-center px-4 py-2 shadow-xs">
@@ -85,9 +85,13 @@ const Login = () => {
         </div>
       </header>
 
-      {/* ── Main Split Showcase Section ── */}
-      <main className="flex-1 max-w-6xl w-full mx-auto p-4 sm:p-6 md:p-10 flex items-center justify-center">
-        <div className="w-full bg-white rounded-3xl shadow-xl shadow-slate-200/60 border border-slate-200/80 overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-[580px]">
+      {/* ── Main Split Showcase Section with Ambient Glow ── */}
+      <main className="relative flex-1 max-w-6xl w-full mx-auto p-4 sm:p-6 md:p-10 flex items-center justify-center">
+        {/* Ambient Aurora Glow Orbs */}
+        <div className="absolute top-1/4 -left-8 w-72 h-72 sm:w-96 sm:h-96 rounded-full bg-gradient-to-tr from-blue-600/20 via-indigo-500/15 to-transparent blur-3xl pointer-events-none animate-float-slow -z-10" />
+        <div className="absolute bottom-1/4 -right-8 w-80 h-80 sm:w-[400px] sm:h-[400px] rounded-full bg-gradient-to-bl from-sky-400/25 via-blue-700/15 to-transparent blur-3xl pointer-events-none animate-float-slow-reverse -z-10" />
+
+        <div className="w-full bg-white rounded-3xl shadow-xl shadow-slate-200/70 border border-slate-200/80 overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-[580px] animate-card-entrance">
 
           {/* ── LEFT PANEL: Subtle Campus Architectural Background Card ── */}
           <div
@@ -98,7 +102,7 @@ const Login = () => {
             <div className="absolute inset-0 bg-gradient-to-br from-slate-950/90 via-blue-950/85 to-indigo-950/90 backdrop-blur-[2px]" />
 
             {/* Top Brand Header */}
-            <div className="relative z-10 space-y-4">
+            <div className="relative z-10 space-y-4 animate-fade-in-left animation-delay-100">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold bg-white/10 backdrop-blur-md text-blue-200 border border-white/20 shadow-xs">
                 <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
@@ -120,8 +124,12 @@ const Login = () => {
                 { title: 'Faculty & Admin Workflows', sub: 'Instant approval & notifications' },
                 { title: 'PDF & Official Reports', sub: 'Automated authorization exports' },
               ].map((feat, i) => (
-                <div key={i} className="flex items-start gap-3 bg-white/10 border border-white/15 rounded-2xl p-3.5 backdrop-blur-md shadow-xs">
-                  <div className="w-8 h-8 rounded-xl bg-blue-500/30 border border-blue-400/40 flex items-center justify-center shrink-0 text-blue-300">
+                <div
+                  key={i}
+                  className="flex items-start gap-3 bg-white/10 border border-white/15 rounded-2xl p-3.5 backdrop-blur-md shadow-xs animate-fade-in-left transition-all duration-300 hover:translate-x-1.5 hover:bg-white/15 hover:border-white/30 cursor-pointer group"
+                  style={{ animationDelay: `${180 + i * 100}ms` }}
+                >
+                  <div className="w-8 h-8 rounded-xl bg-blue-500/30 border border-blue-400/40 flex items-center justify-center shrink-0 text-blue-300 group-hover:scale-110 group-hover:bg-blue-500/50 transition-all duration-300">
                     <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                     </svg>
@@ -135,7 +143,7 @@ const Login = () => {
             </div>
 
             {/* Footer Tag */}
-            <div className="relative z-10 pt-4 border-t border-white/15 flex items-center justify-between text-xs text-slate-300">
+            <div className="relative z-10 pt-4 border-t border-white/15 flex items-center justify-between text-xs text-slate-300 animate-fade-in-left animation-delay-450">
               <span>© 2026 VCET. All rights reserved.</span>
               <span className="font-semibold text-blue-300"></span>
             </div>
@@ -146,14 +154,14 @@ const Login = () => {
             <div className="max-w-sm mx-auto w-full space-y-6">
 
               {/* Top: Welcome + Check Halls button */}
-              <div className="flex items-start justify-between gap-4">
+              <div className="flex items-start justify-between gap-4 animate-fade-in-right animation-delay-150">
                 <div>
                   <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Welcome Back</h1>
                   <p className="text-sm text-slate-500 mt-1">Login to VCET Hall Reservation Portal</p>
                 </div>
                 <Link
                   to="/schedule"
-                  className="shrink-0 px-4 py-2 rounded-full border-2 border-slate-800 text-xs font-bold text-slate-800 hover:bg-slate-800 hover:text-white transition-all duration-200 whitespace-nowrap"
+                  className="shrink-0 px-4 py-2 rounded-full border-2 border-slate-800 text-xs font-bold text-slate-800 hover:bg-slate-800 hover:text-white transition-all duration-200 whitespace-nowrap shadow-xs hover:shadow-md hover:scale-105 active:scale-95"
                 >
                   Check Halls
                 </Link>
@@ -161,7 +169,7 @@ const Login = () => {
 
               {/* Success Alert */}
               {justVerified && (
-                <div className="flex items-center gap-3 p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs font-semibold text-emerald-800">
+                <div className="flex items-center gap-3 p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs font-semibold text-emerald-800 animate-fade-in-right">
                   <svg className="w-5 h-5 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
@@ -171,7 +179,7 @@ const Login = () => {
 
               {/* Error Alert */}
               {apiError && (
-                <div className="flex items-center gap-3 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-xs font-semibold text-rose-800">
+                <div className="flex items-center gap-3 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-xs font-semibold text-rose-800 animate-fade-in-right">
                   <svg className="w-5 h-5 text-rose-600 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                   </svg>
@@ -180,7 +188,7 @@ const Login = () => {
               )}
 
               {/* Login Form */}
-              <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+              <form onSubmit={handleSubmit} className="space-y-5 animate-fade-in-right animation-delay-250" noValidate>
                 <FloatingInput
                   label="Email Address"
                   name="college_email"
@@ -204,29 +212,35 @@ const Login = () => {
                   autoComplete="current-password"
                 />
 
-                {/* Secure Login Button */}
+                {/* Secure Login Button with Shimmer Sweep */}
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3.5 px-4 rounded-xl text-white font-bold text-sm tracking-wide shadow-md hover:brightness-110 active:brightness-95 disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"
+                  className="relative overflow-hidden w-full py-3.5 px-4 rounded-xl text-white font-bold text-sm tracking-wide shadow-md hover:shadow-xl hover:shadow-blue-900/25 hover:brightness-105 hover:scale-[1.01] active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer group"
                   style={{ background: '#2957a4' }}
                 >
+                  {/* Subtle Light Shimmer Sweep */}
+                  <span className="absolute inset-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none animate-shimmer-sweep" />
+
                   {loading ? (
                     <>
-                      <svg className="w-5 h-5 animate-spin shrink-0" fill="none" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 animate-spin shrink-0 relative z-10" fill="none" viewBox="0 0 24 24">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                       </svg>
-                      <span>Authenticating…</span>
+                      <span className="relative z-10">Authenticating…</span>
                     </>
                   ) : (
-                    <span>Secure Login</span>
+                    <span className="relative z-10 flex items-center gap-2">
+                      Secure Login
+                      <span className="inline-block transition-transform duration-200 group-hover:translate-x-1">→</span>
+                    </span>
                   )}
                 </button>
               </form>
 
               {/* Register as Guest Link */}
-              <p className="text-center text-xs sm:text-sm text-slate-600">
+              <p className="text-center text-xs sm:text-sm text-slate-600 animate-fade-in-right animation-delay-350">
                 External organization?{' '}
                 <Link to="/register" className="font-bold hover:underline" style={{ color: '#2957a4' }}>
                   Register as Guest

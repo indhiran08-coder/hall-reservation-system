@@ -146,3 +146,99 @@
   }
 }
 
+/* ── Landing & Entrance Animations ── */
+@keyframes cardEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(24px) scale(0.985);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fadeInLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInRight {
+  0% {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes floatSlow {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(25px, -20px) scale(1.08);
+  }
+}
+
+@keyframes floatSlowReverse {
+  0%, 100% {
+    transform: translate(0, 0) scale(1.05);
+  }
+  50% {
+    transform: translate(-20px, 25px) scale(0.96);
+  }
+}
+
+@keyframes shimmerSweep {
+  0% {
+    transform: translateX(-150%) skewX(-20deg);
+  }
+  100% {
+    transform: translateX(300%) skewX(-20deg);
+  }
+}
+
+.animate-card-entrance {
+  animation: cardEntrance 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-fade-in-left {
+  animation: fadeInLeft 0.65s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-fade-in-right {
+  animation: fadeInRight 0.65s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-float-slow {
+  animation: floatSlow 14s ease-in-out infinite;
+}
+
+.animate-float-slow-reverse {
+  animation: floatSlowReverse 16s ease-in-out infinite;
+}
+
+.animate-shimmer-sweep {
+  animation: shimmerSweep 2.2s ease-in-out 0.8s 1 forwards;
+}
+
+/* Stagger delay utilities */
+.animation-delay-100 { animation-delay: 100ms; }
+.animation-delay-150 { animation-delay: 150ms; }
+.animation-delay-200 { animation-delay: 200ms; }
+.animation-delay-250 { animation-delay: 250ms; }
+.animation-delay-300 { animation-delay: 300ms; }
+.animation-delay-350 { animation-delay: 350ms; }
+.animation-delay-400 { animation-delay: 400ms; }
+.animation-delay-450 { animation-delay: 450ms; }
+
+
