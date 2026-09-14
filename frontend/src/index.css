@@ -291,4 +291,43 @@
   animation: rotateSlow 40s linear infinite;
 }
 
+@keyframes scanBeam {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.6;
+  }
+  80% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(1000%);
+    opacity: 0;
+  }
+}
+
+.animate-scan-beam {
+  animation: scanBeam 9s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes particleFloat1 {
+  0%, 100% { transform: translateY(0px) translateX(0px); opacity: 0.3; }
+  50% { transform: translateY(-28px) translateX(14px); opacity: 0.8; }
+}
+
+@keyframes particleFloat2 {
+  0%, 100% { transform: translateY(0px) translateX(0px); opacity: 0.25; }
+  50% { transform: translateY(32px) translateX(-18px); opacity: 0.75; }
+}
+
+.animate-particle-1 {
+  animation: particleFloat1 6s ease-in-out infinite;
+}
+
+.animate-particle-2 {
+  animation: particleFloat2 8s ease-in-out infinite;
+}
+
 
