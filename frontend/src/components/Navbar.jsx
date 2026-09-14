@@ -56,8 +56,8 @@ const Navbar = ({ onMenuClick }) => {
       {/* User avatar */}
       {user && (
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-            <span className="text-sm font-semibold text-blue-700">
+          <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: 'rgba(41,87,164,0.12)' }}>
+            <span className="text-sm font-semibold" style={{ color: '#2957a4' }}>
               {user.first_name?.[0]?.toUpperCase()}
             </span>
           </div>

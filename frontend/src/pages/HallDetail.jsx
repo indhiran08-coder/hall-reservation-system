@@ -64,7 +64,7 @@ const HallDetail = () => {
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-sm text-gray-500">
-          <Link to="/halls" className="hover:text-blue-600">Halls</Link>
+          <Link to="/halls" className="hover:underline" style={{ color: '#2957a4' }}>Halls</Link>
           <span>/</span>
           <span className="text-gray-900 font-medium">{hall.name}</span>
         </nav>
@@ -77,7 +77,7 @@ const HallDetail = () => {
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">{hall.name}</h1>
                 <div className="flex items-center gap-2 mt-2 flex-wrap">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700 border border-blue-200">
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border" style={{ backgroundColor: 'rgba(41,87,164,0.08)', color: '#2957a4', borderColor: 'rgba(41,87,164,0.2)' }}>
                     {hall.floor}
                   </span>
                   <span className="text-sm text-gray-500 flex items-center gap-1">
@@ -155,7 +155,7 @@ const HallDetail = () => {
                     </div>
                   ))}
                 </div>
-                <div className="mt-4 p-3 bg-blue-50 border border-blue-100 rounded-lg text-sm text-blue-700">
+                <div className="mt-4 p-3 rounded-lg text-sm border" style={{ backgroundColor: 'rgba(41,87,164,0.06)', borderColor: 'rgba(41,87,164,0.15)', color: '#1e4388' }}>
                   You can book slots not listed above. The system will automatically detect conflicts.
                 </div>
               </div>

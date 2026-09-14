@@ -75,7 +75,8 @@ const Calendar = () => {
           </div>
           <Link
             to="/schedule"
-            className="px-4 py-2.5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md transition-all flex items-center gap-2"
+            className="px-4 py-2.5 rounded-2xl text-white font-bold text-xs shadow-md transition-all flex items-center gap-2"
+            style={{ backgroundColor: '#2957a4' }}
           >
             <span>📍 Live Roadmap Schedule</span>
           </Link>
@@ -137,10 +138,15 @@ const Calendar = () => {
                       onClick={() => setSelected(ds === selected ? null : ds)}
                       className={`
                         h-16 p-1.5 rounded-2xl flex flex-col justify-between items-center transition-all relative border text-xs
-                        ${isSelected ? 'bg-blue-600 text-white border-blue-600 shadow-md ring-2 ring-blue-300' :
-                          isToday    ? 'bg-blue-50 text-blue-700 border-blue-300 font-extrabold' :
-                                       'bg-slate-50/50 hover:bg-blue-50/50 border-slate-200/80 text-slate-800'}
+                        ${isSelected ? 'text-white border-transparent shadow-md ring-2' :
+                          isToday    ? 'border-transparent font-extrabold' :
+                                       'bg-slate-50/50 hover:border-slate-400 border-slate-200/80 text-slate-800'}
                       `}
+                      style={
+                        isSelected ? { backgroundColor: '#2957a4', ringColor: '#2957a4' } :
+                        isToday    ? { backgroundColor: 'rgba(41,87,164,0.08)', color: '#2957a4' } :
+                        {}
+                      }
                     >
                       <span className="font-bold">{day}</span>
                       
@@ -163,7 +169,7 @@ const Calendar = () => {
             {/* Legend */}
             <div className="flex items-center gap-4 pt-3 border-t border-slate-100 text-xs font-bold text-slate-500">
               <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500" /> Confirmed Event</span>
-              <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-blue-600" /> Today</span>
+              <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#2957a4' }} /> Today</span>
               <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-slate-300" /> Empty Slot</span>
             </div>
 
@@ -194,7 +200,8 @@ const Calendar = () => {
                 <p className="text-xs font-semibold text-slate-400">No hall reservations on this day</p>
                 <Link
                   to={`/book?date=${selected}`}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 text-white font-bold text-xs shadow-xs hover:bg-blue-700 transition-all"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-white font-bold text-xs shadow-xs transition-all"
+                  style={{ backgroundColor: '#2957a4' }}
                 >
                   Book this Date
                 </Link>
@@ -216,7 +223,7 @@ const Calendar = () => {
                         </Badge>
                       </div>
 
-                      <p className="text-xs font-bold text-blue-700">{formatTimeRange(b.start_time, b.end_time)}</p>
+                      <p className="text-xs font-bold" style={{ color: '#2957a4' }}>{formatTimeRange(b.start_time, b.end_time)}</p>
                       <p className="text-xs text-slate-600 font-medium">{b.purpose}</p>
 
                       {b.user && (

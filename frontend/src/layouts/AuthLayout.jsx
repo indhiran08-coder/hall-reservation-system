@@ -49,7 +49,7 @@ const AuthLayout = ({ children }) => {
       </header>
 
       {/* ── Subtitle bar ───────────────────────────────────────────── */}
-      <div className="bg-blue-700 text-white text-center py-1.5 text-xs font-semibold tracking-widest uppercase">
+      <div className="text-white text-center py-1.5 text-xs font-semibold tracking-widest uppercase shadow-xs" style={{ backgroundColor: '#2957a4' }}>
         Hall Reservation System
       </div>
 

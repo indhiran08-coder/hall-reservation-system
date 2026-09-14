@@ -340,7 +340,10 @@ const PublicSchedule = () => {
                           </span>
                         )}
                         {status === 'upcoming' && (
-                          <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold bg-blue-50 text-[#2957a4] border border-blue-100">
+                          <span
+                            className="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold border"
+                            style={{ backgroundColor: 'rgba(41,87,164,0.08)', color: '#2957a4', borderColor: 'rgba(41,87,164,0.2)' }}
+                          >
                             Upcoming
                           </span>
                         )}

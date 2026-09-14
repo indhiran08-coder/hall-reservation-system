@@ -154,7 +154,7 @@ const AdminHalls = () => {
 
         {loading ? (
           <div className="flex items-center justify-center h-48">
-            <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+            <div className="w-8 h-8 border-4 border-[#2957a4] border-t-transparent rounded-full animate-spin" />
           </div>
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -180,7 +180,8 @@ const AdminHalls = () => {
                 </div>
                 <button
                   onClick={() => openEdit(hall)}
-                  className="mt-auto w-full text-sm font-medium text-blue-600 border border-blue-200 rounded-lg py-2 hover:bg-blue-50 transition-colors"
+                  className="mt-auto w-full text-sm font-medium border rounded-lg py-2 transition-colors hover:brightness-105"
+                  style={{ color: '#2957a4', borderColor: 'rgba(41,87,164,0.3)', backgroundColor: 'rgba(41,87,164,0.04)' }}
                 >
                   Edit Details
                 </button>

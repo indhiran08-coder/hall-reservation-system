@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { authAPI } from '../../services/api';
+import TechBackground from '../../components/TechBackground';
 
 const OTP_LENGTH = 6;
 const RESEND_SECONDS = 60;
@@ -108,13 +109,12 @@ const VerifyOTP = () => {
         </div>
       </header>
 
-      {/* ── Main Split Showcase Section with Ambient Glow ── */}
+      {/* ── Main Split Showcase Section with Tech Background ── */}
       <main className="relative flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 md:p-8 flex items-center justify-center">
-        {/* Ambient Aurora Glow Orbs */}
-        <div className="absolute top-1/4 -left-8 w-72 h-72 sm:w-96 sm:h-96 rounded-full bg-gradient-to-tr from-blue-600/20 via-indigo-500/15 to-transparent blur-3xl pointer-events-none animate-float-slow -z-10" />
-        <div className="absolute bottom-1/4 -right-8 w-80 h-80 sm:w-[400px] sm:h-[400px] rounded-full bg-gradient-to-bl from-sky-400/25 via-blue-700/15 to-transparent blur-3xl pointer-events-none animate-float-slow-reverse -z-10" />
+        {/* Dynamic Tech Grid & Floating Geometry Background */}
+        <TechBackground />
 
-        <div className="w-full bg-white rounded-3xl shadow-xl shadow-slate-200/70 border border-slate-200/80 overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-[520px] animate-card-entrance">
+        <div className="w-full bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl shadow-slate-300/60 border border-slate-200/80 overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-[520px] animate-card-entrance relative z-10">
           
           {/* ── LEFT PANEL: Showcase Architectural Background ── */}
           <div
@@ -220,9 +220,10 @@ const VerifyOTP = () => {
                       onChange={(e) => handleDigitChange(i, e.target.value)}
                       onKeyDown={(e) => handleKeyDown(i, e)}
                       className={`w-10 sm:w-12 h-12 sm:h-14 text-center text-lg sm:text-xl font-extrabold rounded-xl border-2
-                        focus:outline-none focus:ring-4 focus:ring-blue-600/10 transition-all duration-150
-                        ${d ? 'border-[#2957a4] bg-blue-50/40 text-slate-900 shadow-2xs' : 'border-slate-200 bg-slate-50 text-slate-900 focus:bg-white focus:border-[#2957a4]'}
+                        focus:outline-none transition-all duration-150
+                        ${d ? 'border-[#2957a4] text-slate-900 shadow-2xs' : 'border-slate-200 bg-slate-50 text-slate-900 focus:bg-white focus:border-[#2957a4]'}
                         ${error ? 'border-rose-400 bg-rose-50/30' : ''}`}
+                      style={d ? { backgroundColor: 'rgba(41,87,164,0.06)' } : {}}
                       aria-label={`OTP digit ${i + 1}`}
                       autoComplete="one-time-code"
                     />

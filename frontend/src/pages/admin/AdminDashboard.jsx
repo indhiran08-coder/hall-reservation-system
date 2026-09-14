@@ -30,7 +30,7 @@ const AdminDashboard = () => {
   if (loading) return (
     <DashboardLayout>
       <div className="flex items-center justify-center h-64">
-        <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-4 border-[#2957a4] border-t-transparent rounded-full animate-spin" />
       </div>
     </DashboardLayout>
   );
@@ -70,7 +70,7 @@ const AdminDashboard = () => {
 
         {/* Quick links */}
         <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-3">
-          <Link to="/admin/bookings" className="flex items-center justify-center gap-2 bg-blue-600 text-white text-sm font-medium px-4 py-2.5 rounded-lg hover:bg-blue-700 transition-colors">
+          <Link to="/admin/bookings" className="flex items-center justify-center gap-2 text-white text-sm font-medium px-4 py-2.5 rounded-lg transition-colors hover:brightness-110" style={{ backgroundColor: '#2957a4' }}>
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
             Bookings
           </Link>
@@ -82,7 +82,7 @@ const AdminDashboard = () => {
 
         {/* Summary cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <StatCard label="Total"     value={summary.total}      color="border-blue-500"   sub="All time" />
+          <StatCard label="Total"     value={summary.total}      color="border-[#2957a4]"   sub="All time" />
           <StatCard label="Confirmed" value={summary.confirmed}  color="border-emerald-500" sub="Active" />
           <StatCard label="Cancelled" value={summary.cancelled}  color="border-red-400"    sub="By staff/admin" />
           <StatCard label="Cancel %"  value={`${summary.cancellation_rate}%`} color="border-amber-400" sub="Of all bookings" />
@@ -102,7 +102,7 @@ const AdminDashboard = () => {
                   <XAxis dataKey="name" tick={{ fontSize: 11 }} />
                   <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
                   <Tooltip />
-                  <Bar dataKey="Bookings" fill="#2563eb" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="Bookings" fill="#2957a4" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             )}
@@ -120,7 +120,7 @@ const AdminDashboard = () => {
                   <XAxis dataKey="month" tick={{ fontSize: 11 }} />
                   <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
                   <Tooltip />
-                  <Line type="monotone" dataKey="Bookings" stroke="#2563eb" strokeWidth={2} dot={{ r: 4 }} />
+                  <Line type="monotone" dataKey="Bookings" stroke="#2957a4" strokeWidth={2} dot={{ r: 4 }} />
                 </LineChart>
               </ResponsiveContainer>
             )}

@@ -112,12 +112,15 @@ const Sidebar = ({ isOpen, onClose }) => {
     navigate('/login');
   };
 
-  const linkClass = ({ isActive }) =>
-    `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ${
+  const linkClass = ({ isActive }) => ({
+    className: `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ${
       isActive
-        ? 'bg-blue-600 text-white shadow-sm'
+        ? 'text-white shadow-sm'
         : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-    }`;
+    }`,
+    style: isActive ? { backgroundColor: '#2957a4' } : {}
+  });
+
 
   return (
     <>
@@ -150,7 +153,7 @@ const Sidebar = ({ isOpen, onClose }) => {
             />
             <div className="flex items-center justify-between pt-1.5 border-t border-slate-100">
               <span className="text-[11px] font-bold text-slate-700 tracking-wider uppercase">Hall Reservation</span>
-              <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-md border" style={{ color: '#2957a4', background: 'rgba(41,87,164,0.08)', borderColor: 'rgba(41,87,164,0.2)' }}>
                 {isAdmin ? 'Admin Portal' : 'Staff Portal'}
               </span>
             </div>
@@ -163,7 +166,8 @@ const Sidebar = ({ isOpen, onClose }) => {
             <NavLink
               key={item.to}
               to={item.to}
-              className={linkClass}
+              className={({ isActive }) => linkClass({ isActive }).className}
+              style={({ isActive }) => linkClass({ isActive }).style}
               onClick={onClose}
             >
               {item.icon}
@@ -182,13 +186,8 @@ const Sidebar = ({ isOpen, onClose }) => {
                   key={item.to}
                   to={item.to}
                   end={item.to === '/admin'}
-                  className={({ isActive }) =>
-                    `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ${
-                      isActive
-                        ? 'bg-violet-600 text-white shadow-sm'
-                        : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-                    }`
-                  }
+                  className={({ isActive }) => linkClass({ isActive }).className}
+                  style={({ isActive }) => linkClass({ isActive }).style}
                   onClick={onClose}
                 >
                   {item.icon}

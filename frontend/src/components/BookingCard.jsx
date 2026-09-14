@@ -42,12 +42,15 @@ const BookingCard = ({ booking, onCancel, onDelete, compact = false }) => {
   if (compact) {
     return (
       <div className="flex items-center gap-3 py-3 border-b border-gray-50 last:border-0">
-        <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
-          status === 'cancelled' ? 'bg-red-400'
-          : timeLabel === 'ongoing' ? 'bg-orange-400'
-          : timeLabel === 'past'   ? 'bg-gray-300'
-          : 'bg-blue-500'
-        }`} />
+        <div
+          className={`w-2 h-2 rounded-full flex-shrink-0 ${
+            status === 'cancelled' ? 'bg-red-400'
+            : timeLabel === 'ongoing' ? 'bg-orange-400'
+            : timeLabel === 'past'   ? 'bg-gray-300'
+            : ''
+          }`}
+          style={status !== 'cancelled' && timeLabel !== 'ongoing' && timeLabel !== 'past' ? { backgroundColor: '#2957a4' } : {}}
+        />
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-gray-900 truncate">{hall?.name}</p>
           <p className="text-xs text-gray-500">{formatDate(date)} · {formatTimeRange(start_time, end_time)}</p>

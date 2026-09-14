@@ -65,9 +65,10 @@ const Halls = () => {
               onClick={() => setFloor(f)}
               className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all border ${
                 floor === f
-                  ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
-                  : 'bg-white text-gray-600 border-gray-300 hover:border-blue-400 hover:text-blue-600'
+                  ? 'text-white border-transparent shadow-sm'
+                  : 'bg-white text-gray-600 border-gray-300 hover:border-slate-400 hover:text-slate-800'
               }`}
+              style={floor === f ? { backgroundColor: '#2957a4', borderColor: '#2957a4' } : {}}
             >
               {f}
             </button>

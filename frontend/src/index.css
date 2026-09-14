@@ -38,7 +38,14 @@
     @apply inline-flex items-center justify-center gap-2 font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm;
   }
   .btn-primary {
-    @apply btn bg-blue-600 hover:bg-blue-700 text-white focus:ring-blue-500 px-4 py-2.5;
+    @apply btn text-white px-4 py-2.5;
+    background-color: #2957a4;
+  }
+  .btn-primary:hover {
+    background-color: #1e4388;
+  }
+  .btn-primary:focus {
+    --tw-ring-color: #2957a4;
   }
   .btn-secondary {
     @apply btn bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 focus:ring-gray-300 px-4 py-2.5;
@@ -59,8 +66,9 @@
   /* ── Form inputs ── */
   .input-field {
     @apply w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder-gray-400
-           focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+           focus:outline-none focus:ring-2 focus:border-transparent
            transition-all duration-200 bg-white;
+    --tw-ring-color: #2957a4;
   }
   .input-error {
     @apply border-red-400 focus:ring-red-400;
@@ -86,7 +94,7 @@
   }
   .badge-confirmed  { @apply badge bg-green-100 text-green-800; }
   .badge-cancelled  { @apply badge bg-red-100 text-red-800; }
-  .badge-available  { @apply badge bg-blue-100 text-blue-700; }
+  .badge-available  { @apply badge bg-[#2957a4]/10 text-[#2957a4]; }
   .badge-booked     { @apply badge bg-orange-100 text-orange-800; }
   .badge-upcoming   { @apply badge bg-purple-100 text-purple-800; }
   .badge-past       { @apply badge bg-gray-100 text-gray-600; }
@@ -112,7 +120,10 @@
     @apply bg-green-50 border border-green-200 text-green-700 rounded-lg px-4 py-3 text-sm;
   }
   .alert-info {
-    @apply bg-blue-50 border border-blue-200 text-blue-700 rounded-lg px-4 py-3 text-sm;
+    @apply rounded-lg px-4 py-3 text-sm;
+    background-color: rgba(41, 87, 164, 0.08);
+    border: 1px solid rgba(41, 87, 164, 0.2);
+    color: #2957a4;
   }
 }
 
@@ -239,6 +250,45 @@
 .animation-delay-300 { animation-delay: 300ms; }
 .animation-delay-350 { animation-delay: 350ms; }
 .animation-delay-400 { animation-delay: 400ms; }
-.animation-delay-450 { animation-delay: 450ms; }
+/* ── Interactive Tech Background & Floating Geometry Utilities ── */
+.bg-tech-grid {
+  background-image: 
+    linear-gradient(to right, rgba(41, 87, 164, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(41, 87, 164, 0.05) 1px, transparent 1px);
+  background-size: 36px 36px;
+}
+
+.bg-tech-dots {
+  background-image: radial-gradient(rgba(41, 87, 164, 0.12) 1.25px, transparent 1.25px);
+  background-size: 24px 24px;
+}
+
+@keyframes pulseSlow {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.75;
+    transform: scale(1.08);
+  }
+}
+
+@keyframes rotateSlow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulseSlow 8s ease-in-out infinite;
+}
+
+.animate-spin-slow {
+  animation: rotateSlow 40s linear infinite;
+}
 
 

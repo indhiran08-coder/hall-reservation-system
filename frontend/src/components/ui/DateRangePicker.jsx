@@ -228,7 +228,10 @@ export const DateRangePicker = ({
             {label} {required && <span className="text-rose-500">*</span>}
           </label>
           {startDate && endDate && (
-            <span className="text-[11px] font-semibold text-blue-600 bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-100">
+            <span
+              className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full border"
+              style={{ backgroundColor: 'rgba(41,87,164,0.08)', color: '#2957a4', borderColor: 'rgba(41,87,164,0.2)' }}
+            >
               {totalConsecutiveDays} {totalConsecutiveDays === 1 ? 'Day' : 'Consecutive Days'}
             </span>
           )}
@@ -240,9 +243,9 @@ export const DateRangePicker = ({
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className={`flex h-11 w-full items-center justify-between rounded-2xl border bg-white px-3.5 text-sm font-normal shadow-xs outline-none transition-colors hover:bg-slate-50/70 focus-visible:ring-[3px] focus-visible:ring-blue-500/20 ${
+          className={`flex h-11 w-full items-center justify-between rounded-2xl border bg-white px-3.5 text-sm font-normal shadow-xs outline-none transition-colors hover:bg-slate-50/70 ${
             isOpen
-              ? 'border-blue-600 ring-[3px] ring-blue-500/20'
+              ? 'border-[#2957a4] ring-[3px] ring-[#2957a4]/20'
               : error
               ? 'border-rose-400 focus:border-rose-600 focus:ring-[3px] focus:ring-rose-500/20'
               : 'border-slate-200/80 hover:border-slate-300'
@@ -371,7 +374,7 @@ export const DateRangePicker = ({
                   Quick Select
                 </span>
                 {selectingEnd && (
-                  <span className="text-[11px] font-medium text-blue-600 animate-pulse">
+                  <span className="text-[11px] font-medium animate-pulse" style={{ color: '#2957a4' }}>
                     Click end date to finish
                   </span>
                 )}

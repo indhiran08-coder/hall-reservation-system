@@ -108,8 +108,8 @@ const Profile = () => {
         {/* Read-only identity card */}
         <div className="card">
           <div className="card-header flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-              <span className="text-xl font-bold text-blue-700">
+            <div className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: 'rgba(41,87,164,0.12)' }}>
+              <span className="text-xl font-bold" style={{ color: '#2957a4' }}>
                 {user?.first_name?.[0]?.toUpperCase()}
               </span>
             </div>

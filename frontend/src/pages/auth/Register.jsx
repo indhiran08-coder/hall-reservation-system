@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { authAPI } from '../../services/api';
+import TechBackground from '../../components/TechBackground';
 
 /* ─── Eye Icon Toggle ──────────────────────────────────────────────────────── */
 const EyeIcon = ({ show }) =>
@@ -163,13 +164,12 @@ const Register = () => {
         </div>
       </header>
 
-      {/* ── Main Split Section with Ambient Glow ── */}
+      {/* ── Main Split Section with Tech Background ── */}
       <main className="relative flex-1 max-w-6xl w-full mx-auto p-4 sm:p-6 md:p-10 flex items-center justify-center">
-        {/* Ambient Aurora Glow Orbs */}
-        <div className="absolute top-1/4 -left-8 w-72 h-72 sm:w-96 sm:h-96 rounded-full bg-gradient-to-tr from-blue-600/20 via-indigo-500/15 to-transparent blur-3xl pointer-events-none animate-float-slow -z-10" />
-        <div className="absolute bottom-1/4 -right-8 w-80 h-80 sm:w-[400px] sm:h-[400px] rounded-full bg-gradient-to-bl from-sky-400/25 via-blue-700/15 to-transparent blur-3xl pointer-events-none animate-float-slow-reverse -z-10" />
+        {/* Dynamic Tech Grid & Floating Geometry Background */}
+        <TechBackground />
 
-        <div className="w-full bg-white rounded-3xl shadow-xl shadow-slate-200/70 border border-slate-200/80 overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-[580px] animate-card-entrance">
+        <div className="w-full bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl shadow-slate-300/60 border border-slate-200/80 overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-[580px] animate-card-entrance relative z-10">
 
           {/* ── LEFT PANEL: Institutional Branding & Guidelines ── */}
           <div

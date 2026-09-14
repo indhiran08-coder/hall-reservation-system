@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../../services/api';
+import TechBackground from '../../components/TechBackground';
 
 /* ─── Eye Icon Toggle ──────────────────────────────────────────────────────── */
 const EyeIcon = ({ show }) =>
@@ -73,9 +74,10 @@ const Steps = ({ current }) => (
               s < current
                 ? 'bg-emerald-600 text-white'
                 : s === current
-                ? 'bg-blue-600 text-white ring-4 ring-blue-100'
+                ? 'text-white shadow-md'
                 : 'bg-slate-100 text-slate-400 border border-slate-200'
             }`}
+          style={s === current ? { backgroundColor: '#2957a4' } : {}}
         >
           {s < current ? '✓' : s}
         </div>
@@ -133,9 +135,12 @@ const OTPInput = ({ value, onChange }) => {
           className={`w-11 h-12 text-center text-xl font-bold rounded-xl border-2 outline-none transition-all
             ${
               d
-                ? 'border-blue-600 bg-blue-50/50 text-blue-900'
+                ? 'border-[#2957a4] text-slate-900'
                 : 'border-slate-200 bg-slate-50 text-slate-900'
-            } focus:border-blue-600 focus:bg-white focus:ring-4 focus:ring-blue-600/10`}
+            }`}
+          style={d ? { backgroundColor: 'rgba(41,87,164,0.06)' } : {}}
+          onFocus={(e) => (e.target.style.borderColor = '#2957a4')}
+          onBlur={(e) => { if (!d) e.target.style.borderColor = ''; }}
         />
       ))}
     </div>
@@ -257,16 +262,18 @@ export default function ForgotPassword() {
         </div>
       </header>
 
-      {/* ── Main Container with Ambient Glow ── */}
+      {/* ── Main Container with Tech Background ── */}
       <main className="relative flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 md:p-10 flex items-center justify-center">
-        {/* Ambient Aurora Glow Orbs */}
-        <div className="absolute top-1/4 -left-8 w-72 h-72 sm:w-96 sm:h-96 rounded-full bg-gradient-to-tr from-blue-600/20 via-indigo-500/15 to-transparent blur-3xl pointer-events-none animate-float-slow -z-10" />
-        <div className="absolute bottom-1/4 -right-8 w-80 h-80 sm:w-[400px] sm:h-[400px] rounded-full bg-gradient-to-bl from-sky-400/25 via-blue-700/15 to-transparent blur-3xl pointer-events-none animate-float-slow-reverse -z-10" />
+        {/* Dynamic Tech Grid & Floating Geometry Background */}
+        <TechBackground />
 
-        <div className="w-full max-w-md bg-white rounded-3xl shadow-xl shadow-slate-200/70 border border-slate-200/80 p-8 sm:p-10 space-y-6 animate-card-entrance">
+        <div className="w-full max-w-md bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl shadow-slate-300/60 border border-slate-200/80 p-8 sm:p-10 space-y-6 animate-card-entrance relative z-10">
 
           <div className="text-center space-y-1">
-            <div className="mx-auto w-12 h-12 rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 mb-3">
+            <div
+              className="mx-auto w-12 h-12 rounded-2xl flex items-center justify-center mb-3 border"
+              style={{ backgroundColor: 'rgba(41,87,164,0.08)', borderColor: 'rgba(41,87,164,0.2)', color: '#2957a4' }}
+            >
               {step === 4 ? (
                 <svg className="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
@@ -307,7 +314,8 @@ export default function ForgotPassword() {
               <button
                 type="submit"
                 disabled={loading}
-                className="relative overflow-hidden w-full py-3.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-sm tracking-wide shadow-md shadow-blue-600/20 hover:shadow-lg hover:scale-[1.01] active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2 group cursor-pointer"
+                className="relative overflow-hidden w-full py-3.5 px-4 rounded-xl text-white font-bold text-sm tracking-wide shadow-md hover:shadow-lg hover:brightness-105 hover:scale-[1.01] active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2 group cursor-pointer"
+                style={{ backgroundColor: '#2957a4' }}
               >
                 <span className="absolute inset-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none animate-shimmer-sweep" />
                 <span className="relative z-10">{loading ? 'Sending OTP…' : 'Send Recovery OTP'}</span>
@@ -327,7 +335,8 @@ export default function ForgotPassword() {
               <button
                 type="submit"
                 disabled={otp.replace(/\D/g, '').length < 6}
-                className="relative overflow-hidden w-full py-3.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-sm tracking-wide shadow-md shadow-blue-600/20 hover:shadow-lg hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2 group cursor-pointer"
+                className="relative overflow-hidden w-full py-3.5 px-4 rounded-xl text-white font-bold text-sm tracking-wide shadow-md hover:shadow-lg hover:brightness-105 hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2 group cursor-pointer"
+                style={{ backgroundColor: '#2957a4' }}
               >
                 <span className="absolute inset-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none animate-shimmer-sweep" />
                 <span className="relative z-10">Verify OTP</span>
@@ -380,7 +389,8 @@ export default function ForgotPassword() {
               <button
                 type="submit"
                 disabled={loading}
-                className="relative overflow-hidden w-full py-3.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-sm tracking-wide shadow-md shadow-blue-600/20 hover:shadow-lg hover:scale-[1.01] active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2 group cursor-pointer"
+                className="relative overflow-hidden w-full py-3.5 px-4 rounded-xl text-white font-bold text-sm tracking-wide shadow-md hover:shadow-lg hover:brightness-105 hover:scale-[1.01] active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2 group cursor-pointer"
+                style={{ backgroundColor: '#2957a4' }}
               >
                 <span className="absolute inset-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none animate-shimmer-sweep" />
                 <span className="relative z-10">{loading ? 'Updating Password…' : 'Reset Password'}</span>
@@ -402,7 +412,8 @@ export default function ForgotPassword() {
               </div>
               <button
                 onClick={() => navigate('/login')}
-                className="w-full py-3.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-md shadow-blue-600/20 transition-all duration-200"
+                className="w-full py-3.5 px-4 rounded-xl text-white font-bold text-sm shadow-md hover:brightness-105 transition-all duration-200"
+                style={{ backgroundColor: '#2957a4' }}
               >
                 Go to Sign In
               </button>

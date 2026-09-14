@@ -74,7 +74,9 @@ const TimeSelect = ({ name, value, onChange, label, error, minAfter = null, isEn
         <select
           value={hour}
           onChange={(e) => fireChange(Number(e.target.value), minute)}
-          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-semibold text-slate-900 focus:bg-white focus:border-blue-600 focus:outline-none transition-all"
+          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none transition-all"
+          onFocus={(e) => (e.target.style.borderColor = '#2957a4')}
+          onBlur={(e) => (e.target.style.borderColor = '')}
         >
           {filteredHours.map(({ value: h, label: l }) => (
             <option key={h} value={h}>{l}</option>
@@ -83,7 +85,9 @@ const TimeSelect = ({ name, value, onChange, label, error, minAfter = null, isEn
         <select
           value={minute}
           onChange={(e) => fireChange(hour, Number(e.target.value))}
-          className="w-20 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-semibold text-slate-900 focus:bg-white focus:border-blue-600 focus:outline-none transition-all"
+          className="w-20 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none transition-all"
+          onFocus={(e) => (e.target.style.borderColor = '#2957a4')}
+          onBlur={(e) => (e.target.style.borderColor = '')}
           disabled={isEndTime && filteredMinutes.length === 0}
         >
           {filteredMinutes.map(({ value: m, label: l }) => (
@@ -289,7 +293,7 @@ const BookHall = () => {
               ? `Your hall reservations for ${totalDays} consecutive days (${formatDate(form.date)} to ${formatDate(form.end_date)}) are authorized. Daily passes have been dispatched to your email.`
               : 'Your hall reservation is authorized. A confirmation pass has been dispatched to your email.'}
           </p>
-          <p className="text-[11px] font-bold text-blue-600 animate-pulse">Redirecting to your active passes…</p>
+          <p className="text-[11px] font-bold animate-pulse" style={{ color: '#2957a4' }}>Redirecting to your active passes…</p>
         </div>
       </DashboardLayout>
     );
@@ -303,7 +307,7 @@ const BookHall = () => {
         <div className="flex items-center justify-between">
           <div>
             <nav className="flex items-center gap-2 text-xs text-slate-400 font-semibold mb-1">
-              <Link to="/halls" className="hover:text-blue-600">Halls</Link>
+              <Link to="/halls" className="hover:underline" style={{ color: '#2957a4' }}>Halls</Link>
               <span>/</span>
               <span className="text-slate-900">Guided Wizard</span>
             </nav>
@@ -326,11 +330,12 @@ const BookHall = () => {
               }}
               className={`p-3 rounded-2xl flex items-center justify-center gap-2.5 transition-all text-xs font-extrabold ${
                 wizardStep === s.step
-                  ? 'bg-blue-600 text-white shadow-md'
+                  ? 'text-white shadow-md'
                   : wizardStep > s.step
                   ? 'bg-emerald-50 text-emerald-800 border border-emerald-200 cursor-pointer'
                   : 'bg-slate-50 text-slate-400 opacity-60 cursor-not-allowed'
               }`}
+              style={wizardStep === s.step ? { backgroundColor: '#2957a4' } : {}}
             >
               <span>{s.icon}</span>
               <span className="hidden sm:inline">Step {s.step}: {s.title}</span>
@@ -387,9 +392,10 @@ const BookHall = () => {
                         }}
                         className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                           !isMultiDay
-                            ? 'bg-blue-600 text-white shadow-xs'
+                            ? 'text-white shadow-xs'
                             : 'text-slate-600 hover:text-slate-900'
                         }`}
+                        style={!isMultiDay ? { backgroundColor: '#2957a4' } : {}}
                       >
                         Single Day
                       </button>
@@ -403,9 +409,10 @@ const BookHall = () => {
                         }}
                         className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                           isMultiDay
-                            ? 'bg-blue-600 text-white shadow-xs'
+                            ? 'text-white shadow-xs'
                             : 'text-slate-600 hover:text-slate-900'
                         }`}
+                        style={isMultiDay ? { backgroundColor: '#2957a4' } : {}}
                       >
                         🗓 Multi-Day Event
                       </button>
@@ -440,11 +447,18 @@ const BookHall = () => {
                         required
                       />
                       {isMultiDayActive && totalDays > 1 && (
-                        <div className="p-3 bg-blue-50/70 border border-blue-200/80 rounded-xl text-xs text-blue-900 flex items-center justify-between">
+                        <div
+                          className="p-3 rounded-xl text-xs flex items-center justify-between border"
+                          style={{
+                            backgroundColor: 'rgba(41,87,164,0.06)',
+                            borderColor: 'rgba(41,87,164,0.25)',
+                            color: '#1d345e'
+                          }}
+                        >
                           <span className="font-bold">
                             📅 {totalDays} Consecutive Days Selected
                           </span>
-                          <span className="text-[11px] font-medium text-blue-700">
+                          <span className="text-[11px] font-medium" style={{ color: '#2957a4' }}>
                             {formatDate(form.date)} → {formatDate(form.end_date)}
                           </span>
                         </div>
@@ -492,7 +506,8 @@ const BookHall = () => {
                   <button
                     type="button"
                     onClick={handleNextStep}
-                    className="px-6 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs shadow-md transition-all flex items-center gap-2"
+                    className="px-6 py-3 rounded-2xl text-white font-extrabold text-xs shadow-md transition-all flex items-center gap-2"
+                    style={{ backgroundColor: '#2957a4' }}
                   >
                     <span>Proceed to Event Details</span>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -535,7 +550,9 @@ const BookHall = () => {
                       value={form.requirements}
                       onChange={handleChange}
                       rows={3}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-3 text-xs font-medium text-slate-900 focus:bg-white focus:border-blue-600 focus:outline-none transition-all resize-none"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-3 text-xs font-medium text-slate-900 focus:bg-white focus:outline-none transition-all resize-none"
+                      onFocus={(e) => (e.target.style.borderColor = '#2957a4')}
+                      onBlur={(e) => (e.target.style.borderColor = '')}
                       placeholder="e.g., 2 wireless podium mics, projector screen enabled, central AC setup"
                     />
                   </div>
@@ -552,7 +569,8 @@ const BookHall = () => {
                   <button
                     type="button"
                     onClick={handleNextStep}
-                    className="px-6 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs shadow-md transition-all flex items-center gap-2"
+                    className="px-6 py-3 rounded-2xl text-white font-extrabold text-xs shadow-md transition-all flex items-center gap-2"
+                    style={{ backgroundColor: '#2957a4' }}
                   >
                     <span>Preview Official Pass</span>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -578,7 +596,7 @@ const BookHall = () => {
                   </div>
                   <div className="flex justify-between border-b border-slate-200 pb-2">
                     <span className="font-bold text-slate-500">Date & Slot:</span>
-                    <span className="font-bold text-blue-700">
+                    <span className="font-bold" style={{ color: '#2957a4' }}>
                       {isMultiDayActive && totalDays > 1
                         ? `${formatDate(form.date)} to ${formatDate(form.end_date)} (${totalDays} Days) • ${formatTimeRange(form.start_time, form.end_time)} daily`
                         : `${formatDate(form.date)} • ${formatTimeRange(form.start_time, form.end_time)}`}
