@@ -5,7 +5,6 @@ import React, { useEffect, useState } from 'react';
  * Features:
  * - Mouse parallax micro-movement for depth
  * - Subtle horizontal cyber scan-beam light wave
- * - Dynamic animated tech constellation & glowing particle nodes
  * - Clean engineering grid + dot-matrix blueprint vignette
  * - Futuristic architectural HUD accents (rotary dials, compass markers, status telemetry)
  */
@@ -73,13 +72,6 @@ const TechBackground = () => {
         style={{ background: 'radial-gradient(ellipse, rgba(41,87,164,0.38) 0%, transparent 70%)' }}
       />
 
-      {/* ── 5. Interactive Constellation Nodes & Glowing Star Particles ── */}
-      <div className="absolute top-[22%] left-[18%] size-2 rounded-full bg-[#2957a4] shadow-[0_0_12px_#2957a4] animate-particle-1" />
-      <div className="absolute top-[38%] left-[28%] size-1.5 rounded-full bg-sky-400 shadow-[0_0_10px_#38bdf8] animate-particle-2" />
-      <div className="absolute top-[68%] left-[12%] size-2.5 rounded-full bg-[#2957a4]/80 shadow-[0_0_14px_#2957a4] animate-particle-1" />
-      <div className="absolute top-[16%] right-[22%] size-2 rounded-full bg-indigo-500 shadow-[0_0_12px_#6366f1] animate-particle-2" />
-      <div className="absolute top-[72%] right-[19%] size-2 rounded-full bg-sky-400 shadow-[0_0_12px_#38bdf8] animate-particle-1" />
-      <div className="absolute top-[45%] right-[28%] size-1.5 rounded-full bg-[#2957a4] shadow-[0_0_10px_#2957a4] animate-particle-2" />
 
       {/* ── 6. Futuristic Architectural HUD & Geometric Accents ── */}
       {/* Top Right: Rotating Isometric Campus Hex-Cube */}
