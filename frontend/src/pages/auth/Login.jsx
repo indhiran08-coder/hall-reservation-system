@@ -4,6 +4,7 @@ import { authAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import FloatingInput from '../../components/ui/FloatingInput';
 import TechBackground from '../../components/TechBackground';
+import RippleDistortion from '../../components/RippleDistortion';
 
 
 /* ══════════════════════════════════════════════════════════════════════════════
@@ -93,16 +94,33 @@ const Login = () => {
 
         <div className="w-full bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl shadow-slate-300/60 border border-slate-200/80 overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-[580px] animate-card-entrance relative z-10">
 
-          {/* ── LEFT PANEL: Subtle Campus Architectural Background Card ── */}
+          {/* ── LEFT PANEL: Interactive RippleDistortion Campus Image ── */}
           <div
-            className="lg:col-span-5 relative p-8 sm:p-10 text-white flex flex-col justify-between overflow-hidden bg-cover bg-center"
-            style={{ backgroundImage: 'url(/vcet-campus.jpg)' }}
+            className="lg:col-span-5 relative text-white flex flex-col justify-between overflow-hidden"
           >
-            {/* Dark Deep Royal Blue Mask Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-br from-slate-950/90 via-blue-950/85 to-indigo-950/90 backdrop-blur-[2px]" />
+            {/* WebGL Ripple Canvas – fills the entire left panel */}
+            <div className="absolute inset-0 z-0">
+              <RippleDistortion
+                src="/vcet-campus.jpg"
+                brushSize={150}
+                strength={0.2}
+                swirl={1}
+                rings={4}
+                spread={5}
+                fade={3}
+                tint="#2957a4"
+                tintAmount={0.1}
+                trigger="hover"
+                clickStrength={2}
+                enabled
+              />
+            </div>
+
+            {/* Dark Deep Royal Blue Gradient Overlay (over the ripple canvas) */}
+            <div className="absolute inset-0 z-10 bg-gradient-to-br from-slate-950/85 via-[#0f1e45]/80 to-indigo-950/85 pointer-events-none" />
 
             {/* Top Brand Header */}
-            <div className="relative z-10 space-y-4 animate-fade-in-left animation-delay-100">
+            <div className="relative z-20 p-8 sm:p-10 space-y-4 animate-fade-in-left animation-delay-100">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold bg-white/10 backdrop-blur-md text-blue-200 border border-white/20 shadow-xs">
                 <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
@@ -110,7 +128,7 @@ const Login = () => {
                 <span>VCET Campus Portal</span>
               </div>
               <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight leading-tight">
-                Seamless Campus Event & Hall Management
+                Seamless Campus Event &amp; Hall Management
               </h2>
               <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-medium">
                 Reserve seminar halls, auditoriums, and conference rooms with real-time schedule conflict prevention.
@@ -118,7 +136,7 @@ const Login = () => {
             </div>
 
             {/* Glassmorphism Feature Checklist */}
-            <div className="relative z-10 my-6 space-y-3">
+            <div className="relative z-20 px-8 sm:px-10 space-y-3 flex-1 flex flex-col justify-center">
               {[
                 { title: 'Real-Time Schedule Roadmap', sub: 'Instant slot conflict checking' },
                 { title: 'Faculty & Admin Workflows', sub: 'Instant approval & notifications' },
@@ -143,9 +161,9 @@ const Login = () => {
             </div>
 
             {/* Footer Tag */}
-            <div className="relative z-10 pt-4 border-t border-white/15 flex items-center justify-between text-xs text-slate-300 animate-fade-in-left animation-delay-450">
+            <div className="relative z-20 px-8 sm:px-10 pb-8 sm:pb-10 pt-4 border-t border-white/15 flex items-center justify-between text-xs text-slate-300 animate-fade-in-left animation-delay-450">
               <span>© 2026 VCET. All rights reserved.</span>
-              <span className="font-semibold text-blue-300"></span>
+              <span className="text-[10px] text-primary-300 font-semibold tracking-wide">Hover to explore ✦</span>
             </div>
           </div>
 
