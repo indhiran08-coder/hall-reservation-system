@@ -27,7 +27,7 @@ const RefinedInput = ({ label, error, helper, type = 'text', icon, required = tr
       </label>
       <div className="relative group">
         {icon && (
-          <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors pointer-events-none">
+          <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary-600 transition-colors pointer-events-none">
             {icon}
           </div>
         )}
@@ -35,7 +35,7 @@ const RefinedInput = ({ label, error, helper, type = 'text', icon, required = tr
           type={isPassword ? (showPwd ? 'text' : 'password') : type}
           className={`w-full rounded-xl text-sm text-slate-900 placeholder-slate-400/70
             bg-slate-50 border border-slate-200
-            focus:outline-none focus:border-blue-600 focus:bg-white focus:ring-4 focus:ring-blue-600/10
+            focus:outline-none focus:border-primary-600 focus:bg-white focus:ring-4 focus:ring-primary-600/10
             transition-all duration-200 py-3 ${icon ? 'pl-11' : 'pl-4'} ${isPassword ? 'pr-11' : 'pr-4'}`}
           {...props}
         />
@@ -236,7 +236,7 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 flex flex-col font-sans selection:bg-blue-600 selection:text-white relative overflow-x-hidden">
+    <div className="min-h-screen bg-slate-100 flex flex-col font-sans selection:bg-primary-600 selection:text-white relative overflow-x-hidden">
       {/* ── Official VCET Banner Header ── */}
       <header className="relative z-30 w-full shrink-0">
         <div className="bg-white border-b border-slate-200 flex items-center justify-center px-4 py-2 shadow-xs">
@@ -321,7 +321,7 @@ export default function ForgotPassword() {
                 <span className="relative z-10">{loading ? 'Sending OTP…' : 'Send Recovery OTP'}</span>
               </button>
               <div className="text-center pt-2">
-                <Link to="/login" className="text-xs font-semibold text-slate-500 hover:text-blue-600 transition-colors">
+                <Link to="/login" className="text-xs font-semibold text-slate-500 hover:text-primary-600 transition-colors">
                   ← Back to Sign In
                 </Link>
               </div>
@@ -348,7 +348,7 @@ export default function ForgotPassword() {
                     type="button"
                     onClick={handleResend}
                     disabled={resendCooldown > 0 || loading}
-                    className={`font-bold ${resendCooldown > 0 ? 'text-slate-400 cursor-not-allowed' : 'text-blue-600 hover:underline'}`}
+                    className={`font-bold ${resendCooldown > 0 ? 'text-slate-400 cursor-not-allowed' : 'text-primary-600 hover:underline'}`}
                   >
                     {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend OTP'}
                   </button>

@@ -147,7 +147,7 @@ const VerifyOTP = () => {
                 'Immediate access to hall booking upon verification',
               ].map((item, idx) => (
                 <div key={idx} className="flex items-start gap-2.5 text-xs text-slate-300">
-                  <div className="w-5 h-5 rounded-full bg-blue-600/40 border border-blue-400/50 flex items-center justify-center shrink-0 text-blue-300 mt-0.5 font-bold text-[10px]">
+                  <div className="w-5 h-5 rounded-full bg-primary-600/40 border border-primary-400/50 flex items-center justify-center shrink-0 text-primary-200 mt-0.5 font-bold text-[10px]">
                     ✓
                   </div>
                   <span>{item}</span>

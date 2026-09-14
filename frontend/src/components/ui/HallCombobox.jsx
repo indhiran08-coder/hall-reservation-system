@@ -88,9 +88,9 @@ export const HallCombobox = ({
           role="combobox"
           aria-expanded={open}
           onClick={() => setOpen(!open)}
-          className={`flex h-11 w-full items-center justify-between rounded-2xl border bg-white px-3.5 text-sm font-normal shadow-xs outline-none transition-colors hover:bg-slate-50/70 focus-visible:ring-[3px] focus-visible:ring-blue-500/20 ${
+          className={`flex h-11 w-full items-center justify-between rounded-2xl border bg-white px-3.5 text-sm font-normal shadow-xs outline-none transition-colors hover:bg-slate-50/70 focus-visible:ring-[3px] focus-visible:ring-primary-500/20 ${
             open
-              ? 'border-blue-600 ring-[3px] ring-blue-500/20'
+              ? 'border-primary-600 ring-[3px] ring-primary-500/20'
               : error
               ? 'border-rose-400 focus:border-rose-600 focus:ring-[3px] focus:ring-rose-500/20'
               : 'border-slate-200/80 hover:border-slate-300'
@@ -98,7 +98,7 @@ export const HallCombobox = ({
           aria-label="Hall venue combobox"
         >
           <div className="flex items-center gap-2.5 truncate">
-            <Building2 className={`size-4 shrink-0 ${selectedHall ? 'text-blue-600' : 'text-slate-400'}`} />
+            <Building2 className={`size-4 shrink-0 ${selectedHall ? 'text-primary-600' : 'text-slate-400'}`} />
             <span className={selectedHall ? 'text-slate-900 font-medium truncate' : 'text-slate-400 font-normal'}>
               {selectedHall ? (
                 <>

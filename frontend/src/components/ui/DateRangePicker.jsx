@@ -252,14 +252,14 @@ export const DateRangePicker = ({
           }`}
         >
           <div className="flex items-center gap-2.5 truncate">
-            <CalendarIcon className={`size-4 shrink-0 ${startDate ? 'text-blue-600' : 'text-slate-400'}`} />
+            <CalendarIcon className={`size-4 shrink-0 ${startDate ? 'text-primary-600' : 'text-slate-400'}`} />
             <span className={startDate ? 'text-slate-900 font-medium truncate' : 'text-slate-400 font-normal'}>
               {triggerLabel}
             </span>
           </div>
           <ChevronDown
             className={`size-4 text-slate-400/80 shrink-0 transition-transform duration-200 ${
-              isOpen ? 'rotate-180 text-blue-600' : ''
+              isOpen ? 'rotate-180 text-primary-600' : ''
             }`}
           />
         </button>

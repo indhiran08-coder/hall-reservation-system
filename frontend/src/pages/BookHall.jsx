@@ -656,7 +656,7 @@ const BookHall = () => {
               <div className="flex items-center justify-between border-b border-white/15 pb-4">
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <span className="text-[10px] font-bold tracking-widest uppercase text-blue-200">
+                  <span className="text-[10px] font-bold tracking-widest uppercase text-primary-200">
                     {isMultiDayActive && totalDays > 1 ? `Official Multi-Day Pass (${totalDays} Days)` : 'Official Campus Pass Preview'}
                   </span>
                 </div>
@@ -668,7 +668,7 @@ const BookHall = () => {
                 <h3 className="text-xl font-extrabold text-white mt-0.5">
                   {selectedHallObj?.name || 'Select a Hall…'}
                 </h3>
-                <p className="text-[11px] text-blue-300 font-medium">{selectedHallObj?.floor || 'Ground Floor'}</p>
+                <p className="text-[11px] text-primary-300 font-medium">{selectedHallObj?.floor || 'Ground Floor'}</p>
                 {selectedHallObj?.capacity && (
                   <p className="text-[11px] text-slate-400 font-medium mt-0.5">{selectedHallObj.capacity} pax capacity</p>
                 )}

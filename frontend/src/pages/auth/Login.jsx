@@ -53,7 +53,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 flex flex-col font-sans selection:bg-blue-600 selection:text-white overflow-x-hidden relative">
+    <div className="min-h-screen bg-slate-100 flex flex-col font-sans selection:bg-primary-600 selection:text-white overflow-x-hidden relative">
       {/* ── Official VCET Banner Header ── */}
       <header className="relative z-30 w-full shrink-0">
         <div className="bg-white border-b border-slate-200 flex items-center justify-center px-4 py-2 shadow-xs">
@@ -129,7 +129,7 @@ const Login = () => {
                   className="flex items-start gap-3 bg-white/10 border border-white/15 rounded-2xl p-3.5 backdrop-blur-md shadow-xs animate-fade-in-left transition-all duration-300 hover:translate-x-1.5 hover:bg-white/15 hover:border-white/30 cursor-pointer group"
                   style={{ animationDelay: `${180 + i * 100}ms` }}
                 >
-                  <div className="w-8 h-8 rounded-xl bg-blue-500/30 border border-blue-400/40 flex items-center justify-center shrink-0 text-blue-300 group-hover:scale-110 group-hover:bg-blue-500/50 transition-all duration-300">
+                  <div className="w-8 h-8 rounded-xl bg-primary-500/30 border border-primary-400/40 flex items-center justify-center shrink-0 text-primary-200 group-hover:scale-110 group-hover:bg-primary-500/50 transition-all duration-300">
                     <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                     </svg>

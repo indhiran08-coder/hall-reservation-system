@@ -21,7 +21,7 @@ export const VCETLogo = ({ size = 'md' }) => {
       />
       <div className="leading-tight">
         <p className={`${s.title} font-bold text-gray-900 tracking-tight`}>VCET Hall</p>
-        <p className={`${s.sub} font-semibold text-blue-600 tracking-wide uppercase`}>Reservation</p>
+        <p className={`${s.sub} font-semibold text-primary-600 tracking-wide uppercase`}>Reservation</p>
       </div>
     </div>
   );
@@ -34,7 +34,7 @@ export const VCETLogo = ({ size = 'md' }) => {
  */
 const AuthLayout = ({ children }) => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-primary-50 to-primary-100/50 flex flex-col">
 
       {/* ── VCET College Banner ─────────────────────────────────────── */}
       <header className="bg-white border-b border-gray-200 shadow-sm w-full overflow-hidden">

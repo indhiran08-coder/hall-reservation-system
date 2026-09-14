@@ -47,7 +47,7 @@ export const FloatingInput = ({
             error
               ? 'border-rose-400 focus:border-rose-600 focus:ring-[3px] focus:ring-rose-500/20'
               : isFocused
-              ? 'border-blue-600 ring-[3px] ring-blue-500/20'
+              ? 'border-primary-600 ring-[3px] ring-primary-500/20'
               : 'border-slate-200/80 hover:border-slate-300'
           } ${isPassword || isValid ? 'pr-11' : 'pr-4'}`}
           {...props}
@@ -58,7 +58,7 @@ export const FloatingInput = ({
           htmlFor={id}
           className={`pointer-events-none absolute left-4 transition-all duration-150 origin-left select-none ${
             isFloating
-              ? 'top-1.5 scale-75 font-semibold text-xs ' + (isFocused ? 'text-blue-600' : 'text-slate-500')
+              ? 'top-1.5 scale-75 font-semibold text-xs ' + (isFocused ? 'text-primary-600' : 'text-slate-500')
               : 'top-3.5 scale-100 font-normal text-sm text-slate-400'
           }`}
         >

@@ -27,7 +27,7 @@ const RefinedInput = ({ label, error, helper, type = 'text', icon, required = tr
       </label>
       <div className="relative group">
         {icon && (
-          <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors pointer-events-none">
+          <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary-600 transition-colors pointer-events-none">
             {icon}
           </div>
         )}
@@ -35,7 +35,7 @@ const RefinedInput = ({ label, error, helper, type = 'text', icon, required = tr
           type={isPassword ? (showPwd ? 'text' : 'password') : type}
           className={`w-full rounded-xl text-sm text-slate-900 placeholder-slate-400/70
             bg-slate-50 border border-slate-200
-            focus:outline-none focus:border-blue-600 focus:bg-white focus:ring-4 focus:ring-blue-600/10
+            focus:outline-none focus:border-primary-600 focus:bg-white focus:ring-4 focus:ring-primary-600/10
             transition-all duration-200 py-3 ${icon ? 'pl-11' : 'pl-4'} ${isPassword ? 'pr-11' : 'pr-4'}`}
           {...props}
         />
@@ -138,7 +138,7 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 flex flex-col font-sans selection:bg-blue-600 selection:text-white overflow-x-hidden relative">
+    <div className="min-h-screen bg-slate-100 flex flex-col font-sans selection:bg-primary-600 selection:text-white overflow-x-hidden relative">
       {/* ── Official VCET Banner Header ── */}
       <header className="relative z-30 w-full shrink-0">
         <div className="bg-white border-b border-slate-200 flex items-center justify-center px-4 py-2 shadow-xs">
@@ -200,7 +200,7 @@ const Register = () => {
                 'Direct access to live hall roadmaps & availability',
               ].map((item, idx) => (
                 <div key={idx} className="flex items-start gap-2.5 text-xs text-slate-300">
-                  <div className="w-5 h-5 rounded-full bg-blue-600/40 border border-blue-400/50 flex items-center justify-center shrink-0 text-blue-300 mt-0.5">
+                  <div className="w-5 h-5 rounded-full bg-primary-600/40 border border-primary-400/50 flex items-center justify-center shrink-0 text-primary-200 mt-0.5">
                     ✓
                   </div>
                   <span>{item}</span>

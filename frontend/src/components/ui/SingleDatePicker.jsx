@@ -145,9 +145,9 @@ export const SingleDatePicker = ({
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className={`flex h-11 w-full items-center justify-between rounded-2xl border bg-white px-3.5 text-sm font-normal shadow-xs outline-none transition-colors hover:bg-slate-50/70 focus-visible:ring-[3px] focus-visible:ring-blue-500/20 ${
+          className={`flex h-11 w-full items-center justify-between rounded-2xl border bg-white px-3.5 text-sm font-normal shadow-xs outline-none transition-colors hover:bg-slate-50/70 focus-visible:ring-[3px] focus-visible:ring-primary-500/20 ${
             isOpen
-              ? 'border-blue-600 ring-[3px] ring-blue-500/20'
+              ? 'border-primary-600 ring-[3px] ring-primary-500/20'
               : error
               ? 'border-rose-400 focus:border-rose-600 focus:ring-[3px] focus:ring-rose-500/20'
               : 'border-slate-200/80 hover:border-slate-300'
@@ -158,12 +158,12 @@ export const SingleDatePicker = ({
               value ? 'text-slate-900 font-medium' : 'text-slate-400 font-normal'
             }`}
           >
-            <CalendarIcon className={`size-4 shrink-0 ${value ? 'text-blue-600' : 'text-slate-400'}`} />
+            <CalendarIcon className={`size-4 shrink-0 ${value ? 'text-primary-600' : 'text-slate-400'}`} />
             {value ? formatDate(value) : 'Pick a date'}
           </span>
           <ChevronDown
             className={`size-4 text-slate-400/80 shrink-0 transition-transform duration-200 ${
-              isOpen ? 'rotate-180 text-blue-600' : ''
+              isOpen ? 'rotate-180 text-primary-600' : ''
             }`}
           />
         </button>
