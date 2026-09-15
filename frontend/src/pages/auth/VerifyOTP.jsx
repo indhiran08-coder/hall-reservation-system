@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { authAPI } from '../../services/api';
-import TechBackground from '../../components/TechBackground';
+// Component inspired by github.com/zavalit/bayer-dithering-webgl-demo
+import PixelBlast from '../../components/PixelBlast';
 
 const OTP_LENGTH = 6;
 const RESEND_SECONDS = 60;
@@ -109,10 +110,30 @@ const VerifyOTP = () => {
         </div>
       </header>
 
-      {/* ── Main Split Showcase Section with Tech Background ── */}
+      {/* ── Main Split Showcase Section with Interactive PixelBlast Background ── */}
       <main className="relative flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 md:p-8 flex items-center justify-center">
-        {/* Dynamic Tech Grid & Floating Geometry Background */}
-        <TechBackground />
+        {/* Interactive WebGL PixelBlast Background with VCET Blue */}
+        <div className="fixed inset-0 pointer-events-auto z-0 overflow-hidden">
+          <PixelBlast
+            variant="square"
+            pixelSize={4}
+            color="#2957a4"
+            patternScale={2}
+            patternDensity={1}
+            pixelSizeJitter={0}
+            enableRipples
+            rippleSpeed={0.4}
+            rippleThickness={0.12}
+            rippleIntensityScale={1.5}
+            liquid={false}
+            liquidStrength={0.12}
+            liquidRadius={1.2}
+            liquidWobbleSpeed={5}
+            speed={0.5}
+            edgeFade={0.25}
+            transparent
+          />
+        </div>
 
         <div className="w-full bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl shadow-slate-300/60 border border-slate-200/80 overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-[520px] animate-card-entrance relative z-10">
           
