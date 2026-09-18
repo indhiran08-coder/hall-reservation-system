@@ -32,8 +32,10 @@ const ALLOWED_DEPARTMENT_EMAILS = new Set([
   'iqac@velalarengg.ac.in',
   'vcetcdc@velalarengg.ac.in',
   'placement@velalarengg.ac.in',
-  'indhirans@velalarengg.ac.in' // admin
+  (process.env.ADMIN_EMAIL || 'indhirans@velalarengg.ac.in').toLowerCase() // admin
 ]);
+
+const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || 'indhirans@velalarengg.ac.in').toLowerCase();
 
 /**
  * Step 1: Validate uniqueness, generate OTP, store temporarily, send email.
@@ -64,12 +66,15 @@ const initiateRegistration = async (userData) => {
   const otp = generateOTP();
   const expires_at = getOTPExpiry();
 
+  // Pre-hash password before saving in OTP metadata so plaintext passwords never touch the DB
+  const password_hash = await bcrypt.hash(password, 12);
+
   const metadata = JSON.stringify({
     first_name: personName,
     department: orgName,
     email: targetEmail,
     phone: (phone || '').trim(),
-    password,
+    password_hash,
     role: 'guest'
   });
 
@@ -108,11 +113,11 @@ const verifyOTPAndCreateUser = async (personalEmail, otpInput) => {
   if (record.otp !== String(otpInput)) throw new Error('Incorrect OTP. Please try again.');
 
   // Parse stored registration data
-  const { first_name, department, email: targetEmail, phone, password, role = 'guest' } =
+  const { first_name, department, email: targetEmail, phone, password_hash, password, role = 'guest' } =
     JSON.parse(record.metadata);
 
-  // Hash password with salt rounds = 12
-  const password_hash = await bcrypt.hash(password, 12);
+  // Use pre-hashed password if present, or hash legacy plain password
+  const finalPasswordHash = password_hash || (await bcrypt.hash(password, 12));
 
   // Insert user
   const { error: userError } = await supabase.from('users').insert({
@@ -121,7 +126,7 @@ const verifyOTPAndCreateUser = async (personalEmail, otpInput) => {
     college_email: targetEmail,
     personal_email: targetEmail,
     phone,
-    password_hash,
+    password_hash: finalPasswordHash,
     role
   });
 
@@ -157,7 +162,7 @@ const loginUser = async (collegeEmail, password) => {
   // Enforce access whitelist: only authorized department emails, guests, or admin
   const isAllowedOfficial = ALLOWED_DEPARTMENT_EMAILS.has(user.college_email.toLowerCase());
   const isGuest = user.role === 'guest';
-  const isAdmin = user.college_email.toLowerCase() === 'indhirans@velalarengg.ac.in' || user.role === 'admin';
+  const isAdmin = user.college_email.toLowerCase() === ADMIN_EMAIL || user.role === 'admin';
 
   if (!isAllowedOfficial && !isGuest && !isAdmin) {
     throw new Error('Access restricted: Only authorized department emails and registered guests can access the portal.');

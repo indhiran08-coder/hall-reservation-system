@@ -22,14 +22,19 @@ const authenticate = (req, res, next) => {
   }
 };
 
+const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || 'indhirans@velalarengg.ac.in').toLowerCase();
+
 /**
  * Middleware: Requires the authenticated user to have role === 'admin'.
  * Must be used AFTER authenticate.
  */
 const requireAdmin = (req, res, next) => {
-  const isAdmin = req.user && (req.user.role === 'admin' || req.user.college_email === 'indhirans@velalarengg.ac.in');
+  const isAdmin = req.user && (
+    req.user.role === 'admin' ||
+    (req.user.college_email && req.user.college_email.toLowerCase() === ADMIN_EMAIL)
+  );
   if (!isAdmin) {
-    return res.status(403).json({ error: 'Access Denied: Only authorized administrator (indhirans@velalarengg.ac.in) can access Admin features.' });
+    return res.status(403).json({ error: 'Access Denied: You do not have administrator privileges.' });
   }
   next();
 };

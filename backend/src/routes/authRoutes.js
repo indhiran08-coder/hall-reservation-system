@@ -10,12 +10,13 @@ const {
 } = require('../controllers/authController');
 
 const { validateRegister, validateVerifyOTP, validateLogin } = require('../middleware/validate');
+const { authLimiter, otpLimiter } = require('../middleware/rateLimiter');
 
-// Public routes — no authentication required
-router.post('/register', validateRegister, register);
-router.post('/verify-otp', validateVerifyOTP, verifyOTP);
-router.post('/login', validateLogin, login);
-router.post('/forgot-password', forgotPasswordHandler);
-router.post('/reset-password', resetPasswordHandler);
+// Public routes with rate limiting
+router.post('/register',        authLimiter, validateRegister, register);
+router.post('/verify-otp',      otpLimiter,  validateVerifyOTP, verifyOTP);
+router.post('/login',           authLimiter, validateLogin, login);
+router.post('/forgot-password', authLimiter, forgotPasswordHandler);
+router.post('/reset-password',  authLimiter, resetPasswordHandler);
 
 module.exports = router;

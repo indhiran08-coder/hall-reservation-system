@@ -17,11 +17,16 @@ const getProfile = async (req, res) => {
   }
 };
 
+const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || 'indhirans@velalarengg.ac.in').toLowerCase();
+
 const updateProfile = async (req, res) => {
   try {
     const { personal_email, phone, department, password, new_password } = req.body;
 
-    const isAdmin = req.user && (req.user.role === 'admin' || req.user.college_email === 'indhirans@velalarengg.ac.in');
+    const isAdmin = req.user && (
+      req.user.role === 'admin' ||
+      (req.user.college_email && req.user.college_email.toLowerCase() === ADMIN_EMAIL)
+    );
 
     const updates = {};
     // Only administrator can modify personal_email or department

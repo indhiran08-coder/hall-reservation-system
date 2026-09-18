@@ -37,7 +37,7 @@ router.get('/schedule', async (req, res) => {
 
     if (error) throw error;
 
-    // Detect and enrich multi-day bookings
+    // Detect and enrich multi-day bookings (omitting user_id from output)
     const enrichedBookings = await Promise.all((bookings || []).map(async (b) => {
       const { data: siblings } = await supabase
         .from('bookings')
@@ -49,11 +49,12 @@ router.get('/schedule', async (req, res) => {
         .order('date');
 
       const allDates = [...new Set((siblings || []).map(s => s.date))].sort();
+      const { user_id, ...publicBooking } = b;
 
       if (allDates.length > 1) {
         const currentDayIndex = allDates.indexOf(b.date);
         return {
-          ...b,
+          ...publicBooking,
           is_multiday: true,
           total_days: allDates.length,
           current_day_index: currentDayIndex >= 0 ? currentDayIndex + 1 : 1,
@@ -64,7 +65,7 @@ router.get('/schedule', async (req, res) => {
       }
 
       return {
-        ...b,
+        ...publicBooking,
         is_multiday: false,
         total_days: 1
       };
